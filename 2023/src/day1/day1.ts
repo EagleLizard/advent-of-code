@@ -21,7 +21,7 @@ export async function day1() {
   let calibrationSum: number;
   console.log('~ Day 1 ~');
   inputStrs = await laodDay1Input();
-  
+
   calibrationValues = inputStrs.map(getCalibrationValue);
   calibrationSum = calibrationValues.reduce((acc, curr) => {
     return acc + curr;
@@ -34,7 +34,7 @@ export async function day2p2() {
   let inputStrs: string[];
   let calibrationValues: number[];
   let calibrationSum: number;
-  console.log(`~ Day 1 part 2 ~`);
+  console.log('~ Day 1 part 2 ~');
   inputStrs = await laodDay1Input();
   // getCalibrationValueP2('onetwo5xthreeight');
   calibrationValues = inputStrs.map(getCalibrationValueP2);
@@ -58,7 +58,6 @@ function getCalibrationValueP2(inputStr: string): number {
 
     Approach 2:
     Find the first and last digit by search
-      
   */
   let firstMatch: DigitMatch | undefined;
   let lastMatch: DigitMatch | undefined;
@@ -80,7 +79,7 @@ function getCalibrationValueP2(inputStr: string): number {
     /[0-9]/g,
   ].reduce((acc, curr) => {
     let matches = inputStr.matchAll(curr);
-    return [...acc, ...matches]
+    return [ ...acc, ...matches ];
   }, [] as RegExpMatchArray[]);
 
   for(let i = 0; i < allMatches.length; ++i) {
@@ -112,7 +111,7 @@ function getCalibrationValueP2(inputStr: string): number {
       (lastMatch === undefined)
       || (currMatch.index > lastMatch.index)
     ) {
-      lastMatch = currMatch
+      lastMatch = currMatch;
     }
   }
 
@@ -131,7 +130,7 @@ function getCalibrationValueP2(inputStr: string): number {
   // console.log(inputStr);
   // console.log(calibrationString);
 
-  return +calibrationString
+  return +calibrationString;
 }
 
 function getDigitFromMatchString(digitMatchStr: string): string {
