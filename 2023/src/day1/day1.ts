@@ -10,6 +10,11 @@ const DAY1_INPUT_FILE_PATH = [
   DAY1_INPUT_FILE_NAME,
 ].join(path.sep);
 
+type DigitMatch = {
+  value: string;
+  index: number;
+};
+
 export async function day1() {
   let inputStrs: string[];
   let calibrationValues: number[];
@@ -31,11 +36,11 @@ export async function day2p2() {
   let calibrationSum: number;
   console.log(`~ Day 1 part 2 ~`);
   inputStrs = await laodDay1Input();
-  getCalibrationValueP2('onetwo5xthreeight');
-  // calibrationValues = inputStrs.map(getCalibrationValueP2);
-  // calibrationSum = calibrationValues.reduce((acc, curr) => {
-  //   return acc + curr;
-  // }, 0);
+  // getCalibrationValueP2('onetwo5xthreeight');
+  calibrationValues = inputStrs.map(getCalibrationValueP2);
+  calibrationSum = calibrationValues.reduce((acc, curr) => {
+    return acc + curr;
+  }, 0);
   console.log('calibrationSum:');
   console.log(calibrationSum);
 }
@@ -55,6 +60,13 @@ function getCalibrationValueP2(inputStr: string): number {
     Find the first and last digit by search
       
   */
+  let firstMatch: DigitMatch | undefined;
+  let lastMatch: DigitMatch | undefined;
+  let digitMatches: DigitMatch[] = [];
+  let firstDigit: string;
+  let secondDigit: string;
+  let calibrationString: string;
+
   let allMatches = [
     /one/g,
     /two/g,
@@ -70,18 +82,81 @@ function getCalibrationValueP2(inputStr: string): number {
     let matches = inputStr.matchAll(curr);
     return [...acc, ...matches]
   }, [] as RegExpMatchArray[]);
-  let firstMatch: RegExpMatchArray;
-  let lastMatch: RegExpMatchArray;
+
   for(let i = 0; i < allMatches.length; ++i) {
     let currMatch: RegExpMatchArray;
+    let digitMatch: DigitMatch;
     currMatch = allMatches[i];
+    if(
+      (currMatch.index !== undefined)
+      && (typeof currMatch[0] === 'string')
+    ) {
+      digitMatch = {
+        value: currMatch[0],
+        index: currMatch.index,
+      };
+      digitMatches.push(digitMatch);
+    }
+  }
+
+  for(let i = 0; i < digitMatches.length; ++i) {
+    let currMatch: DigitMatch;
+    currMatch = digitMatches[i];
     if(
       (firstMatch === undefined)
       || (currMatch.index < firstMatch.index)
-      ) {
-
-      }
+    ) {
+      firstMatch = currMatch;
+    }
+    if(
+      (lastMatch === undefined)
+      || (currMatch.index > lastMatch.index)
+    ) {
+      lastMatch = currMatch
+    }
   }
+
+  if(
+    (firstMatch === undefined)
+    || (lastMatch === undefined)
+  ) {
+    throw new Error(`No matches found for string: ${inputStr}`);
+  }
+
+  firstDigit = getDigitFromMatchString(firstMatch.value);
+  secondDigit = getDigitFromMatchString(lastMatch.value);
+
+  calibrationString = `${firstDigit}${secondDigit}`;
+
+  // console.log(inputStr);
+  // console.log(calibrationString);
+
+  return +calibrationString
+}
+
+function getDigitFromMatchString(digitMatchStr: string): string {
+  let digitChar: string | undefined;
+  if(!isNaN(+digitMatchStr)) {
+    return digitMatchStr;
+  }
+  [
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+  ].some((numStr, idx) => {
+    digitChar = `${idx + 1}`;
+    return numStr === digitMatchStr;
+  });
+  if(digitChar === undefined) {
+    throw new Error(`String is not a valid digit: ${digitMatchStr}`);
+  }
+  return digitChar;
 }
 
 function getCalibrationValue(inputStr: string): number {
