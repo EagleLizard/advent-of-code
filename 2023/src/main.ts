@@ -2,7 +2,7 @@
 import sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();
 
-import { day1 } from './day1/day1';
+import { day1, day2p2 } from './day1/day1';
 
 (async () => {
   try {
@@ -15,5 +15,6 @@ import { day1 } from './day1/day1';
 
 async function main() {
   console.log('EagleLizard - Advent of Code');
-  day1();
+  await day1();
+  await day2p2();
 }

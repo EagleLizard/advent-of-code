@@ -25,6 +25,54 @@ export async function day1() {
   console.log(calibrationSum);
 }
 
+export async function day2p2() {
+  let inputStrs: string[];
+  let calibrationValues: number[];
+  let calibrationSum: number;
+  console.log(`~ Day 1 part 2 ~`);
+  inputStrs = await laodDay1Input();
+  getCalibrationValueP2('onetwo5xthreeight');
+  // calibrationValues = inputStrs.map(getCalibrationValueP2);
+  // calibrationSum = calibrationValues.reduce((acc, curr) => {
+  //   return acc + curr;
+  // }, 0);
+  console.log('calibrationSum:');
+  console.log(calibrationSum);
+}
+
+function getCalibrationValueP2(inputStr: string): number {
+  /*
+    Approach 1:
+    First replace all instances of words with the corresponding digits.
+      Do this with an array of patterns calling string.replace
+    Run the resulting string through the original ge†CalibrationValue function
+    SCRATCH:
+      This wasn't the correct solution because the following strings:
+      'oneight' => '18'
+      'twone' => '21'
+
+    Approach 2:
+    Find the first and last digit by search
+      
+  */
+  let allMatches = [
+    /one/g,
+    /two/g,
+    /three/g,
+    /four/g,
+    /five/g,
+    /six/g,
+    /seven/g,
+    /eight/g,
+    /nine/g,
+    /[0-9]/g,
+  ].reduce((acc, curr) => {
+    let matches = inputStr.matchAll(curr);
+    return [...acc, ...matches]
+  }, [] as RegExpMatchArray[]);
+  console.log(allMatches);
+}
+
 function getCalibrationValue(inputStr: string): number {
   let numStr: string;
   let firstDigit: string;
