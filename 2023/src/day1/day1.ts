@@ -70,7 +70,18 @@ function getCalibrationValueP2(inputStr: string): number {
     let matches = inputStr.matchAll(curr);
     return [...acc, ...matches]
   }, [] as RegExpMatchArray[]);
-  console.log(allMatches);
+  let firstMatch: RegExpMatchArray;
+  let lastMatch: RegExpMatchArray;
+  for(let i = 0; i < allMatches.length; ++i) {
+    let currMatch: RegExpMatchArray;
+    currMatch = allMatches[i];
+    if(
+      (firstMatch === undefined)
+      || (currMatch.index < firstMatch.index)
+      ) {
+
+      }
+  }
 }
 
 function getCalibrationValue(inputStr: string): number {
