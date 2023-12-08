@@ -2,7 +2,7 @@
 use std::{env, path::PathBuf};
 
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 struct GameHand {
   red: u16,
   blue: u16,
@@ -16,6 +16,14 @@ struct Game {
   game_id: u16,
   hands: Vec<GameHand>,
 }
+impl Game {
+  fn clone(&self) -> Game {
+    return Game {
+      game_id: self.game_id,
+      hands: self.hands.clone(),
+    }
+  }
+}
 
 /*
   The Elf would first like to know which games would have been possible
@@ -24,6 +32,7 @@ struct Game {
 
 pub fn day2main () {
   println!("~ Day 2 ~");
+  println!("~ Day 2 Part 1 ~");
   println!("{}", get_input_path().display());
   let input_lines = load_day2_input();
   let bag_contents = BagContents {
@@ -31,15 +40,50 @@ pub fn day2main () {
     green: 13,
     blue: 14
   };
+  let mut all_games: Vec<Game> = Vec::new();
   let mut possible_games: Vec<Game> = Vec::new();
   for line in input_lines.iter() {
     let curr_game = parse_game_line(line).unwrap();
+    all_games.push(curr_game.clone());
     if is_possible_game(&curr_game, &bag_contents) {
       possible_games.push(curr_game);
     }
   }
   let id_sum = possible_games.iter().fold(0, |acc, curr| acc + curr.game_id);
   println!("{}", "Possible game IDs sum: \n".to_string() + &id_sum.to_string());
+
+  println!("\n~ Day 2 Part 2 ~");
+  /*
+    in each game you played, what is the fewest number of cubes of each color
+      that could have been in the bag to make the game possible?
+  */
+  let mut all_min_bags: Vec<BagContents> = Vec::new();
+  for curr_game in all_games.iter() {
+    let mut min_bag = BagContents {
+      red: 0,
+      green: 0,
+      blue: 0,
+    };
+    for curr_hand in curr_game.hands.iter() {
+      if curr_hand.red > min_bag.red {
+        min_bag.red = curr_hand.red;
+      }
+      if curr_hand.green > min_bag.green {
+        min_bag.green = curr_hand.green;
+      }
+      if curr_hand.blue > min_bag.blue {
+        min_bag.blue = curr_hand.blue;
+      }
+    }
+    all_min_bags.push(min_bag);
+  }
+  let min_bag_power_set_sum = all_min_bags.iter().fold(0, |acc, curr| {
+    let power_val = curr.red * curr.blue * curr.green;
+    return acc + power_val;
+  });
+
+  println!("Min cube set power sum:");
+  println!("{}", min_bag_power_set_sum);
 }
 
 fn is_possible_game(game: &Game, bag_contents: &BagContents) -> bool {
@@ -106,7 +150,7 @@ fn parse_game_hand(game_hand_str: &str) -> Result<GameHand, String> {
     blue: 0,
     green: 0,
   };
-  let mut hand_strs: Vec<&str> = Vec::new();
+  let hand_strs: Vec<&str>;
   if !game_hand_str.contains(',') {
     // only one str exists
     hand_strs = vec![game_hand_str]
