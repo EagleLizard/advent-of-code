@@ -35,6 +35,16 @@ export async function day3Main() {
   partFlag = false;
   numArr = [];
   foundParts = [];
+
+  const terminateNum = () => {
+    numFlag = false;
+    if(partFlag) {
+      partFlag = false;
+      foundParts.push(numArr.join(''));
+    }
+    numArr = [];
+  };
+
   for(let y = 0; y < grid.length; ++y) {
     let currRow: string;
     currRow = grid[y];
@@ -47,12 +57,7 @@ export async function day3Main() {
       if(numFlag) {
         if(!isNumChar(char)) {
           // part number terminal
-          numFlag = false;
-          if(partFlag) {
-            partFlag = false;
-            foundParts.push(numArr.join(''));
-          }
-          numArr = [];
+          terminateNum();
         } else {
           if(!partFlag) {
             // look at adjacent tiles
@@ -64,10 +69,13 @@ export async function day3Main() {
         }
       }
     }
+    terminateNum();
     if(numFlag) {
-      console.log('_'+numArr.join(''));
+      // error - shouldn't happen
+      console.log('_' + numArr.join(''));
     }
     if(partFlag) {
+      // error - shouldn't happen
       console.log(numArr.join(''));
     }
   }
@@ -117,11 +125,11 @@ async function loadDay3Input() {
     .map(inputLine => inputLine.trim())
     .filter(inputLine => inputLine.length > 0);
 
-  /*
-    extract symbols from input
-  */
-  console.log(
-    [ ...new Set(dataStr.replace(/[0-9.\n]/g, '').split('')) ].join('')
-  );
+  // /*
+  //   extract symbols from input
+  // */
+  // console.log(
+  //   [ ...new Set(dataStr.replace(/[0-9.\n]/g, '').split('')) ].join('')
+  // );
   return day3Input;
 }
