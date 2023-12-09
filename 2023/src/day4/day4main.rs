@@ -1,29 +1,23 @@
 
 
 use crate::util::input_util::load_day_input;
+use crate::day4::scratch_card::Card;
 
 const DAY_4_INPUT_FILE_NAME: &str = "day4.txt";
-
-#[derive(Debug)]
-struct Card {
-  id: u16,
-  winning_nums: Vec<u16>,
-  nums: Vec<u16>,
-  score: u16,
-}
 
 pub fn day4_main() {
   println!("~ Day 4 ~");
 
   let input_lines = load_day_input(DAY_4_INPUT_FILE_NAME);
   let cards = parse_card_lines(input_lines);
+  let mut score_sum: u16 = 0;
 
   for card in cards.iter() {
-    println!("id: {}", card.id);
-    println!("winning_nums: {}", card.winning_nums.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(", "));
-    println!("nums: {}", card.nums.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(", "));
-    println!();
+    let score = card.get_score();
+    score_sum += score;
   }
+
+  println!("score sum: {}", score_sum);
 }
 
 fn parse_card_lines(lines: Vec<String>) -> Vec<Card> {
@@ -63,7 +57,6 @@ fn parse_card_line(line: &str) -> Card {
     id: card_id,
     winning_nums,
     nums,
-    score: 0,
   };
 
   return card;
