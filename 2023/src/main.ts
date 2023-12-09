@@ -4,7 +4,7 @@ sourceMapSupport.install();
 
 import { day1, day2p2 } from './day1/day1';
 import { day3Main } from './day3/day3';
-import { getDayDivider } from './lib/divider';
+import { getDayDivider } from './util/divider';
 
 (async () => {
   try {

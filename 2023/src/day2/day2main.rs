@@ -7,12 +7,13 @@ use crate::day2::game::{
   BagContents,
 };
 use crate::day2::game_parse::parse_game_line;
+use crate::util::input_util::load_day_input;
 
+const DAY_2_INPUT_FILE_NAME: &str = "day2.txt";
 
 pub fn day2main () {
   println!("\n~ Day 2 ~");
-  println!("Input path: \n{}\n", get_input_path().display());
-  let input_lines = load_day2_input();
+  let input_lines = load_day_input(DAY_2_INPUT_FILE_NAME);
   let mut all_games: Vec<Game> = Vec::new();
   for line in input_lines.iter() {
     let curr_game = parse_game_line(line).unwrap();
@@ -89,29 +90,3 @@ fn day2p1(all_games: &Vec<Game>) {
     ;
   }
 }
-
-fn get_input_path() -> PathBuf {
-  let input_dir_path = get_base_path()
-    .join("input");
-  return std::fs::canonicalize(input_dir_path).unwrap();
-}
-
-fn get_base_path() -> PathBuf {
-  return env::current_dir().unwrap();
-}
-
-fn load_day2_input() -> Vec<String> {
-  let input_file_name = "day2.txt";
-  let input_file_path = std::fs::canonicalize(
-      get_input_path().join(input_file_name)
-  ).unwrap();
-  let input_file_data = std::fs::read_to_string(input_file_path).unwrap();
-  let input_file_lines = input_file_data
-    .split("\n")
-    .filter(|line| line.len() > 0)
-    .map(|line| String::from(line))
-    .collect::<Vec<String>>();
-
-  return input_file_lines;
-}
-
