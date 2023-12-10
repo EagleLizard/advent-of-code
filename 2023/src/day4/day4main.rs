@@ -10,6 +10,44 @@ pub fn day4_main() {
 
   let input_lines = load_day_input(DAY_4_INPUT_FILE_NAME);
   let cards = parse_card_lines(input_lines);
+  day4_part1(&cards);
+  day4_part2(&cards);
+}
+
+fn day4_part2(base_cards: &Vec<Card>) {
+  let mut cards: Vec<Card> = base_cards.to_vec().clone();
+
+  let mut i: usize = 0;
+
+  while i < cards.len() {
+    let card = cards[i].clone();
+    let win_count = card.get_win_count() as usize;
+    for k in 0..win_count {
+      let copy_idx = i + k + 1;
+      if copy_idx > cards.len() - 1 {
+        break;
+      }
+      let card_ref = &mut cards[i + k + 1];
+      card_ref.copies += 1 * card.copies;
+    }
+    i += 1;
+  }
+
+  let total_cards: u32 = cards.iter().fold(0, |acc, curr| acc + curr.copies);
+
+  println!("Total scratchcards: {}", total_cards);
+}
+
+fn print_card(card: &Card) {
+  println!("{}", card.id);
+  println!("{}", card.winning_nums.iter().map(|num| num.to_string()).collect::<Vec<String>>().join(" "));
+  println!("{}", card.nums.iter().map(|num| num.to_string()).collect::<Vec<String>>().join(" "));
+  println!("copies: {}", card.copies);
+  println!("win count: {}", card.get_win_count());
+}
+
+fn day4_part1(cards: &Vec<Card>) {
+  println!("\n~ Day 4 Part 1 ~");
   let mut score_sum: u16 = 0;
 
   for card in cards.iter() {
@@ -57,6 +95,7 @@ fn parse_card_line(line: &str) -> Card {
     id: card_id,
     winning_nums,
     nums,
+    copies: 1,
   };
 
   return card;
