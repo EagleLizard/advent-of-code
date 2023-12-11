@@ -12,7 +12,7 @@ use crate::util::input_util::load_day_input;
 const DAY_2_INPUT_FILE_NAME: &str = "day2.txt";
 
 pub fn day2main () {
-  println!("\n~ Day 2 ~");
+  println!("\n~ Day 2 ~\n");
   let input_lines : Vec<String> = load_day_input(DAY_2_INPUT_FILE_NAME)
     .into_iter()
     .filter(|line| line.len() > 0)
