@@ -8,7 +8,9 @@ const DAY_4_INPUT_FILE_NAME: &str = "day4.txt";
 pub fn day4_main() {
   println!("~ Day 4 ~");
 
-  let input_lines = load_day_input(DAY_4_INPUT_FILE_NAME);
+  let input_lines: Vec<String> = load_day_input(DAY_4_INPUT_FILE_NAME).into_iter()
+    .filter(|line| line.len() > 0)
+    .collect();
   let cards = parse_card_lines(input_lines);
   day4_part1(&cards);
   day4_part2(&cards);

@@ -13,7 +13,10 @@ const DAY_2_INPUT_FILE_NAME: &str = "day2.txt";
 
 pub fn day2main () {
   println!("\n~ Day 2 ~");
-  let input_lines = load_day_input(DAY_2_INPUT_FILE_NAME);
+  let input_lines : Vec<String> = load_day_input(DAY_2_INPUT_FILE_NAME)
+    .into_iter()
+    .filter(|line| line.len() > 0)
+    .collect();
   let mut all_games: Vec<Game> = Vec::new();
   for line in input_lines.iter() {
     let curr_game = parse_game_line(line).unwrap();

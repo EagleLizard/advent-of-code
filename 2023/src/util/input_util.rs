@@ -19,7 +19,6 @@ pub fn load_day_input(input_file_name: &str) -> Vec<String> {
   let input_file_data = std::fs::read_to_string(input_file_path).unwrap();
   let input_file_lines = input_file_data
     .split("\n")
-    .filter(|line| line.len() > 0)
     .map(|line| String::from(line))
     .collect::<Vec<String>>();
 
