@@ -4,7 +4,7 @@ use crate::{
   day5::almanac_parse::parse_almanac,
 };
 
-const DAY_5_INPUT_FILE_NAME: &str = "day5_test.txt";
+const DAY_5_INPUT_FILE_NAME: &str = "day5.txt";
 
 pub fn day5_main() {
   println!("~ Day 5 ~\n");
