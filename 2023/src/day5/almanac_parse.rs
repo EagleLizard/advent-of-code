@@ -6,7 +6,7 @@ use regex::Regex;
 
 use super::almanac::AlmanacMap;
 
-pub fn parse_almanac(input_lines: &Vec<String>) -> Almanac {
+pub fn parse_almanac(input_lines: Vec<String>) -> Almanac {
   let mut curr_amc_state: AmcEntryKind = AmcEntryKind::None;
   let mut almanac_entries_map: HashMap<AmcEntryKind, AlmanacEntry> = HashMap::new();
 
@@ -15,7 +15,7 @@ pub fn parse_almanac(input_lines: &Vec<String>) -> Almanac {
   let mut seeds_opt: Option<Vec<u64>> = Option::None;
 
   for line in input_lines.iter() {
-    curr_amc_state = get_amc_state(&curr_amc_state, line);
+    curr_amc_state = get_amc_state(curr_amc_state, line);
 
     if curr_amc_state == AmcEntryKind::None {
       panic!("AmcEntryKind::None encountered");
@@ -39,8 +39,6 @@ pub fn parse_almanac(input_lines: &Vec<String>) -> Almanac {
         curr_amc_entry.amc_maps.push(amc_map);
       }
     }
-
-
   }
 
   let seeds = seeds_opt.unwrap();
@@ -75,7 +73,7 @@ fn parse_almanac_map(line: &str) -> AlmanacMap {
   return amc_map;
 }
 
-fn get_amc_state(curr_state: &AmcEntryKind, line: &String) -> AmcEntryKind {
+fn get_amc_state(curr_state: AmcEntryKind, line: &String) -> AmcEntryKind {
   let amc_state: AmcEntryKind;
   let amc_entry_str: &str = line.split(" ").collect::<Vec<&str>>()[0];
 
@@ -104,7 +102,7 @@ fn get_amc_state(curr_state: &AmcEntryKind, line: &String) -> AmcEntryKind {
       _ => panic!("Invalid almanac map declaration: {}", line)
     };
   } else {
-    amc_state = *curr_state;
+    amc_state = curr_state;
   }
 
   return amc_state;
