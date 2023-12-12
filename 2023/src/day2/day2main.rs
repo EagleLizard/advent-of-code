@@ -39,7 +39,7 @@ fn day2p2(all_games: &Vec<Game>) {
     in each game you played, what is the fewest number of cubes of each color
       that could have been in the bag to make the game possible?
   */
-  println!("\n~ Day 2 Part 2 ~\n");
+  println!("\n~ Day 2 Part 2 ~");
   let mut all_min_bags: Vec<BagContents> = Vec::new();
   for curr_game in all_games.iter() {
     let mut min_bag = BagContents {
@@ -74,7 +74,7 @@ fn day2p1(all_games: &Vec<Game>) {
     The Elf would first like to know which games would have been possible
     if the bag contained only 12 red cubes, 13 green cubes, and 14 blue cubes?
   */
-  println!("\n~ Day 2 Part 1 ~\n");
+  println!("\n~ Day 2 Part 1 ~");
   let mut possible_games: Vec<&Game> = Vec::new();
   let bag_contents = BagContents {
     red: 12,
