@@ -17,19 +17,44 @@ pub fn day6_main() {
     day6_part1(&boat_races)
   });
   println!("\n[d6p1] took: {:#?}", fun_time);
+
+  fun_time = run_and_time(|| {
+    day6_part2(&boat_races)
+  });
+  println!("\n[d6p2] took: {:#?}", fun_time);
+}
+
+fn day6_part2(boat_races: &Vec<BoatRace>) {
+  println!("\n~ Day 6 Part 2 ~");
+  
+  let actual_time = boat_races.iter().fold(Vec::new(), |mut acc, curr| {
+      acc.push(curr.time.to_string());
+      acc
+    })
+    .join("")
+    .parse::<u64>()
+    .unwrap();
+  let actual_distance = boat_races.iter().fold(Vec::new(), |mut acc, curr| {
+    acc.push(curr.distance.to_string());
+    acc
+  })
+    .join("")
+    .parse::<u64>()
+    .unwrap();
+  let boat_race = BoatRace {
+    id: 1,
+    time: actual_time,
+    distance: actual_distance,
+  };
+  let ways_to_win = get_ways_to_win(&boat_race);
+  println!("ways_to_win: {}", ways_to_win);
 }
 
 fn day6_part1(boat_races: &Vec<BoatRace>) {
   println!("\n~ Day 6 Part 1 ~");
-  let mut ways_to_win: Vec<u16> = Vec::new();
+  let mut ways_to_win = Vec::new();
   for boat_race in boat_races.iter() {
-    let mut curr_ways_to_win: u16 = 0;
-    for i in 0..(boat_race.time + 1) {
-      let curr_distance = boat_race.hold_button(i);
-      if curr_distance > boat_race.distance {
-        curr_ways_to_win += 1;
-      }
-    }
+    let curr_ways_to_win = get_ways_to_win(boat_race);
     ways_to_win.push(curr_ways_to_win);
   }
   let win_multiple: u32 = ways_to_win.iter()
@@ -38,3 +63,15 @@ fn day6_part1(boat_races: &Vec<BoatRace>) {
   println!("win_multiple: {}", win_multiple);
     
 }
+
+fn get_ways_to_win(boat_race: &BoatRace) -> u64 {
+  let mut curr_ways_to_win: u64 = 0;
+  for i in 0..(boat_race.time + 1) {
+    let curr_distance = boat_race.hold_button(i);
+    if curr_distance > boat_race.distance {
+      curr_ways_to_win += 1;
+    }
+  }
+  curr_ways_to_win
+}
+

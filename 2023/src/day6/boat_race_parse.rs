@@ -10,11 +10,11 @@ pub fn parse_boat_races(lines: Vec<String>) -> Vec<BoatRace> {
   let times_str = lines[0].split(":").collect::<Vec<&str>>()[1].trim();
   let distances_str = lines[1].split(":").collect::<Vec<&str>>()[1].trim();
 
-  let times: Vec<u16> = times_str.split(" ")
+  let times: Vec<u64> = times_str.split(" ")
     .filter(|time_str| time_str.len() > 0)
     .map(|time_str| time_str.parse().unwrap())
     .collect();
-  let distances: Vec<u16> = distances_str.split(" ")
+  let distances: Vec<u64> = distances_str.split(" ")
     .filter(|distance_str| distance_str.len() > 0)
     .map(|distance_str| distance_str.parse().unwrap())
     .collect();
