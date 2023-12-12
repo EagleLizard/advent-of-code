@@ -5,7 +5,9 @@ mod day5;
 
 mod util;
 
-use std::time::{Instant, Duration};
+use std::time::Duration;
+
+use util::timer::run_and_time;
 
 use crate::util::log_util::get_day_divider_n;
 
@@ -32,9 +34,7 @@ fn main() {
 }
 
 fn run_fun_and_time(fun: &dyn Fn() -> ()) {
-  let start = Instant::now();
-  fun();
-  let fun_time = start.elapsed();
+  let fun_time = run_and_time(fun);
   log_duration(fun_time);
 }
 

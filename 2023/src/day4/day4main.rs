@@ -2,6 +2,7 @@
 
 use crate::util::input_util::load_day_input;
 use crate::day4::scratch_card::Card;
+use crate::util::timer::run_and_time;
 
 const DAY_4_INPUT_FILE_NAME: &str = "day4.txt";
 
@@ -12,11 +13,20 @@ pub fn day4_main() {
     .filter(|line| line.len() > 0)
     .collect();
   let cards = parse_card_lines(input_lines);
-  day4_part1(&cards);
-  day4_part2(&cards);
+
+  let mut fun_time = run_and_time(|| {
+    day4_part1(&cards);
+  });
+  println!("\n[d4p1] took: {:#?}", fun_time);
+  
+  fun_time = run_and_time(|| {
+    day4_part2(&cards);
+  });
+  println!("\n[d4p2] took: {:#?}", fun_time);
 }
 
 fn day4_part2(base_cards: &Vec<Card>) {
+  println!("\n~ Day 4 Part 2 ~\n");
   let mut cards: Vec<Card> = base_cards.to_vec().clone();
 
   let mut i: usize = 0;
@@ -49,7 +59,7 @@ fn print_card(card: &Card) {
 }
 
 fn day4_part1(cards: &Vec<Card>) {
-  println!("\n~ Day 4 Part 1 ~");
+  println!("\n~ Day 4 Part 1 ~\n");
   let mut score_sum: u16 = 0;
 
   for card in cards.iter() {

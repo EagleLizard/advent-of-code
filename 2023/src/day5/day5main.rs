@@ -1,13 +1,15 @@
 
 use crate::{
-  util::input_util::load_day_input,
+  util::{input_util::load_day_input, timer::run_and_time},
   day5::almanac_parse::parse_almanac,
 };
 
-const DAY_5_INPUT_FILE_NAME: &str = "day5.txt";
+use super::almanac::Almanac;
+
+const DAY_5_INPUT_FILE_NAME: &str = "day5_test.txt";
 
 pub fn day5_main() {
-  println!("~ Day 5 ~\n");
+  println!("~ Day 5 ~");
 
   let input_lines: Vec<String> = load_day_input(DAY_5_INPUT_FILE_NAME)
     .into_iter()
@@ -15,7 +17,16 @@ pub fn day5_main() {
     .collect();
   let amc = parse_almanac(input_lines);
 
-  let mut locations: Vec<u64> = Vec::new();
+  let mut fun_time = run_and_time(|| {
+    day5_part1(&amc);
+  });
+  println!("\n[d5p1] took: {:#?}", fun_time);
+  
+}
+
+fn day5_part1(amc: &Almanac) {
+  println!("\n~ Day 5 Part 1 ~\n");
+  let mut locations = Vec::new();
   for seed in amc.seeds.iter() {
     let mut curr_src = seed.clone();
     for amc_entry in amc.amc_entries.iter() {
@@ -35,7 +46,7 @@ pub fn day5_main() {
       min_location = *location;
     }
   }
-  println!("Lowest location:\n{}", min_location);
+  println!("Lowest location: {}", min_location);
 }
 
 fn list_to_str<T: ToString>(list: &[T]) -> String {

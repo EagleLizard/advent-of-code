@@ -1,5 +1,4 @@
 
-use std::{env, path::PathBuf};
 
 use crate::day2::game::{
   Game,
@@ -8,11 +7,12 @@ use crate::day2::game::{
 };
 use crate::day2::game_parse::parse_game_line;
 use crate::util::input_util::load_day_input;
+use crate::util::timer::run_and_time;
 
 const DAY_2_INPUT_FILE_NAME: &str = "day2.txt";
 
 pub fn day2main () {
-  println!("\n~ Day 2 ~\n");
+  println!("~ Day 2 ~");
   let input_lines : Vec<String> = load_day_input(DAY_2_INPUT_FILE_NAME)
     .into_iter()
     .filter(|line| line.len() > 0)
@@ -23,8 +23,15 @@ pub fn day2main () {
     all_games.push(curr_game.clone());
   }
   
-  day2p1(&all_games);
-  day2p2(&all_games);
+  let mut fun_time = run_and_time(|| {
+    day2p1(&all_games);
+  });
+  println!("\n[d2p1] took: {:#?}", fun_time);
+
+  fun_time = run_and_time(|| {
+    day2p2(&all_games);
+  });
+  println!("\n[d2p2] took: {:#?}", fun_time);
 }
 
 fn day2p2(all_games: &Vec<Game>) {
@@ -32,7 +39,7 @@ fn day2p2(all_games: &Vec<Game>) {
     in each game you played, what is the fewest number of cubes of each color
       that could have been in the bag to make the game possible?
   */
-  println!("\n~ Day 2 Part 2 ~");
+  println!("\n~ Day 2 Part 2 ~\n");
   let mut all_min_bags: Vec<BagContents> = Vec::new();
   for curr_game in all_games.iter() {
     let mut min_bag = BagContents {
@@ -67,7 +74,7 @@ fn day2p1(all_games: &Vec<Game>) {
     The Elf would first like to know which games would have been possible
     if the bag contained only 12 red cubes, 13 green cubes, and 14 blue cubes?
   */
-  println!("~ Day 2 Part 1 ~");
+  println!("\n~ Day 2 Part 1 ~\n");
   let mut possible_games: Vec<&Game> = Vec::new();
   let bag_contents = BagContents {
     red: 12,

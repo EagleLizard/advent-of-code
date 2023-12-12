@@ -27,7 +27,7 @@ impl AlmanacEntry {
       {
         // calculate the offset if it exists
         let offset: i64 = amc_map.dest_start as i64 - amc_map.src_start as i64;
-        let dest = src.clone() as i64 + offset;
+        let dest = src as i64 + offset;
         return dest as u64;
       }
     }
@@ -38,7 +38,7 @@ impl AlmanacEntry {
         the same destination number.
         So, seed number 10 corresponds to soil number 10.
     */
-    return src;
+    src
   }
 }
 
