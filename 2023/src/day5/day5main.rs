@@ -31,7 +31,7 @@ pub fn day5_main() {
 }
 
 fn day5_part2(amc: &Almanac) {
-  println!("\n~ Day 5 Part 2 ~\n");
+  println!("\n~ Day 5 Part 2 ~");
   /*
     Try a brute force method.
       [note] - worked, but took 21gig RAM & 2800 seconds
@@ -78,7 +78,7 @@ fn day5_part2(amc: &Almanac) {
 }
 
 fn day5_part1(amc: &Almanac) {
-  println!("\n~ Day 5 Part 1 ~\n");
+  println!("\n~ Day 5 Part 1 ~");
   let mut locations = Vec::new();
   for seed in amc.seeds.iter() {
     let mut curr_src = seed.clone();
