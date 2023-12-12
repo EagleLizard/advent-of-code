@@ -46,7 +46,8 @@ fn day6_part2(boat_races: &Vec<BoatRace>) {
     time: actual_time,
     distance: actual_distance,
   };
-  let ways_to_win = get_ways_to_win(&boat_race);
+  let ways_to_win = get_ways_to_win_faster(&boat_race);
+  // let ways_to_win = get_ways_to_win(&boat_race);
   println!("ways_to_win: {}", ways_to_win);
 }
 
@@ -64,6 +65,7 @@ fn day6_part1(boat_races: &Vec<BoatRace>) {
     
 }
 
+#[allow(dead_code)]
 fn get_ways_to_win(boat_race: &BoatRace) -> u64 {
   let mut curr_ways_to_win: u64 = 0;
   for i in 0..(boat_race.time + 1) {
@@ -73,5 +75,29 @@ fn get_ways_to_win(boat_race: &BoatRace) -> u64 {
     }
   }
   curr_ways_to_win
+}
+
+/*
+  ~400% faster than other
+*/
+fn get_ways_to_win_faster(boat_race: &BoatRace) -> u64 {
+  let mut first_win_idx = 0;
+  let mut last_win_idx = 0;
+  for i in 0..(boat_race.time + 1) {
+    let curr_distance = boat_race.hold_button(i);
+    if curr_distance > boat_race.distance {
+      first_win_idx = i;
+      break;
+    }
+  }
+  for i in (0..boat_race.time + 1).rev() {
+    let curr_distance = boat_race.hold_button(i);
+    if curr_distance > boat_race.distance {
+      last_win_idx = i;
+      break;
+    }
+  }
+  let ways_to_win = (last_win_idx + 1) - first_win_idx;
+  ways_to_win
 }
 
