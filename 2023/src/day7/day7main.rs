@@ -27,7 +27,7 @@ pub fn day7_main() {
 }
 
 pub fn day7_part1(camel_hands: &Vec<CamelHand>) {
-  println!("\n~ Day 6 Part 2 ~");
+  println!("\n~ Day 7 Part 1 ~");
   let mut sorted_hands: Vec<CamelHand> = camel_hands.clone();
   sorted_hands.sort();
 
