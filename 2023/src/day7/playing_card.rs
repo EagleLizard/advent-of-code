@@ -8,6 +8,7 @@ A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2
 */
 #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Clone, Copy)]
 pub enum PlayingCard {
+  Joker,
   Two,
   Three,
   Four,
@@ -48,11 +49,11 @@ impl CamelHand {
   }
 }
 
-pub fn get_hand_type(cards: &[PlayingCard; 5]) -> PlayingHand {
+pub fn get_hand_type(cards: &[PlayingCard; 5], with_joker: bool) -> PlayingHand {
   /*
     count the number of cards
   */
-  let mut card_counts = HashMap::new();
+  let mut card_counts: HashMap<&PlayingCard, u8> = HashMap::new();
   for card in cards.iter() {
     if !card_counts.contains_key(card) {
       card_counts.insert(card, 0 as u8);
@@ -60,16 +61,38 @@ pub fn get_hand_type(cards: &[PlayingCard; 5]) -> PlayingHand {
     let curr_card_count = card_counts.get(card).unwrap();
     card_counts.insert(card, curr_card_count + 1);
   }
-  let max_card = card_counts.iter()
-    .reduce(|acc, curr| {
-      if curr.1 > acc.1 {
-        curr
-      } else {
-        acc
-      }
-    })
-    .unwrap();
-  let hand_type = match *max_card.1 {
+  // println!("{:#?}", card_counts);
+  let mut joker_count = 0;
+  if with_joker && cards.contains(&PlayingCard::Joker) {
+    
+    /*
+      stash count and pluck out joker
+        UNLESS joker is the 5 card
+    */
+    joker_count = *card_counts.get(&PlayingCard::Joker).unwrap();
+    if joker_count < 5 {
+      card_counts.remove(&PlayingCard::Joker);
+    } else {
+      return PlayingHand::FiveOfAKind;
+    }
+
+  }
+  
+  /*
+    create a copy to avoid mutable borrow
+  */
+  let card_counts_copy = card_counts.clone();
+  let max_card_pair = card_counts_copy.iter().reduce(|acc, curr| {
+    if acc.1 > curr.1 {
+      acc
+    } else {
+      curr
+    }
+  }).unwrap();
+  
+  card_counts.insert(max_card_pair.0, *max_card_pair.1 + joker_count).unwrap();
+  let max_card_val = card_counts.get(max_card_pair.0).unwrap();
+  let hand_type = match max_card_val {
     5 => PlayingHand::FiveOfAKind,
     4 => PlayingHand::FourOfAKind,
     3 => {
@@ -137,6 +160,7 @@ impl Eq for CamelHand {}
 
 fn get_card_str(card: &PlayingCard) -> &str {
   match card {
+    PlayingCard::Joker => "J",
     PlayingCard::Two => "2",
     PlayingCard::Three => "3",
     PlayingCard::Four => "4",
