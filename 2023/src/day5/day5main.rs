@@ -53,11 +53,11 @@ fn day5_part2(amc: &Almanac) {
 
 
   let mut locatons = Vec::new();
-  for seed_pair in seed_pairs.iter() {
-    let mut pairs = vec![seed_pair.clone()];
-    for pair in pairs.iter() {
+  for seed_pair in seed_pairs {
+    let pairs = vec![seed_pair];
+    for pair in pairs {
       // println!("\nsrc_pair: {}", pair.to_string());
-      let mut curr_src_pairs = vec![pair.clone()];
+      let mut curr_src_pairs = vec![pair];
       for amc_entry in amc.amc_entries.iter() {
         let dest_pairs = curr_src_pairs.iter().fold(Vec::new(), |mut acc, curr| {
           for dest_pair in amc_entry.get_dest_pairs(curr).iter() {
