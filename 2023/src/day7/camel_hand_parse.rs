@@ -1,5 +1,5 @@
 
-use super::playing_card::{CamelHand, PlayingCard};
+use super::playing_card::{CamelHand, PlayingCard, get_hand_type};
 
 pub fn parse_camel_hands(input_lines: &Vec<String>) -> Vec<CamelHand> {
   let mut camel_hands = Vec::new();
@@ -27,9 +27,12 @@ pub fn parse_camel_hands(input_lines: &Vec<String>) -> Vec<CamelHand> {
       })
       .collect();
     let bid: u16 = hand_parts[1].parse().unwrap();
+    let hand_type = get_hand_type(&cards.as_slice().try_into().unwrap());
+
     let camel_hand = CamelHand {
       cards: cards.try_into().unwrap(),
       bid,
+      hand_type,
     };
     camel_hands.push(camel_hand);
   }

@@ -6,7 +6,7 @@ use std::cmp::{Ord, Ordering};
 /*
 A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2
 */
-#[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Clone, Copy)]
 pub enum PlayingCard {
   Two,
   Three,
@@ -22,7 +22,7 @@ pub enum PlayingCard {
   King,
   Ace,
 }
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum PlayingHand {
   HighCard,
   OnePair,
@@ -32,65 +32,15 @@ pub enum PlayingHand {
   FourOfAKind,
   FiveOfAKind,
 }
+
 #[derive(Clone)]
 pub struct CamelHand {
   pub cards: [PlayingCard; 5],
+  pub hand_type: PlayingHand,
   pub bid: u16,
 }
 impl CamelHand {
-  pub fn get_type(&self) -> PlayingHand {
-    /*
-      count the number of cards
-    */
-    let mut card_counts = HashMap::new();
-    for card in self.cards.iter() {
-      if !card_counts.contains_key(card) {
-        card_counts.insert(card, 0 as u8);
-      }
-      let curr_card_count = card_counts.get(card).unwrap();
-      card_counts.insert(card, curr_card_count + 1);
-    }
-    let max_card = card_counts.iter()
-      .reduce(|acc, curr| {
-        if curr.1 > acc.1 {
-          curr
-        } else {
-          acc
-        }
-      })
-      .unwrap();
-    let hand_type = match *max_card.1 {
-      5 => PlayingHand::FiveOfAKind,
-      4 => PlayingHand::FourOfAKind,
-      3 => {
-        let has_pair = card_counts.values().any(|count| *count == 2);
-        if has_pair {
-          PlayingHand::FullHouse
-        } else {
-          PlayingHand::ThreeOfAKind
-        }
-      }
-      2 => {
-        let pair_count = card_counts.values().fold(0, |acc, curr| {
-          if *curr == 2 {
-            acc + 1
-          } else {
-            acc
-          }
-        });
-        if pair_count > 1 {
-          PlayingHand::TwoPair
-        } else {
-          PlayingHand::OnePair
-        }
-      }
-      1 => PlayingHand::HighCard,
-      _ => unreachable!(),
-    };
-    return hand_type;
-  }
-
-  #[allow(dead_code)]
+  // #[allow(dead_code)]
   pub fn get_hand_str(&self) -> String {
     self.cards.iter().map(|card| get_card_str(card).to_string())
       .collect::<Vec<String>>()
@@ -98,13 +48,65 @@ impl CamelHand {
   }
 }
 
+pub fn get_hand_type(cards: &[PlayingCard; 5]) -> PlayingHand {
+  /*
+    count the number of cards
+  */
+  let mut card_counts = HashMap::new();
+  for card in cards.iter() {
+    if !card_counts.contains_key(card) {
+      card_counts.insert(card, 0 as u8);
+    }
+    let curr_card_count = card_counts.get(card).unwrap();
+    card_counts.insert(card, curr_card_count + 1);
+  }
+  let max_card = card_counts.iter()
+    .reduce(|acc, curr| {
+      if curr.1 > acc.1 {
+        curr
+      } else {
+        acc
+      }
+    })
+    .unwrap();
+  let hand_type = match *max_card.1 {
+    5 => PlayingHand::FiveOfAKind,
+    4 => PlayingHand::FourOfAKind,
+    3 => {
+      let has_pair = card_counts.values().any(|count| *count == 2);
+      if has_pair {
+        PlayingHand::FullHouse
+      } else {
+        PlayingHand::ThreeOfAKind
+      }
+    }
+    2 => {
+      let pair_count = card_counts.values().fold(0, |acc, curr| {
+        if *curr == 2 {
+          acc + 1
+        } else {
+          acc
+        }
+      });
+      if pair_count > 1 {
+        PlayingHand::TwoPair
+      } else {
+        PlayingHand::OnePair
+      }
+    }
+    1 => PlayingHand::HighCard,
+    _ => unreachable!(),
+  };
+  return hand_type;
+}
+
 impl Ord for CamelHand {
   fn cmp(&self, other: &Self) -> Ordering {
-    let a_type = self.get_type();
-    let b_type = other.get_type();
-    if a_type < b_type {
+    let a_hand_type = self.hand_type;
+    let b_hand_type = other.hand_type;
+    if a_hand_type < b_hand_type {
       return Ordering::Less;
-    } else if a_type > b_type {
+    } else if a_hand_type > b_hand_type {
       return Ordering::Greater;
     }
     /*
