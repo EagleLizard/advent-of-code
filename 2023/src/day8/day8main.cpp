@@ -4,19 +4,18 @@
 
 #include "day8main.h"
 #include "../util/input-util.h"
+#include "desert-map-parse.h"
+#include "desert-map.h"
 
-using namespace std;
-
-const string DAY_8_INPUT_FILE = "day8_test1.txt";
+const std::string DAY_8_INPUT_FILE = "day8_test1.txt";
 
 void day8Main() {
-  cout << "~ Day 8 ~" << endl;
+  std::cout << "~ Day 8 ~" << std::endl;
 
-  auto input_lines = loadDayInput(DAY_8_INPUT_FILE);
+  auto inputLines = InputUtil::loadDayInput(DAY_8_INPUT_FILE);
 
-  for(auto & line : input_lines) {
-    cout << line << endl;
-  }
+  auto desertMap = DesertMapParse::parseDesertMap(inputLines);
+  
 }
 
 

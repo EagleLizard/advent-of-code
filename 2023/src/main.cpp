@@ -6,18 +6,16 @@
 #include "day8/day8main.h"
 #include "util/time-util.h"
 
-using namespace std;
-
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 
 void logDayDivider(uint);
 void funAndTime(std::function<void()>);
-string repeatStr(string, uint);
+std::string repeatStr(std::string, uint);
 
 int main() {
   logDayDivider(13);
-  cout << endl << "EagleLizard - Advent of Code [C++]" << endl << endl;
+  std::cout << std::endl << "EagleLizard - Advent of Code [C++]" << std::endl << std::endl;
   logDayDivider(13);
 
   funAndTime([]() {
@@ -31,10 +29,10 @@ int main() {
 }
 
 void logDayDivider(uint n) {
-  cout << endl << repeatStr("🎄~", n) << endl << endl;
+  std::cout << std::endl << repeatStr("🎄~", n) << std::endl << std::endl;
 }
-string repeatStr(string str, uint n) {
-  string repeatStr = "";
+std::string repeatStr(std::string str, uint n) {
+  std::string repeatStr = "";
   for(uint i = 0; i < n; ++i) {
     repeatStr += str;
   }
@@ -46,8 +44,8 @@ void funAndTime(std::function<void()> fn) {
   fn();
   auto t2 = high_resolution_clock::now();
   auto duration = t2 - t1;
-  string durationStr = getIntuitiveTimeString(duration);
-  cout << repeatStr("-", durationStr.length()) << endl;
-  cout << durationStr << endl;
+  std::string durationStr = getIntuitiveTimeString(duration);
+  std::cout << repeatStr("-", durationStr.length()) << std::endl;
+  std::cout << durationStr << std::endl;
 }
 
