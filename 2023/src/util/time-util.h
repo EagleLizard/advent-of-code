@@ -6,40 +6,61 @@
 #include <iomanip>
 
 
-std::string getIntuitiveTimeString(std::chrono::nanoseconds ns) {
-     const auto microsecond = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::microseconds(1)
-    );
-    const auto millisecond = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::milliseconds(1)
-    );
-    const auto second = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::seconds(1)
-    );
-    const auto minute = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::minutes(1)
-    );
-    const auto hour = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::hours(1)
-    );
+namespace TimeUtil {
 
-    std::ostringstream ss;
+  using std::string;
+  using std::ostringstream;
+  using namespace std::chrono;
 
-    if (ns >= hour) {
-        ss << (ns / hour) << "h";
-    } else if (ns >= minute) {
-        ss << (ns / minute) << "m";
-    } else if (ns >= second) {
-        ss << (ns / second) << "s";
-    } else if (ns >= millisecond) {
-        ss << (ns / millisecond) << "ms";
-    } else if (ns >= microsecond) {
-        ss << (ns / microsecond) << "µs";
-    } else {
-        ss << ns.count() << "ns";
+  struct Timer {
+    steady_clock::time_point startTime;
+    static Timer start() {
+      auto startTime = high_resolution_clock::now();
+      return Timer {
+        startTime,
+      };
     }
+    nanoseconds stop() {
+      return high_resolution_clock::now() - this->startTime;
+    }
+  };
 
-    return ss.str();
+  static string getIntuitiveTimeString(nanoseconds ns) {
+      const auto microsecond = duration_cast<nanoseconds>(
+        microseconds(1)
+      );
+      const auto millisecond = duration_cast<nanoseconds>(
+        milliseconds(1)
+      );
+      const auto second = duration_cast<nanoseconds>(
+        seconds(1)
+      );
+      const auto minute = duration_cast<nanoseconds>(
+        minutes(1)
+      );
+      const auto hour = duration_cast<nanoseconds>(
+        hours(1)
+      );
+
+      ostringstream ss;
+
+      if (ns >= hour) {
+          ss << (ns / hour) << "h";
+      } else if (ns >= minute) {
+          ss << (ns / minute) << "m";
+      } else if (ns >= second) {
+          ss << (ns / second) << "s";
+      } else if (ns >= millisecond) {
+          ss << (ns / millisecond) << "ms";
+      } else if (ns >= microsecond) {
+          ss << (ns / microsecond) << "µs";
+      } else {
+          ss << ns.count() << "ns";
+      }
+
+      return ss.str();
+  }
 }
+
 
 #endif // TIME_UTIL_H

@@ -19,12 +19,9 @@ int main() {
   logDayDivider(13);
 
   funAndTime([]() {
-    day8Main();
+    Day8Main::day8Main();
   });
   logDayDivider(5);
-
-  
-
   return 0;
 }
 
@@ -44,7 +41,7 @@ void funAndTime(std::function<void()> fn) {
   fn();
   auto t2 = high_resolution_clock::now();
   auto duration = t2 - t1;
-  std::string durationStr = getIntuitiveTimeString(duration);
+  std::string durationStr = TimeUtil::getIntuitiveTimeString(duration);
   std::cout << repeatStr("-", durationStr.length()) << std::endl;
   std::cout << durationStr << std::endl;
 }

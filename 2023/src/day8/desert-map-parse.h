@@ -10,11 +10,17 @@
 
 namespace DesertMapParse {
 
-  static DesertMap::DesertMap parseDesertMap(std::vector<std::string>);
-  static std::vector<DesertMap::DIRECTION> parseInstructions(std::string);
-  static std::pair<std::string, std::pair<std::string, std::string>> parseNodeMap(std::string);
+  using std::string;
+  using std::pair;
+  using std::vector;
+  using std::cout;
+  using std::endl;
 
-  static DesertMap::DesertMap parseDesertMap(std::vector<std::string> inputLines) {
+  static DesertMap::DesertMap parseDesertMap(vector<string>);
+  static vector<DesertMap::DIRECTION> parseInstructions(string);
+  static pair<string, pair<string, string>> parseNodeMap(string);
+
+  static DesertMap::DesertMap parseDesertMap(vector<string> inputLines) {
     auto desertMap = DesertMap::DesertMap {};
     uint lineCount = 0;
     for(auto &inputLine : inputLines) {
@@ -27,12 +33,11 @@ namespace DesertMapParse {
       }
       lineCount++;
     }
-    std::cout << desertMap << std::endl;
     return desertMap;
   }
 
-  static std::vector<DesertMap::DIRECTION> parseInstructions(std::string inputLine) {
-    std::vector<DesertMap::DIRECTION> instructions;
+  static vector<DesertMap::DIRECTION> parseInstructions(string inputLine) {
+    vector<DesertMap::DIRECTION> instructions;
     for(auto & c : inputLine) {
       auto direction = DesertMap::getDirection(c);
       instructions.push_back(direction);
@@ -40,7 +45,7 @@ namespace DesertMapParse {
     return instructions;
   }
 
-  static std::pair<std::string, std::pair<std::string, std::string>> parseNodeMap(std::string inputLine) {
+  static pair<string, pair<string, string>> parseNodeMap(string inputLine) {
     auto lineParts = StrUtil::split(inputLine, "=");
     auto keyPart = StrUtil::trim(lineParts[0]);
     auto valueParts = StrUtil::split(
@@ -50,7 +55,7 @@ namespace DesertMapParse {
     auto leftVal = StrUtil::trim(valueParts[0]).substr(1);
     auto rightVal = StrUtil::trim(valueParts[1]);
     rightVal = rightVal.substr(0, rightVal.length() - 1);
-    return std::pair(keyPart, std::pair(leftVal, rightVal));
+    return pair(keyPart, pair(leftVal, rightVal));
   }
 }
 

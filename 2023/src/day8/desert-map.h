@@ -10,6 +10,14 @@
 
 namespace DesertMap {
 
+  using std::map;
+  using std::string;
+  using std::pair;
+  using std::vector;
+  using std::ostream;
+  using std::endl;
+  using std::invalid_argument;
+
   enum DIRECTION {
     LEFT = 'L',
     RIGHT = 'R'
@@ -18,24 +26,24 @@ namespace DesertMap {
   struct DesertMap;
   static char getDirectionChar(DIRECTION);
 
-  using NodeMap = std::map<std::string, std::pair<std::string, std::string>>;
+  using NodeMap = map<string, pair<string, string>>;
 
   struct DesertMap {
-    std::vector<DIRECTION> instructions;
+    vector<DIRECTION> instructions;
     NodeMap nodeMap;
   };
 
-  std::ostream& operator<<(std::ostream& os, const DesertMap& desertMap) {
-    std::string instructionsStr = "";
+  ostream& operator<<(ostream& os, const DesertMap& desertMap) {
+    string instructionsStr = "";
     for(auto & instruction : desertMap.instructions) {
       instructionsStr += getDirectionChar(instruction);
     }
     os
-      << "instructions: " << instructionsStr << std::endl
-      << "nodeMap: " << std::endl
+      << "instructions: " << instructionsStr << endl
+      << "nodeMap: " << endl
     ;
     for(auto & elem : desertMap.nodeMap) {
-      os << "~ " << elem.first << ": " << "(" << elem.second.first << ", " << elem.second.second << ")" << std::endl;
+      os << "~ " << elem.first << ": " << "(" << elem.second.first << ", " << elem.second.second << ")" << endl;
     }
     
     return os;
@@ -48,9 +56,9 @@ namespace DesertMap {
       case DIRECTION::RIGHT:
         return 'R';
       default:
-        std::string errMsg = "DH_1.1 Unexpected DIRECTION: ";
+        string errMsg = "DH_1.1 Unexpected DIRECTION: ";
         errMsg += static_cast<char>(direction);
-        throw std::invalid_argument(errMsg);
+        throw invalid_argument(errMsg);
     }
   }
 
@@ -61,11 +69,11 @@ namespace DesertMap {
       case 'R':
         return DIRECTION::RIGHT;
       default:
-        std::string errMsg = "DH_1.2 Invalid direction char: ";
+        string errMsg = "DH_1.2 Invalid direction char: ";
         errMsg += "'";
         errMsg += c;
         errMsg += "'";
-        throw std::invalid_argument(errMsg);
+        throw invalid_argument(errMsg);
     }
   }
 }

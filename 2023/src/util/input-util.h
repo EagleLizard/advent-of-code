@@ -11,15 +11,19 @@
 
 namespace InputUtil {
 
-  static std::vector<std::string> loadDayInput(std::string);
-  static std::string getBasePath();
-  static std::string getInputFilePath(std::string);
+  using std::vector;
+  using std::string;
+  using std::ifstream;
 
-  static std::vector<std::string> loadDayInput(std::string inputFileName) {
-    std::vector<std::string> inputLines;
+  static vector<string> loadDayInput(string);
+  static string getBasePath();
+  static string getInputFilePath(string);
+
+  static vector<string> loadDayInput(string inputFileName) {
+    vector<string> inputLines;
     auto inputFilePath = getInputFilePath(inputFileName);
-    std::ifstream ifs (inputFilePath);
-    std::string inputLine;
+    ifstream ifs (inputFilePath);
+    string inputLine;
     while(getline(ifs, inputLine)) {
       inputLines.push_back(
         StrUtil::trim(inputLine)
@@ -28,13 +32,13 @@ namespace InputUtil {
     return inputLines;
   }
 
-  static std::string getInputFilePath(std::string inputFileName) {
+  static string getInputFilePath(string inputFileName) {
     auto basePath = getBasePath(); 
     auto inputFilePath = std::filesystem::canonical(basePath + "/input/" + inputFileName);
     return inputFilePath;
   }
 
-  static std::string getBasePath() {
+  static string getBasePath() {
     return std::filesystem::current_path();
   }
 
