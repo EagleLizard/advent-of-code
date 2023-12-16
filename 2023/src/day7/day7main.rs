@@ -14,12 +14,8 @@ const DAY_7_INPUT_FILE_NAME: &str = "day7.txt";
 
 pub fn day7_main() {
   println!("~ Day 7 ~");
-  let input_lines: Vec<String> = load_day_input(DAY_7_INPUT_FILE_NAME)
-    .into_iter()
-    .filter(|line| line.len() > 0)
-    .collect();
 
-  let camel_hands = parse_camel_hands(&input_lines);
+  let camel_hands = get_camel_hands();
 
   let mut fun_time = run_and_time(|| {
     day7_part1(&camel_hands);
@@ -32,7 +28,7 @@ pub fn day7_main() {
   println!("\n[d7p2] took: {:#?}", fun_time);
 }
 
-pub fn day7_part1(camel_hands: &Vec<CamelHand>) {
+pub fn day7_part1(camel_hands: &Vec<CamelHand>) -> u32 {
   println!("\n~ Day 7 Part 1 ~");
   let mut sorted_hands: Vec<CamelHand> = camel_hands.clone();
   sorted_hands.sort();
@@ -44,10 +40,10 @@ pub fn day7_part1(camel_hands: &Vec<CamelHand>) {
     acc + curr_winnings
   });
   println!("total_winnings: {}", total_winnings);
-
+  total_winnings
 }
 
-pub fn day7_part2(camel_hands: &Vec<CamelHand>) {
+pub fn day7_part2(camel_hands: &Vec<CamelHand>) -> u32 {
   println!("\n~ Day 7 Part 2 ~");
   let mut joker_camel_hands = camel_hands.clone();
   for joker_camel_hand in joker_camel_hands.iter_mut() {
@@ -68,4 +64,41 @@ pub fn day7_part2(camel_hands: &Vec<CamelHand>) {
     acc + curr_winnings
   });
   println!("total_winnings: {}", total_winnings);
+  total_winnings
+}
+
+pub fn get_camel_hands() -> Vec<CamelHand> {
+  let input_lines: Vec<String> = load_day_input(DAY_7_INPUT_FILE_NAME)
+    .into_iter()
+    .filter(|line| line.len() > 0)
+    .collect();
+
+  parse_camel_hands(&input_lines)
+}
+
+#[cfg(test)]
+mod day8_tests {
+  
+  use std::sync::Once;
+  use super::*;
+
+use super::{get_camel_hands, day7_part1};
+
+  fn get_test_input() -> Vec<CamelHand> {
+    get_camel_hands()
+  }
+
+  #[test]
+  fn p1_test() {
+    let test_input = get_test_input();
+    let result = day7_part1(&test_input);
+    assert_eq!(result, 251058093)
+  }
+
+  #[test]
+  fn p2_test() {
+    let test_input = get_test_input();
+    let result = day7_part2(&test_input);
+    assert_eq!(result, 249781879)
+  }
 }

@@ -23,7 +23,7 @@ pub fn parse_camel_hands(input_lines: &Vec<String>) -> Vec<CamelHand> {
         "4" => PlayingCard::Four,
         "3" => PlayingCard::Three,
         "2" => PlayingCard::Two,
-        _ => panic!("Invalid playing card: {}", card_str)
+        _ => unreachable!("Invalid playing card: {}", card_str)
       })
       .collect();
     let bid: u16 = hand_parts[1].parse().unwrap();
