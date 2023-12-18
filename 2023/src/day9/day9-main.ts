@@ -5,7 +5,7 @@ import { runAndTime } from '../util/timer';
 import { OasisReport } from './oasis-report';
 import { parseOasisReport } from './oasis-report-parse';
 
-const DAY_9_INPUT_FILE_NAME = 'day9_test.txt';
+const DAY_9_INPUT_FILE_NAME = 'day9.txt';
 
 export async function day9Main() {
   console.log('~ Day 9~');
