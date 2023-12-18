@@ -5,6 +5,7 @@ sourceMapSupport.install();
 import { day1, day2p2 } from './day1/day1';
 import { day3Main } from './day3/day3';
 import { getDayDivider } from './util/divider';
+import { day9Main } from './day9/day9-main';
 
 (async () => {
   try {
@@ -24,4 +25,8 @@ async function main() {
 
   console.log(`\n${getDayDivider(5)}\n`);
   await day3Main();
+
+  console.log(`\n${getDayDivider(5)}\n`);
+  await day9Main();
+
 }
