@@ -20,8 +20,41 @@ export async function day9Main() {
     day9Part1(oasisReport);
   });
   console.log(`\n[day9p1] took: ${getIntuitiveTimeString(fnTimeMs)}`);
+  oasisReport = await parseOasisReport(inputLines);
+  fnTimeMs = runAndTime(() => {
+    day9Part2(oasisReport);
+  });
+  console.log(`\n[day9p2] took: ${getIntuitiveTimeString(fnTimeMs)}`);
 }
 
+function day9Part2(oasisReport: OasisReport) {
+  console.log('\n~ Day 9 Part 2 ~');
+  let predictions: number[];
+
+  predictions = oasisReport.histories.map((history, idx) => {
+    let historyDiffs: number[][];
+
+    historyDiffs = getHistoryDiffs(history.values);
+    // add the zero placeholder to the last diff
+    historyDiffs[historyDiffs.length - 1].unshift(0);
+    for(let i = historyDiffs.length - 1; i > 0; --i) {
+      let currPredictionVal: number;
+      let currDiffs = historyDiffs[i];
+      let lastDiffs = historyDiffs[i - 1];
+      let currDiffVal = currDiffs[0];
+      let lastDiffVal = lastDiffs[0];
+
+      currPredictionVal = lastDiffVal - currDiffVal;
+      lastDiffs.unshift(currPredictionVal);
+    }
+    return historyDiffs[0][0];
+  });
+  let predictionsSum = predictions.reduce((acc, curr) => {
+    return acc + curr;
+  }, 0);
+  console.log('predictionsSum:');
+  console.log(predictionsSum);
+}
 
 function day9Part1(oasisReport: OasisReport) {
   console.log('\n~ Day 9 Part 1 ~');
@@ -29,21 +62,8 @@ function day9Part1(oasisReport: OasisReport) {
 
   predictions = oasisReport.histories.map((history, idx) => {
     let historyDiffs: number[][];
-    let historyValues = history.values;
 
-    historyDiffs = [
-      historyValues,
-    ];
-
-    while(!isDiffingComplete(historyDiffs)) {
-      let lastDiffArr = historyDiffs[historyDiffs.length - 1];
-      let currDiffArr: number[] = [];
-      for(let i = 1; i < lastDiffArr.length; ++i) {
-        let lastDiff = lastDiffArr[i] - lastDiffArr[i - 1];
-        currDiffArr.push(lastDiff);
-      }
-      historyDiffs.push(currDiffArr);
-    }
+    historyDiffs = getHistoryDiffs(history.values);
     // add the zero placeholder to the last diff
     historyDiffs[historyDiffs.length - 1].push(0);
     for(let i = historyDiffs.length - 1; i > 0; --i) {
@@ -61,7 +81,28 @@ function day9Part1(oasisReport: OasisReport) {
   let predictionsSum = predictions.reduce((acc, curr) => {
     return acc + curr;
   }, 0);
-  console.log(`predictionsSum: ${predictionsSum}`);
+  console.log('predictionsSum:');
+  console.log(predictionsSum);
+}
+
+function getHistoryDiffs(historyValues: number[]): number[][] {
+  let historyDiffs: number[][];
+
+  historyDiffs = [
+    historyValues,
+  ];
+
+  while(!isDiffingComplete(historyDiffs)) {
+    let lastDiffArr = historyDiffs[historyDiffs.length - 1];
+    let currDiffArr: number[] = [];
+    for(let i = 1; i < lastDiffArr.length; ++i) {
+      let lastDiff = lastDiffArr[i] - lastDiffArr[i - 1];
+      currDiffArr.push(lastDiff);
+    }
+    historyDiffs.push(currDiffArr);
+  }
+
+  return historyDiffs;
 }
 
 function isDiffingComplete(diffs: number[][]): boolean {
