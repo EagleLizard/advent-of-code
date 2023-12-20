@@ -2,13 +2,14 @@
 import sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();
 
-import { day1, day2p2 as day1p2 } from './day1/day1';
+import { day1, day1p2 } from './day1/day1';
 import { day3Main } from './day3/day3';
 import { getDayDivider } from './util/divider';
 import { day9Main } from './day9/day9-main';
 import { Timer } from './util/timer';
 import { getIntuitiveTimeString } from './util/format-util';
 import { printDayBanner } from './util/print-util';
+import { day10Main } from './day10/day10-main';
 
 (async () => {
   try {
@@ -35,6 +36,10 @@ async function main() {
   await runFnAndTime(async () => {
     await day9Main();
   }, 9);
+
+  await runFnAndTime(async () => {
+    await day10Main();
+  }, 10);
 
 }
 

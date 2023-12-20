@@ -29,7 +29,7 @@ export async function day1() {
   console.log(calibrationSum);
 }
 
-export async function day2p2() {
+export async function day1p2() {
   let inputStrs: string[];
   let calibrationValues: number[];
   let calibrationSum: number;
