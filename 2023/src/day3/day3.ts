@@ -17,7 +17,6 @@ type PartNum = {
 };
 
 export async function day3Main() {
-  console.log('~ Day 3 ~');
   let inputStrs: string[];
   let grid: string[];
   inputStrs = await loadDay3Input();

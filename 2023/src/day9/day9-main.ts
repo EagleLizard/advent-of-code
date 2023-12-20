@@ -1,6 +1,6 @@
 
 import { loadDayInput } from '../util/input-util';
-import { getIntuitiveTimeString } from '../util/print-util';
+import { getIntuitiveTimeString } from '../util/format-util';
 import { runAndTime } from '../util/timer';
 import { OasisReport } from './oasis-report';
 import { parseOasisReport } from './oasis-report-parse';
@@ -8,7 +8,6 @@ import { parseOasisReport } from './oasis-report-parse';
 const DAY_9_INPUT_FILE_NAME = 'day9.txt';
 
 export async function day9Main() {
-  console.log('~ Day 9~');
   let inputLines: string[];
   let oasisReport: OasisReport;
   inputLines = (await loadDayInput(DAY_9_INPUT_FILE_NAME))

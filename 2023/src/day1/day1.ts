@@ -19,7 +19,6 @@ export async function day1() {
   let inputStrs: string[];
   let calibrationValues: number[];
   let calibrationSum: number;
-  console.log('~ Day 1 ~');
   inputStrs = await laodDay1Input();
 
   calibrationValues = inputStrs.map(getCalibrationValue);
