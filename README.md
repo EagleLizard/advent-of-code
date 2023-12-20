@@ -16,6 +16,10 @@ This repository contains [Advent of Code](https://adventofcode.com/) solutions b
         1. [Prerequisites](#aoc-2023-rust-prerequisites)
         1. [Getting Started](#aoc-2023-rust-getting-started)
         1. [Running the Code](#aoc-2023-rust-running-the-code)
+    1. [C++](#aoc-2023-cpp)
+        1. [Prerequisites](#aoc-2023-cpp-prerequisites)
+        1. [Getting Started](#aoc-2023-cpp-getting-started)
+        1. [Running the Code](#aoc-2023-cpp-running-the-code)
 
 <a id="aoc-2023"></a>
 # AoC 2023
@@ -104,4 +108,45 @@ cargo watch -x run
 You can also run in watch mode using:
 ```sh
 make watch
+```
+
+<a id="aoc-2023-cpp"></a>
+## C++
+
+On MacOS, uses `g++` which is an alias to `clang`.
+
+<a id="aoc-2023-cpp-prerequisites"></a>
+### Prerequisites
+* cmake @ `3.27.7`
+* fswatch @ `1.17.1`
+
+To use the Makefile and run the project in watch mode, install `fswatch`:
+```sh
+brew install fswatch
+```
+
+<a id="aoc-2023-cpp-getting-started"></a>
+### Getting Started
+
+In the `2023` directory, run:
+```sh
+make build-cpp
+```
+
+<a id="aoc-2023-cpp-running-the-code"></a>
+### Running the Code
+
+If you built the executable already via the previous section, you can run:
+```sh
+./cpp-out/aoc2023cpp
+```
+
+Alternatively, you can build and run the project using:
+```sh
+make run-cpp
+```
+
+You can also run in watch mode using:
+```sh
+make watch-cpp
 ```
