@@ -3,6 +3,7 @@ mod day2;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 mod util;
 
@@ -34,6 +35,11 @@ fn main() {
 
   run_fun_and_time(
     &day6::day6main::day6_main
+  );
+  log_day_divider(5);
+
+  run_fun_and_time(
+    &day7::day7main::day7_main
   );
   log_day_divider(5);
 

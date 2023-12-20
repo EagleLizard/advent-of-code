@@ -65,7 +65,7 @@ fn day6_part1(boat_races: &Vec<BoatRace>) {
     
 }
 
-#[allow(dead_code)]
+// #[allow(dead_code)]
 fn get_ways_to_win(boat_race: &BoatRace) -> u64 {
   let mut curr_ways_to_win: u64 = 0;
   for i in 0..(boat_race.time + 1) {
