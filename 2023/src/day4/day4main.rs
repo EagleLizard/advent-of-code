@@ -26,7 +26,7 @@ pub fn day4_main() {
 }
 
 fn day4_part2(base_cards: &Vec<Card>) {
-  println!("\n~ Day 4 Part 2 ~\n");
+  println!("\n~ Day 4 Part 2 ~");
   let mut cards: Vec<Card> = base_cards.to_vec().clone();
 
   let mut i: usize = 0;
@@ -59,7 +59,7 @@ fn print_card(card: &Card) {
 }
 
 fn day4_part1(cards: &Vec<Card>) {
-  println!("\n~ Day 4 Part 1 ~\n");
+  println!("\n~ Day 4 Part 1 ~");
   let mut score_sum: u16 = 0;
 
   for card in cards.iter() {
