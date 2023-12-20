@@ -24,11 +24,6 @@ pub struct AlmanacPair {
   pub start: u64,
   pub end: u64,
 }
-impl AlmanacPair {
-  pub fn to_string(&self) -> String {
-    return format!("[{}, {}]", self.start, self.end - 1)
-  }
-}
 #[derive(Debug, Clone)]
 pub struct AlmanacEntry {
   pub kind: AmcEntryKind,

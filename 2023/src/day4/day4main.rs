@@ -50,14 +50,6 @@ fn day4_part2(base_cards: &Vec<Card>) {
   println!("Total scratchcards: {}", total_cards);
 }
 
-fn print_card(card: &Card) {
-  println!("{}", card.id);
-  println!("{}", card.winning_nums.iter().map(|num| num.to_string()).collect::<Vec<String>>().join(" "));
-  println!("{}", card.nums.iter().map(|num| num.to_string()).collect::<Vec<String>>().join(" "));
-  println!("copies: {}", card.copies);
-  println!("win count: {}", card.get_win_count());
-}
-
 fn day4_part1(cards: &Vec<Card>) {
   println!("\n~ Day 4 Part 1 ~");
   let mut score_sum: u16 = 0;

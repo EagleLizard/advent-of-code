@@ -53,11 +53,10 @@ fn day5_part2(amc: &Almanac) {
 
 
   let mut locatons = Vec::new();
-  for seed_pair in seed_pairs {
-    let pairs = vec![seed_pair];
-    for pair in pairs {
-      // println!("\nsrc_pair: {}", pair.to_string());
-      let mut curr_src_pairs = vec![pair];
+  for seed_pair in seed_pairs.iter() {
+    let pairs = vec![seed_pair.clone()];
+    for pair in pairs.iter() {
+      let mut curr_src_pairs = vec![pair.clone()];
       for amc_entry in amc.amc_entries.iter() {
         let dest_pairs = curr_src_pairs.iter().fold(Vec::new(), |mut acc, curr| {
           for dest_pair in amc_entry.get_dest_pairs(curr).iter() {
@@ -100,11 +99,4 @@ fn day5_part1(amc: &Almanac) {
     }
   }
   println!("Lowest location: {}", min_location);
-}
-
-fn list_to_str<T: ToString>(list: &[T]) -> String {
-  return list.iter()
-    .map(|val| val.to_string())
-    .collect::<Vec<String>>()
-    .join(", ");
 }
