@@ -64,7 +64,6 @@ function day10Part1(pipeMap: PipeMap) {
 }
 
 function connectPipes(pipeMap: PipeMap) {
-  let pipeQueue = [ pipeMap.start ];
   let visitedMap: Record<number, boolean> = {};
   let allPipes = pipeMap.pipeMatrix.reduce((acc, curr) => {
     return [ ...acc, ...curr ];
@@ -96,12 +95,10 @@ function connectPipes(pipeMap: PipeMap) {
           default:
             throw new Error(`invalid adjacent pipe direction: ${direction}`);
         }
-        pipeQueue.push(adjacentPipe);
       }
     }
 
     visitedMap[currPipe.id] = true;
-    pipeQueue.shift();
   }
   return pipeMap;
 }
