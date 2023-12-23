@@ -9,6 +9,7 @@ import { day9Main } from './day9/day9-main';
 import { Timer } from './util/timer';
 import { getIntuitiveTimeString } from './util/format-util';
 import { printDayBanner } from './util/print-util';
+import { day10Main } from './day10/day10-main';
 
 (async () => {
   try {
@@ -36,14 +37,18 @@ async function main() {
     await day9Main();
   }, 9);
 
+  await runFnAndTime(async () => {
+    await day10Main();
+  }, 10);
+
 }
 
 async function runFnAndTime(fn: () => Promise<void>, dayNumber: number) {
   let fnTimer = Timer.start();
+  console.log(`\n${getDayDivider(5)}\n`);
+  printDayBanner(dayNumber);
   await fn();
   let fnTimeMs = fnTimer.stop();
   let fnTimeStr = getIntuitiveTimeString(fnTimeMs);
-  console.log(`\n${getDayDivider(5)}\n`);
-  printDayBanner(dayNumber);
   console.log(`\n${'-'.repeat(fnTimeStr.length)}\n${fnTimeStr}`);
 }
