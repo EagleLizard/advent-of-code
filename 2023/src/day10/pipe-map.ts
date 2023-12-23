@@ -1,3 +1,4 @@
+import { PipePart } from './pipe-part';
 
 /*
   |
@@ -37,17 +38,6 @@ type Point = {
   y: number,
 };
 
-export type PipePart = {
-  char: string;
-  kind: PIPE_PART_ENUM;
-  north: PipePart | undefined,
-  east: PipePart | undefined,
-  south: PipePart | undefined,
-  west: PipePart | undefined,
-  x: number,
-  y: number,
-};
-
 export class PipeMap {
 
   public pipeMatrix: PipePart[][];
@@ -65,31 +55,9 @@ export class PipeMap {
     this.start = getDefaultPipePart();
   }
 
-  static getPipePart(char: string, x: number, y: number): PipePart {
-    let pipePart: PipePart;
-    let pipeKind: PIPE_PART_ENUM;
-    if((pipeKind = PIPE_CHAR_TO_PART_MAP[char]) === undefined) {
-      throw new Error(`Invalid pipe part: ${char}`);
-    }
-
-    pipePart = {
-      char,
-      kind: pipeKind,
-      north: undefined,
-      east: undefined,
-      south: undefined,
-      west: undefined,
-      x,
-      y,
-    };
-
-    return pipePart;
-  }
-
   setPipePart(pipePart: PipePart, x: number, y: number) {
     if(pipePart.kind === PIPE_PART_ENUM.START) {
-      this.start.x = x;
-      this.start.y = y;
+      this.start = pipePart;
     }
     this.pipeMatrix[y][x] = pipePart;
   }
@@ -98,11 +66,12 @@ export class PipeMap {
     return this.pipeMatrix[y][x];
   }
 
-  getAdjacentPipes(x: number, y: number): PipePart[] {
+  getAdjacentPipes(pipePart: PipePart): PipePart[] {
     let adjacentPipes: PipePart[];
+    const { x, y } = pipePart;
     let pipePositions: Point[] = [
       {
-        x: x - 1,
+        x,
         y: y - 1,
       },
       {
@@ -118,12 +87,11 @@ export class PipeMap {
         y,
       },
     ].filter(point => {
-      const { x, y } = point;
       return (
-        (x > 0)
-        && (x < this.width)
-        && (y > 0)
-        && (y < this.height)
+        (point.x >= 0)
+        && (point.x < this.width)
+        && (point.y >= 0)
+        && (point.y < this.height)
       );
     })
     ;
@@ -138,17 +106,20 @@ export class PipeMap {
 
     return adjacentPipes;
   }
+
+  static getPipePart(char: string, x: number, y: number): PipePart {
+    let pipePart: PipePart;
+    let pipeKind: PIPE_PART_ENUM;
+    if((pipeKind = PIPE_CHAR_TO_PART_MAP[char]) === undefined) {
+      throw new Error(`Invalid pipe part: ${char}`);
+    }
+
+    pipePart = new PipePart(char, pipeKind, x, y);
+
+    return pipePart;
+  }
 }
 
 function getDefaultPipePart(): PipePart {
-  return {
-    char: '',
-    kind: PIPE_PART_ENUM.INIT,
-    north: undefined,
-    east: undefined,
-    south: undefined,
-    west: undefined,
-    x: -1,
-    y: -1,
-  };
+  return new PipePart();
 }
