@@ -44,7 +44,6 @@ impl GalaxyMap {
       expanded.matrix.push(curr_row.to_vec());
       if curr_row.iter().all(|el| el.kind == GalaxyMapElKind::Space) {
         expanded.matrix.push(curr_row.to_vec());
-        println!("row: {}", y)
       }
     }
     // find cols to expand
