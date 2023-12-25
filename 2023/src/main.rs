@@ -4,6 +4,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day11;
 
 mod util;
 
@@ -11,7 +12,7 @@ use std::time::Duration;
 
 use util::timer::run_and_time;
 
-use crate::util::log_util::get_day_divider_n;
+use crate::util::print_util::get_day_divider_n;
 
 fn main() {
   log_day_divider(13);
@@ -19,35 +20,34 @@ fn main() {
   log_day_divider(13);
   
   run_fun_and_time(
-    &day2::day2main::day2main
+    day2::day2main::day2main
   );
-  log_day_divider(5);
 
   run_fun_and_time(
-    &day4::day4main::day4_main
+    day4::day4main::day4_main
   );
-  log_day_divider(5);
 
   run_fun_and_time(
-    &day5::day5main::day5_main
+    day5::day5main::day5_main
   );
-  log_day_divider(5);
 
   run_fun_and_time(
-    &day6::day6main::day6_main
+    day6::day6main::day6_main
   );
-  log_day_divider(5);
 
   run_fun_and_time(
-    &day7::day7main::day7_main
+    day7::day7main::day7_main
   );
-  log_day_divider(5);
 
+  run_fun_and_time(
+    day11::day11_main::day11_main
+  )
 }
 
-fn run_fun_and_time(fun: &dyn Fn() -> ()) {
+fn run_fun_and_time(fun: fn() -> ()) {
   let fun_time = run_and_time(fun);
   log_duration(fun_time);
+  log_day_divider(5);
 }
 
 fn log_duration(fun_time: Duration) {
