@@ -1,6 +1,9 @@
+
 use crate::{util::{input_util::load_day_input, timer::run_and_time}, day11::galaxy_map::GalaxyMap};
 
-const DAY_11_INPUT_FILE_NAME: &str = "day11_test1.txt";
+use super::galaxy_map::GalaxyMapEl;
+
+const DAY_11_INPUT_FILE_NAME: &str = "day11.txt";
 
 pub fn day11_main() {
   println!("~ Day 11 ~");
@@ -19,10 +22,72 @@ pub fn day11_main() {
 pub fn day11_part1(src_galaxy_map: &GalaxyMap) {
   println!("\n~ Day 11 Part 1 ~");
   let galaxy_map = src_galaxy_map.expand();
-  for curr_row in galaxy_map.matrix {
-    for curr_el in curr_row {
-      print!("{}",curr_el.to_char())
-    }
-    print!("\n")
+  let galaxy_pairs = get_pairs(galaxy_map);
+
+  let mut all_lengths = vec![];
+  for pair in galaxy_pairs {
+    let (galaxy_a, galaxy_b) = pair;
+    let steps = find_path(galaxy_a, galaxy_b);
+    all_lengths.push(steps);
   }
+
+  let all_lengths_sum: u32 = all_lengths.iter().sum();
+  println!("All lengths sum: {}", all_lengths_sum);
+}
+
+fn find_path(galaxy_a: GalaxyMapEl, galaxy_b: GalaxyMapEl) -> u32 {
+  let x1 = galaxy_a.x;
+  let y1 = galaxy_a.y;
+  let x2 = galaxy_b.x;
+  let y2 = galaxy_b.y;
+
+  let mut curr_x = x1;
+  let mut curr_y = y1;
+  let mut steps: u32 = 0;
+  while curr_x != x2 || curr_y != y2 {
+    let dx;
+    let dy;
+    if curr_x > x2 {
+      dx = curr_x - x2;
+    } else {
+      dx = x2 - curr_x;
+    }
+    if curr_y > y2 {
+      dy = curr_y - y2;
+    } else {
+      dy = y2 - curr_y;
+    }
+
+    /*
+    move in the direction we're farther from
+    */
+    if dx > dy {
+      if curr_x < x2 {
+        curr_x += 1;
+      } else if curr_x > x2 {
+        curr_x -= 1;
+      }
+    } else {
+      if curr_y < y2 {
+        curr_y += 1;
+      } else if curr_y > y2 {
+        curr_y -= 1;
+      }
+    }
+    steps += 1;
+  }
+  steps
+}
+
+fn get_pairs(galaxy_map: GalaxyMap) -> Vec<(GalaxyMapEl, GalaxyMapEl)> {
+  let mut pairs = Vec::new();
+  let mut galaxies = galaxy_map.galaxies.clone();
+
+  for el in galaxy_map.galaxies {
+    galaxies.remove(&el);
+    for curr_el in &galaxies {
+      pairs.push((el, *curr_el))
+    }
+  }
+  pairs
 }
