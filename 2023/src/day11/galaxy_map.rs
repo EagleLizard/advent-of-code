@@ -47,13 +47,17 @@ impl GalaxyMapEl {
 #[derive(Clone)]
 pub struct GalaxyMap {
   pub matrix: Vec<Vec<GalaxyMapEl>>,
-  pub galaxies: HashSet<GalaxyMapEl>,
+  pub galaxies: Vec<GalaxyMapEl>,
+  pub expanded_rows: Vec<usize>,
+  pub expanded_cols: Vec<usize>,
 }
 impl GalaxyMap {
   fn new() -> GalaxyMap {
     GalaxyMap {
       matrix: vec![],
-      galaxies: HashSet::new(),
+      galaxies: Vec::new(),
+      expanded_cols: Vec::new(),
+      expanded_rows: Vec::new(),
     }
   }
   pub fn parse(input_lines: Vec<String>) -> GalaxyMap {
@@ -61,7 +65,6 @@ impl GalaxyMap {
   }
   pub fn expand(&self) -> GalaxyMap {
     let mut expanded = GalaxyMap::new();
-    let mut row_inserts: Vec<usize> = vec![];
     let mut col_inserts: Vec<usize> = vec![];
     // find rows to expand
     for (_, curr_row) in self.matrix.iter().enumerate() {
@@ -100,7 +103,7 @@ impl GalaxyMap {
         curr_el.x = u32::try_from(x).unwrap();
         curr_el.y = u32::try_from(y).unwrap();
         if(curr_el.kind == GalaxyMapElKind::Galaxy) {
-          expanded.galaxies.insert(*curr_el);
+          expanded.galaxies.push(*curr_el);
         }
       }
     }
@@ -111,6 +114,8 @@ impl GalaxyMap {
 /* Static Method */
 fn parse_galaxy_map(input_lines: Vec<String>) -> GalaxyMap {
   let mut galaxy_map = GalaxyMap::new();
+  let mut expanded_cols: Vec<usize> = vec![];
+  let mut expanded_rows: Vec<usize> = vec![];
   
   for (y, input_line) in input_lines.iter().enumerate() {
     let mut curr_row: Vec<GalaxyMapEl> = vec![];
@@ -123,18 +128,46 @@ fn parse_galaxy_map(input_lines: Vec<String>) -> GalaxyMap {
       );
       curr_row.push(curr_el);
       if kind == GalaxyMapElKind::Galaxy {
-        galaxy_map.galaxies.insert(curr_el);
+        galaxy_map.galaxies.push(curr_el);
       }
     }
     galaxy_map.matrix.push(curr_row);
   }
+
+  for y in 0..galaxy_map.matrix.len() {
+    let mut row_is_spaces = true;
+    for x in 0..galaxy_map.matrix.len() {
+      if galaxy_map.matrix[y][x].kind != GalaxyMapElKind::Space {
+        row_is_spaces = false;
+        break;
+      }
+    }
+    if row_is_spaces {
+      expanded_rows.push(y);
+    }
+  }
+  galaxy_map.expanded_rows = expanded_rows;
+
+  for x in 0..galaxy_map.matrix[0].len() {
+    let mut col_is_spaces = true;
+    for y in 0..galaxy_map.matrix.len() {
+      if galaxy_map.matrix[y][x].kind != GalaxyMapElKind::Space {
+        col_is_spaces = false;
+        break;
+      }
+    }
+    if col_is_spaces {
+      expanded_cols.push(x);
+    }
+  }
+  galaxy_map.expanded_cols = expanded_cols;
 
   galaxy_map
 }
 
 
 
-fn get_map_el_kind(c: char) -> (GalaxyMapElKind) {
+fn get_map_el_kind(c: char) -> GalaxyMapElKind {
   return match c {
       '.' => GalaxyMapElKind::Space,
       '#' => GalaxyMapElKind::Galaxy,
