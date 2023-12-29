@@ -27,12 +27,7 @@ impl GalaxyMapEl {
       }
       GalaxyMapElKind::Space => None
     };
-    GalaxyMapEl {
-      id,
-      kind,
-      x,
-      y
-    }
+    GalaxyMapEl { id, kind, x, y }
   }
 
   pub fn to_char(&self) -> char {
@@ -48,8 +43,8 @@ impl GalaxyMapEl {
 pub struct GalaxyMap {
   pub matrix: Vec<Vec<GalaxyMapEl>>,
   pub galaxies: Vec<GalaxyMapEl>,
-  pub expanded_rows: Vec<usize>,
-  pub expanded_cols: Vec<usize>,
+  pub expanded_rows: Vec<u32>,
+  pub expanded_cols: Vec<u32>,
 }
 impl GalaxyMap {
   fn new() -> GalaxyMap {
@@ -63,59 +58,42 @@ impl GalaxyMap {
   pub fn parse(input_lines: Vec<String>) -> GalaxyMap {
     parse_galaxy_map(input_lines)
   }
-  pub fn expand(&self) -> GalaxyMap {
-    let mut expanded = GalaxyMap::new();
-    let mut col_inserts: Vec<usize> = vec![];
-    // find rows to expand
-    for (_, curr_row) in self.matrix.iter().enumerate() {
-      expanded.matrix.push(curr_row.to_vec());
-      if curr_row.iter().all(|el| el.kind == GalaxyMapElKind::Space) {
-        expanded.matrix.push(curr_row.to_vec());
-      }
-    }
-    // find cols to expand
-    for x in 0..self.matrix[0].len() {
-      let mut col_is_all_spaces = true;
-      for y in 0..self.matrix.len() {
-        if self.matrix[y][x].kind != GalaxyMapElKind::Space {
-          col_is_all_spaces = false;
-          break;
-        }
-      }
-      if col_is_all_spaces {
-        col_inserts.push(x);
-      }
-    }
-    col_inserts.reverse();
-    for x in col_inserts {
-      for y in 0..expanded.matrix.len() {
-        let expanded_el = GalaxyMapEl::new(
-          GalaxyMapElKind::Space,
-          u32::try_from(x).unwrap(),
-          u32::try_from(y).unwrap(),
-        );
-        expanded.matrix[y].insert(x, expanded_el);
-      }
-    }
-    // re-set x,y coords & galaxies
-    for (y, curr_row) in expanded.matrix.iter_mut().enumerate() {
-      for (x, curr_el) in curr_row.iter_mut().enumerate() {
-        curr_el.x = u32::try_from(x).unwrap();
-        curr_el.y = u32::try_from(y).unwrap();
-        if(curr_el.kind == GalaxyMapElKind::Galaxy) {
-          expanded.galaxies.push(*curr_el);
+  pub fn expand(&mut self, factor: u32) {
+    let expand_by = factor - 1;
+    /*
+      to expand the rows:
+        1. find each column that requires exapnsion
+        2. find all galaxies to the right of column
+        3. update each galaxy's x val to the size of
+          the expansion
+      to expand the cols:
+        1. find each row that requires exapnsion
+        2. find all galaxies below the row (y is inverted)
+        3. update each galaxy's y val to the size of
+          the expansion
+    */
+    for &expanded_col in self.expanded_cols.iter().rev() {
+      for galaxy in &mut self.galaxies {
+        if galaxy.x > expanded_col {
+          galaxy.x += expand_by;
         }
       }
     }
-    expanded
+    for &expanded_row in self.expanded_rows.iter().rev() {
+      for galaxy in &mut self.galaxies {
+        if galaxy.y > expanded_row {
+          galaxy.y += expand_by;
+        }
+      }
+    }
   }
 }
 
 /* Static Method */
 fn parse_galaxy_map(input_lines: Vec<String>) -> GalaxyMap {
   let mut galaxy_map = GalaxyMap::new();
-  let mut expanded_cols: Vec<usize> = vec![];
-  let mut expanded_rows: Vec<usize> = vec![];
+  let mut expanded_cols: Vec<u32> = vec![];
+  let mut expanded_rows: Vec<u32> = vec![];
   
   for (y, input_line) in input_lines.iter().enumerate() {
     let mut curr_row: Vec<GalaxyMapEl> = vec![];
@@ -143,7 +121,7 @@ fn parse_galaxy_map(input_lines: Vec<String>) -> GalaxyMap {
       }
     }
     if row_is_spaces {
-      expanded_rows.push(y);
+      expanded_rows.push(u32::try_from(y).unwrap());
     }
   }
   galaxy_map.expanded_rows = expanded_rows;
@@ -157,7 +135,7 @@ fn parse_galaxy_map(input_lines: Vec<String>) -> GalaxyMap {
       }
     }
     if col_is_spaces {
-      expanded_cols.push(x);
+      expanded_cols.push(u32::try_from(x).unwrap());
     }
   }
   galaxy_map.expanded_cols = expanded_cols;

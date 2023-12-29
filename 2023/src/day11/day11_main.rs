@@ -16,25 +16,21 @@ pub fn day11_main() {
   let galaxy_map = GalaxyMap::parse(input_lines);
 
   let fun_time = run_and_time(|| {
-    day11_part1(&galaxy_map);
+    day11_part1(&mut galaxy_map.clone());
   });
   println!("\n[d11p1] took: {:#?}", fun_time);
 
   let fun_time = run_and_time(|| {
-    /*
-    611998089572
-    611998701561 - too high
-    */
     day11_part2(&mut galaxy_map.clone());
   });
   println!("\n[d11p2] took: {:#?}", fun_time);
 }
 
 
-fn day11_part1(src_galaxy_map: &GalaxyMap) {
+fn day11_part1(src_galaxy_map: &mut GalaxyMap) {
   println!("\n~ Day 11 Part 1 ~");
-  let galaxy_map = src_galaxy_map.expand();
-  let galaxy_pairs = get_pairs(&galaxy_map.galaxies);
+  src_galaxy_map.expand(2);
+  let galaxy_pairs = get_pairs(&src_galaxy_map.galaxies);
 
   let mut all_lengths = vec![];
   for pair in galaxy_pairs {
@@ -49,44 +45,12 @@ fn day11_part1(src_galaxy_map: &GalaxyMap) {
 
 fn day11_part2(src_galaxy_map: &mut GalaxyMap) {
   println!("\n~ Day 11 Part 2 ~");
-  let expand_by: u32 = 999999;
-  /*
-    to expand the rows:
-      1. find each column that requires exapnsion
-      2. find all galaxies to the right of column
-      3. update each galaxy's x val to the size of
-        the expansion
-    to expand the cols:
-      1. find each row that requires exapnsion
-      2. find all galaxies below the row (y is inverted)
-      3. update each galaxy's y val to the size of
-        the expansion
-  */
-  let mut expanded_cols = src_galaxy_map.expanded_cols.clone();
-  expanded_cols.reverse();
-  for expanded_col in expanded_cols {
-    let galaxies = &mut src_galaxy_map.galaxies;
-    let col_val = u32::try_from(expanded_col).unwrap();
-    for galaxy in galaxies {
-      if galaxy.x > col_val {
-        galaxy.x += expand_by;
-      }
-    }
-  }
-  let mut expanded_rows = src_galaxy_map.expanded_rows.clone();
-  expanded_rows.reverse();
-  for expanded_row in expanded_rows {
-    let galaxies = &mut src_galaxy_map.galaxies;
-    let row_val = u32::try_from(expanded_row).unwrap();
-    for galaxy in galaxies {
-      if galaxy.y > row_val {
-        galaxy.y += expand_by;
-      }
-    }
-  }
+  
+  src_galaxy_map.expand(1_000_000);
+
   let galaxy_pairs = get_pairs(&src_galaxy_map.galaxies);
 
-  let mut all_lengths = vec![];
+  let mut all_lengths = Vec::with_capacity(galaxy_pairs.len());
   for pair in galaxy_pairs {
     let (galaxy_a, galaxy_b) = pair;
     let steps = find_path(galaxy_a, galaxy_b);
@@ -122,12 +86,11 @@ fn find_path(galaxy_a: GalaxyMapEl, galaxy_b: GalaxyMapEl) -> u32 {
 
 fn get_pairs(src_galaxies: &[GalaxyMapEl]) -> Vec<(GalaxyMapEl, GalaxyMapEl)> {
   let mut pairs = Vec::new();
-  let mut galaxies: HashSet<GalaxyMapEl> = HashSet::from_iter(src_galaxies.iter().cloned());
 
-  for el in src_galaxies {
-    galaxies.remove(&el);
-    for curr_el in &galaxies {
-      pairs.push((*el, *curr_el))
+  for i in 0..src_galaxies.len() {
+    let curr_left = src_galaxies[i];
+    for curr_right in &src_galaxies[i + 1..] {
+      pairs.push((curr_left, *curr_right));
     }
   }
   pairs
