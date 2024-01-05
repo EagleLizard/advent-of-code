@@ -1,4 +1,5 @@
-// hello.cpp: Maggie Johnson
+
+// +build test
 // Description: a program that prints the immortal saying "hello world"
 
 #include <iostream>
