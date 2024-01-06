@@ -4,6 +4,7 @@ import { runAndTime } from '../util/timer';
 import { PIPE_PART_ENUM, PipeMap } from './pipe-map';
 import { PipePart } from './pipe-part';
 import { parsePipeMap } from './pipe-map-parse';
+import { DAY10_INPUT_FILE_NAME } from '../constants';
 
 enum DIRECTION_ENUM {
   NORTH = 'NORTH',
@@ -12,22 +13,22 @@ enum DIRECTION_ENUM {
   WEST = 'WEST',
 }
 
-const DAY10_INPUT_FILE_NAME = 'day10.txt';
-
 export async function day10Main() {
+  let part1StepsToMiddlePipe: number | undefined;
   let inputLines = (await loadDayInput(DAY10_INPUT_FILE_NAME))
     .map(inputLine => inputLine.trim())
     .filter(inputLine => inputLine.length > 0)
   ;
-  let pipeMap = parsePipeMap(inputLines);
-  let funTime = runAndTime(() => {
-    day10Part1(pipeMap);
+  let funTime = await runAndTime(() => {
+    part1StepsToMiddlePipe = day10Part1(inputLines);
   });
+  console.log('steps to middle pipe:');
+  console.log(part1StepsToMiddlePipe);
   console.log(`\n[day10p1] took: ${getIntuitiveTimeString(funTime)}`);
 }
 
-function day10Part1(pipeMap: PipeMap) {
-  console.log('\n~ Day 10 Part 1 ~');
+export function day10Part1(inputLines: string[]): number {
+  let pipeMap = parsePipeMap(inputLines);
 
   // pipeMap.pipeMatrix.forEach(currRow => {
   //   currRow.forEach(currCell => {
@@ -59,8 +60,7 @@ function day10Part1(pipeMap: PipeMap) {
   }
 
   let stepsToMidPipe = soFar.length / 2;
-  console.log('steps to middle pipe:');
-  console.log(stepsToMidPipe);
+  return stepsToMidPipe;
 }
 
 function connectPipes(pipeMap: PipeMap) {

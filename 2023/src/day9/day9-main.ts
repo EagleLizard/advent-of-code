@@ -4,31 +4,35 @@ import { getIntuitiveTimeString } from '../util/format-util';
 import { runAndTime } from '../util/timer';
 import { OasisReport } from './oasis-report';
 import { parseOasisReport } from './oasis-report-parse';
-
-const DAY_9_INPUT_FILE_NAME = 'day9.txt';
+import { DAY9_INPUT_FILE_NAME } from '../constants';
 
 export async function day9Main() {
   let inputLines: string[];
-  let oasisReport: OasisReport;
-  inputLines = (await loadDayInput(DAY_9_INPUT_FILE_NAME))
+  let part1PredictionsSum: number | undefined;
+  let part2PredictionsSum: number | undefined;
+  inputLines = (await loadDayInput(DAY9_INPUT_FILE_NAME))
     .filter(inputLine => inputLine.length > 0)
   ;
 
-  oasisReport = await parseOasisReport(inputLines);
-  let fnTimeMs = runAndTime(() => {
-    day9Part1(oasisReport);
+  let fnTimeMs = await runAndTime(() => {
+    part1PredictionsSum = day9Part1(inputLines);
   });
+  console.log('predictionsSum:');
+  console.log(part1PredictionsSum);
   console.log(`\n[day9p1] took: ${getIntuitiveTimeString(fnTimeMs)}`);
-  oasisReport = await parseOasisReport(inputLines);
-  fnTimeMs = runAndTime(() => {
-    day9Part2(oasisReport);
+  fnTimeMs = await runAndTime(() => {
+    part2PredictionsSum = day9Part2(inputLines);
   });
+  console.log('predictionsSum:');
+  console.log(part2PredictionsSum);
   console.log(`\n[day9p2] took: ${getIntuitiveTimeString(fnTimeMs)}`);
 }
 
-function day9Part2(oasisReport: OasisReport) {
-  console.log('\n~ Day 9 Part 2 ~');
+export function day9Part2(inputLines: string[]): number {
+  let oasisReport: OasisReport;
   let predictions: number[];
+
+  oasisReport = parseOasisReport(inputLines);
 
   predictions = oasisReport.histories.map((history, idx) => {
     let historyDiffs: number[][];
@@ -51,13 +55,14 @@ function day9Part2(oasisReport: OasisReport) {
   let predictionsSum = predictions.reduce((acc, curr) => {
     return acc + curr;
   }, 0);
-  console.log('predictionsSum:');
-  console.log(predictionsSum);
+  return predictionsSum;
 }
 
-function day9Part1(oasisReport: OasisReport) {
-  console.log('\n~ Day 9 Part 1 ~');
+export function day9Part1(inputLines: string[]): number {
+  let oasisReport: OasisReport;
   let predictions: number[];
+
+  oasisReport = parseOasisReport(inputLines);
 
   predictions = oasisReport.histories.map((history, idx) => {
     let historyDiffs: number[][];
@@ -80,8 +85,8 @@ function day9Part1(oasisReport: OasisReport) {
   let predictionsSum = predictions.reduce((acc, curr) => {
     return acc + curr;
   }, 0);
-  console.log('predictionsSum:');
-  console.log(predictionsSum);
+
+  return predictionsSum;
 }
 
 function getHistoryDiffs(historyValues: number[]): number[][] {

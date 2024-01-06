@@ -67,12 +67,17 @@ export function getIntuitiveTime(ms: number): [ number, string ] {
   return timeTuple;
 }
 
-export function getIntuitiveTimeString(ms: number): string {
+export function getIntuitiveTimeString(ms: number, fixed?: number): string {
   let timeTuple: [ number, string ];
+  let fixedPoints: number;
   timeTuple = getIntuitiveTime(ms);
-  let includeDecimals = (timeTuple[0] % 1) !== 0;
+  let includeDecimals = (
+    (fixed !== undefined)
+    || ((timeTuple[0] % 1) !== 0)
+  );
+  fixedPoints = fixed ?? 3;
   let timeNum = includeDecimals
-    ? timeTuple[0].toFixed(3)
+    ? timeTuple[0].toFixed(fixedPoints)
     : timeTuple[0]
   ;
   return `${timeNum} ${timeTuple[1]}`;

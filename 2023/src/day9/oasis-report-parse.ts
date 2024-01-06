@@ -1,7 +1,7 @@
 
 import { OasisHistory, OasisReport } from './oasis-report';
 
-export async function parseOasisReport(inputLines: string[]): Promise<OasisReport> {
+export function parseOasisReport(inputLines: string[]): OasisReport {
   let oasisReport: OasisReport;
   let oasisHistories: OasisHistory[];
 

@@ -36,12 +36,9 @@ export async function day3Main() {
   console.log('Gear ratio sum:');
   console.log(part2GearRatioSum);
   console.log(`\n[d3p2] took: ${getIntuitiveTimeString(funTime)}`);
-  // day3Part1(inputLines);
-  // day3Part2(inputLines);
 }
 
 export function day3Part2(grid: string[]): number {
-  console.log('~ Day 3 part 2 ~');
   /*
     A gear is any * symbol that is adjacent to exactly two part numbers.
     Its gear ratio is the result of multiplying those two numbers together.
@@ -155,7 +152,6 @@ export function day3Part2(grid: string[]): number {
 }
 
 export function day3Part1(grid: string[]): number {
-  console.log('~ Day 3 part 1 ~');
   /*
     traverse the grid.
     When encountering a number:

@@ -1,3 +1,4 @@
+import { isPromise } from './validate-primitives';
 
 export class Timer {
 
@@ -32,9 +33,12 @@ export class Timer {
   }
 }
 
-export function runAndTime(fn: () => void) {
+export async function runAndTime(fn: () => void | Promise<void>) {
   let timer = Timer.start();
-  fn();
+  let res = fn();
+  if(isPromise(res)) {
+    await res;
+  }
   let fnTime = timer.stop();
   return fnTime;
 }
