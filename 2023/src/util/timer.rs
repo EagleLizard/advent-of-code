@@ -1,9 +1,9 @@
 
 use std::time::{Duration, Instant};
 
-pub fn run_and_time<F>(fun: F) -> Duration
+pub fn run_and_time<F>(mut fun: F) -> Duration
 where
-  F: Fn()
+  F: FnMut()
 {
   let start = Instant::now();
   fun();
