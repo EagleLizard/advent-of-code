@@ -2,15 +2,15 @@
 import sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();
 
-import { day1, day1p2 } from './day1/day1';
-import { day3Main } from './day3/day3';
-import { getDayDivider } from './util/print-util';
-import { day9Main } from './day9/day9-main';
-import { Timer } from './util/timer';
-import { getIntuitiveTimeString } from './util/format-util';
-import { printDayBanner } from './util/print-util';
-import { day10Main } from './day10/day10-main';
+import { getDayDivider, printDayResult } from './util/print-util';
 
+import { day1p1, day1p2 } from './day1/day1-main';
+import { day3Part1, day3Part2 } from './day3/day3-main';
+import { day9Part1, day9Part2 } from './day9/day9-main';
+import { day10Part1 } from './day10/day10-main';
+
+import { DAY10_INPUT_FILE_NAME, DAY1_INPUT_FILE_NAME, DAY3_INPUT_FILE_NAME, DAY9_INPUT_FILE_NAME } from './constants';
+import { RunDayResult, runDay } from './run-aoc';
 (async () => {
   try {
     await main();
@@ -24,31 +24,41 @@ async function main() {
   console.log(`\n${getDayDivider(13)}\n`);
   console.log('EagleLizard - Advent of Code [Typescript]');
   console.log(`\n${getDayDivider(13)}\n`);
-  await runFnAndTime(async () => {
-    await day1();
-    await day1p2();
-  }, 1);
 
-  await runFnAndTime(async () => {
-    await day3Main();
-  }, 3);
+  let dayResult: RunDayResult;
 
-  await runFnAndTime(async () => {
-    await day9Main();
-  }, 9);
+  dayResult = await runDay({
+    dayNum: 1,
+    inputFileName: DAY1_INPUT_FILE_NAME,
+    part1Fn: day1p1,
+    part2Fn: day1p2,
+  });
 
-  await runFnAndTime(async () => {
-    await day10Main();
-  }, 10);
+  printDayResult(dayResult);
 
-}
+  dayResult = await runDay({
+    dayNum: 3,
+    inputFileName: DAY3_INPUT_FILE_NAME,
+    part1Fn: day3Part1,
+    part2Fn: day3Part2,
+  });
 
-async function runFnAndTime(fn: () => Promise<void>, dayNumber: number) {
-  let fnTimer = Timer.start();
-  console.log(`\n${getDayDivider(5)}\n`);
-  printDayBanner(dayNumber);
-  await fn();
-  let fnTimeMs = fnTimer.stop();
-  let fnTimeStr = getIntuitiveTimeString(fnTimeMs);
-  console.log(`\n${'-'.repeat(fnTimeStr.length)}\n${fnTimeStr}`);
+  printDayResult(dayResult);
+
+  dayResult = await runDay({
+    dayNum: 9,
+    inputFileName: DAY9_INPUT_FILE_NAME,
+    part1Fn: day9Part1,
+    part2Fn: day9Part2,
+  });
+
+  printDayResult(dayResult);
+
+  dayResult = await runDay({
+    dayNum: 10,
+    inputFileName: DAY10_INPUT_FILE_NAME,
+    part1Fn: day10Part1,
+  });
+
+  printDayResult(dayResult);
 }

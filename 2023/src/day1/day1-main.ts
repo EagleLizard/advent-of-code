@@ -42,8 +42,6 @@ export function day1p1(inputStrs: string[]): number {
   let calibrationValues: number[];
   let calibrationSum: number;
 
-  console.log('~ Day 1 part 1 ~');
-
   calibrationValues = inputStrs.map(getCalibrationValue);
   calibrationSum = calibrationValues.reduce((acc, curr) => {
     return acc + curr;
@@ -55,8 +53,6 @@ export function day1p1(inputStrs: string[]): number {
 export function day1p2(inputStrs: string[]): number {
   let calibrationSum: number;
   let calibrationValues: number[];
-
-  console.log('~ Day 1 part 2 ~');
 
   calibrationValues = inputStrs.map(getCalibrationValueP2);
   calibrationSum = calibrationValues.reduce((acc, curr) => {

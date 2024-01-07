@@ -22,3 +22,18 @@ export async function loadDayInput(inputFileName: string) {
 
   return dayInput;
 }
+
+export async function loadDayInputTrimmed(inputFileName: string): Promise<string[]> {
+  let inputLines = await loadDayInput(inputFileName);
+  return inputLines
+    .map(inputLine => inputLine.trim())
+    .filter(inputLine => inputLine.length > 0)
+  ;
+}
+
+export function getInputFilePath(inputFileName: string): string {
+  return [
+    INPUT_DIR_PATH,
+    inputFileName,
+  ].join(path.sep);
+}
