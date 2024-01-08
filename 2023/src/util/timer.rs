@@ -10,3 +10,20 @@ where
   let fun_time = start.elapsed();
   return fun_time;
 }
+
+pub struct Timer {
+  start_time: Instant,
+}
+impl Timer {
+  fn new() -> Timer {
+    Timer {
+      start_time: Instant::now(),
+    }
+  }
+  pub fn start() -> Timer {
+    Timer::new()
+  }
+  pub fn stop(&self) -> Duration {
+    self.start_time.elapsed()
+  }
+}

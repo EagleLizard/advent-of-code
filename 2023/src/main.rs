@@ -13,42 +13,34 @@ use std::time::Duration;
 
 use util::timer::run_and_time;
 
-use crate::{util::{print_util::get_day_divider_n, input_util::load_day_input}, day2::day2main::{day2p1, day2p2}, constants::{DAY_2_INPUT_FILE_NAME, DAY_4_INPUT_FILE_NAME, DAY_5_INPUT_FILE_NAME, DAY_6_INPUT_FILE_NAME, DAY_7_INPUT_FILE_NAME, DAY_11_INPUT_FILE_NAME}, day4::day4main::{day4_part1, day4_part2}, day5::day5main::{day5_part1, day5_part2}, day6::day6main::{day6_part1, day6_part2}, day7::day7main::{day7_part1, day7_part2}, day11::day11_main::{day11_part1, day11_part2}};
+use crate::{util::{print_util::get_day_divider_n, input_util::load_day_input, timer::Timer}, day2::day2main::{day2p1, day2p2}, constants::{DAY_2_INPUT_FILE_NAME, DAY_4_INPUT_FILE_NAME, DAY_5_INPUT_FILE_NAME, DAY_6_INPUT_FILE_NAME, DAY_7_INPUT_FILE_NAME, DAY_11_INPUT_FILE_NAME}, day4::day4main::{day4_part1, day4_part2}, day5::day5main::{day5_part1, day5_part2}, day6::day6main::{day6_part1, day6_part2}, day7::day7main::{day7_part1, day7_part2}, day11::day11_main::{day11_part1, day11_part2}};
 
 fn main() {
   log_day_divider(13);
   println!("EagleLizard - Advent of Code [Rust]");
   log_day_divider(13);
+  let day1_result = run_day(2, DAY_2_INPUT_FILE_NAME, day2p1, Some(day2p2));
+  log_day_result(day1_result);
+  let day4_result = run_day(4, DAY_4_INPUT_FILE_NAME, day4_part1, Some(day4_part2));
+  log_day_result(day4_result);
+  let day5_result = run_day(5, DAY_5_INPUT_FILE_NAME, day5_part1, Some(day5_part2));
+  log_day_result(day5_result);
+  let day6_result = run_day(6, DAY_6_INPUT_FILE_NAME, day6_part1, Some(day6_part2));
+  log_day_result(day6_result);
+  let day7_result = run_day(7, DAY_7_INPUT_FILE_NAME, day7_part1, Some(day7_part2));
+  log_day_result(day7_result);
+  let day11_result = run_day(11, DAY_11_INPUT_FILE_NAME, day11_part1, Some(day11_part2));
+  log_day_result(day11_result);
+}
 
-  let mut run_day_result = run_and_time(|| {
-    run_day(2, DAY_2_INPUT_FILE_NAME, day2p1, Some(day2p2))
-  });
-  log_day_duration(run_day_result);
-
-  run_day_result = run_and_time(|| {
-    run_day(4, DAY_4_INPUT_FILE_NAME, day4_part1, Some(day4_part2))
-  });
-  log_day_duration(run_day_result);
-  
-  run_day_result = run_and_time(|| {
-    run_day(5, DAY_5_INPUT_FILE_NAME, day5_part1, Some(day5_part2))
-  });
-  log_day_duration(run_day_result);
-
-  run_day_result = run_and_time(|| {
-    run_day(6, DAY_6_INPUT_FILE_NAME, day6_part1, Some(day6_part2))
-  });
-  log_day_duration(run_day_result);
-  
-  run_day_result = run_and_time(|| {
-    run_day(7, DAY_7_INPUT_FILE_NAME, day7_part1, Some(day7_part2))
-  });
-  log_day_duration(run_day_result);
-
-  run_day_result = run_and_time(|| {
-    run_day(11, DAY_11_INPUT_FILE_NAME, day11_part1, Some(day11_part2))
-  });
-  log_day_duration(run_day_result);
+struct DayResult<T1, T2>
+  where T1: std::fmt::Display + Default,
+  T2: std::fmt::Display + Default,
+{
+  pub day_num: u8,
+  pub day_time: Duration,
+  pub part1_result: PartResult<T1>,
+  pub part2_result: Option<PartResult<T2>>,
 }
 
 fn run_day<
@@ -61,10 +53,11 @@ fn run_day<
   input_file_name: &str,
   part1_fn: F1,
   part2_fn: Option<F2>
-)
+) -> DayResult<T1, T2>
   where F1: FnMut(&Vec<String>) -> T1,
     F2: FnMut(&Vec<String>) -> T2
 {
+  let day_timer = Timer::start();
   let input_lines: Vec<String> = load_day_input(input_file_name)
     .into_iter()
     .filter(|line| line.len() > 0)
@@ -73,15 +66,36 @@ fn run_day<
   println!("\n{}\n\n~ Day {} ~", get_day_divider_n(5), day_num);
 
   let part1_result = run_part(1, &input_lines, part1_fn);
-  print_part_result(part1_result);
+  let mut part2_result: Option<PartResult<T2>> = None;
+  
+
+  let part1_solution_len = part1_result.solution.to_string().len();
+  let mut part2_solution_len = 0;
   
   if part2_fn.is_some() {
-    let part2_result = run_part(2, &input_lines, part2_fn.unwrap());
-    print_part_result(part2_result);
+    let part2_result_val = run_part(2, &input_lines, part2_fn.unwrap());
+    part2_solution_len = part2_result_val.solution.to_string().len();
+    part2_result = Some(part2_result_val);
   }
+  let day_time = day_timer.stop();
+  
+  
+  // print_part_result(&part1_result);
+  // if let Some(ref part2_result) = part2_result {
+  //   print_part_result(&part2_result);
+  // }
+
+  let day_result = DayResult {
+    day_num,
+    day_time,
+    part1_result,
+    part2_result,
+  };
+
+  day_result
 }
 
-fn print_part_result<T>(part_result: PartResult<T>)
+fn print_part_result<T>(part_result: &PartResult<T>)
   where T: std::fmt::Display
 {
   println!("Part {}: {} | {:#?}", part_result.part_num, part_result.solution, part_result.fun_time);
@@ -111,6 +125,19 @@ fn run_part<T: std::fmt::Display + Default, F>(
     solution,
   };
   part_result
+}
+
+fn log_day_result<T1, T2>(day_result: DayResult<T1, T2>)
+  where T1: std::fmt::Display + Default,
+  T2: std::fmt::Display + Default,
+{
+  let part1_result = day_result.part1_result;
+  let part2_result = day_result.part2_result;
+  print_part_result(&part1_result);
+  if part2_result.is_some() {
+    print_part_result(&part2_result.unwrap())
+  }
+  log_day_duration(day_result.day_time);
 }
 
 fn log_day_duration(fun_time: Duration) {
