@@ -1,37 +1,9 @@
 
 use::std::cmp::min;
 
-use crate::{
-  util::{input_util::load_day_input, timer::run_and_time},
-  day5::{almanac_parse::parse_almanac, almanac::AlmanacPair},
-};
+use crate::day5::{almanac_parse::parse_almanac, almanac::AlmanacPair};
 
-use super::almanac::Almanac;
-
-const DAY_5_INPUT_FILE_NAME: &str = "day5.txt";
-
-pub fn day5_main() {
-  println!("~ Day 5 ~");
-
-  let input_lines: Vec<String> = load_day_input(DAY_5_INPUT_FILE_NAME)
-    .into_iter()
-    .filter(|line| line.len() > 0)
-    .collect();
-  let amc = parse_almanac(input_lines);
-
-  let mut fun_time = run_and_time(|| {
-    day5_part1(&amc);
-  });
-  println!("\n[d5p1] took: {:#?}", fun_time);
-
-  fun_time = run_and_time(|| {
-    day5_part2(&amc);
-  });
-  println!("\n[d5p2] took: {:#?}", fun_time);
-}
-
-fn day5_part2(amc: &Almanac) {
-  println!("\n~ Day 5 Part 2 ~");
+pub fn day5_part2(input_lines: &Vec<String>) -> u64 {
   /*
     Try a brute force method.
       [note] - worked, but took 21gig RAM & 2800 seconds
@@ -40,7 +12,7 @@ fn day5_part2(amc: &Almanac) {
     Pass in seed ranges,
       and return any subranges that are within bounds
   */
-  
+  let amc = parse_almanac(input_lines);
   let seed_pairs: Vec<AlmanacPair> = amc.seeds
     .chunks(2)
     .map(|seed_pair| {
@@ -73,11 +45,11 @@ fn day5_part2(amc: &Almanac) {
     }
   }
   let min_location = locatons.iter().fold(u64::MAX, |acc, curr| min(acc, *curr));
-  println!("min location: {}", min_location);
+  min_location
 }
 
-fn day5_part1(amc: &Almanac) {
-  println!("\n~ Day 5 Part 1 ~");
+pub fn day5_part1(input_lines: &Vec<String>) -> u64 {
+  let amc = parse_almanac(input_lines);
   let mut locations = Vec::new();
   for seed in amc.seeds.iter() {
     let mut curr_src = seed.clone();
@@ -98,5 +70,5 @@ fn day5_part1(amc: &Almanac) {
       min_location = *location;
     }
   }
-  println!("Lowest location: {}", min_location);
+  min_location
 }

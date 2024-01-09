@@ -1,46 +1,22 @@
 
-
 use crate::day2::game::{
   Game,
   GameHand,
   BagContents,
 };
 use crate::day2::game_parse::parse_game_line;
-use crate::util::input_util::load_day_input;
-use crate::util::timer::run_and_time;
 
-const DAY_2_INPUT_FILE_NAME: &str = "day2.txt";
-
-pub fn day2main () {
-  println!("~ Day 2 ~");
-  let input_lines : Vec<String> = load_day_input(DAY_2_INPUT_FILE_NAME)
-    .into_iter()
-    .filter(|line| line.len() > 0)
-    .collect();
-  let mut all_games: Vec<Game> = Vec::new();
-  for line in input_lines.iter() {
-    let curr_game = parse_game_line(line).unwrap();
-    all_games.push(curr_game.clone());
-  }
-  
-  let mut fun_time = run_and_time(|| {
-    day2p1(&all_games);
-  });
-  println!("\n[d2p1] took: {:#?}", fun_time);
-
-  fun_time = run_and_time(|| {
-    day2p2(&all_games);
-  });
-  println!("\n[d2p2] took: {:#?}", fun_time);
-}
-
-fn day2p2(all_games: &Vec<Game>) {
+pub fn day2p2(input_lines: &Vec<String>) -> u16 {
   /*
     in each game you played, what is the fewest number of cubes of each color
       that could have been in the bag to make the game possible?
   */
-  println!("\n~ Day 2 Part 2 ~");
   let mut all_min_bags: Vec<BagContents> = Vec::new();
+  let mut all_games: Vec<Game> = Vec::new();
+  for line in input_lines.iter() {
+    let curr_game = parse_game_line(line).unwrap();
+    all_games.push(curr_game)
+  }
   for curr_game in all_games.iter() {
     let mut min_bag = BagContents {
       red: 0,
@@ -65,16 +41,19 @@ fn day2p2(all_games: &Vec<Game>) {
     return acc + power_val;
   });
 
-  println!("Min cube set power sum:");
-  println!("{}", min_bag_power_set_sum);
+  min_bag_power_set_sum
 }
 
-fn day2p1(all_games: &Vec<Game>) {
+pub fn day2p1(input_lines: &Vec<String>) -> u16 {
   /*
     The Elf would first like to know which games would have been possible
     if the bag contained only 12 red cubes, 13 green cubes, and 14 blue cubes?
   */
-  println!("\n~ Day 2 Part 1 ~");
+  let mut all_games: Vec<Game> = Vec::new();
+  for line in input_lines.iter() {
+    let curr_game = parse_game_line(line).unwrap();
+    all_games.push(curr_game)
+  }
   let mut possible_games: Vec<&Game> = Vec::new();
   let bag_contents = BagContents {
     red: 12,
@@ -87,7 +66,7 @@ fn day2p1(all_games: &Vec<Game>) {
     }
   }
   let id_sum = possible_games.iter().fold(0, |acc, curr| acc + curr.game_id);
-  println!("{}", "Possible game IDs sum: \n".to_string() + &id_sum.to_string());
+  return id_sum;
 
   fn is_possible_game(game: &Game, bag_contents: &BagContents) -> bool {
     return game.hands.iter().all(|hand| is_possible_hand(hand, bag_contents));

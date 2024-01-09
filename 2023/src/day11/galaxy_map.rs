@@ -1,4 +1,4 @@
-use std::{sync::atomic::{AtomicU32, Ordering}, collections::HashSet};
+use std::sync::atomic::{AtomicU32, Ordering};
 
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
@@ -55,7 +55,7 @@ impl GalaxyMap {
       expanded_rows: Vec::new(),
     }
   }
-  pub fn parse(input_lines: Vec<String>) -> GalaxyMap {
+  pub fn parse(input_lines: &Vec<String>) -> GalaxyMap {
     parse_galaxy_map(input_lines)
   }
   pub fn expand(&mut self, factor: u32) {
@@ -90,7 +90,7 @@ impl GalaxyMap {
 }
 
 /* Static Method */
-fn parse_galaxy_map(input_lines: Vec<String>) -> GalaxyMap {
+fn parse_galaxy_map(input_lines: &Vec<String>) -> GalaxyMap {
   let mut galaxy_map = GalaxyMap::new();
   let mut expanded_cols: Vec<u32> = vec![];
   let mut expanded_rows: Vec<u32> = vec![];
