@@ -1,4 +1,5 @@
 
+mod day1;
 mod day2;
 mod day4;
 mod day5;
@@ -14,12 +15,16 @@ use std::time::Duration;
 use util::timer::run_and_time;
 use colored::Colorize;
 
-use crate::{util::{print_util::get_day_divider_n, input_util::load_day_input, timer::Timer}, day2::day2main::{day2p1, day2p2}, constants::{DAY_2_INPUT_FILE_NAME, DAY_4_INPUT_FILE_NAME, DAY_5_INPUT_FILE_NAME, DAY_6_INPUT_FILE_NAME, DAY_7_INPUT_FILE_NAME, DAY_11_INPUT_FILE_NAME}, day4::day4main::{day4_part1, day4_part2}, day5::day5main::{day5_part1, day5_part2}, day6::day6main::{day6_part1, day6_part2}, day7::day7main::{day7_part1, day7_part2}, day11::day11_main::{day11_part1, day11_part2}};
+use crate::{util::{print_util::get_day_divider_n, input_util::load_day_input, timer::Timer}, day2::day2main::{day2p1, day2p2}, constants::{DAY_2_INPUT_FILE_NAME, DAY_4_INPUT_FILE_NAME, DAY_5_INPUT_FILE_NAME, DAY_6_INPUT_FILE_NAME, DAY_7_INPUT_FILE_NAME, DAY_11_INPUT_FILE_NAME, DAY_1_INPUT_FILE_NAME}, day4::day4main::{day4_part1, day4_part2}, day5::day5main::{day5_part1, day5_part2}, day6::day6main::{day6_part1, day6_part2}, day7::day7main::{day7_part1, day7_part2}, day11::day11_main::{day11_part1, day11_part2}, day1::day1main::{day1_part1, day1_part2}};
 
 fn main() {
   log_day_divider(13);
   println!("EagleLizard - Advent of Code [Rust]");
   log_day_divider(13);
+
+  let day1_result = run_day(1, DAY_1_INPUT_FILE_NAME, day1_part1, Some(day1_part2));
+  log_day_result(day1_result);
+
   let day2_result = run_day(2, DAY_2_INPUT_FILE_NAME, day2p1, Some(day2p2));
   log_day_result(day2_result);
   let day4_result = run_day(4, DAY_4_INPUT_FILE_NAME, day4_part1, Some(day4_part2));

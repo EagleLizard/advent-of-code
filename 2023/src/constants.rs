@@ -1,4 +1,5 @@
 
+pub const DAY_1_INPUT_FILE_NAME: &str = "day1.txt";
 pub const DAY_2_INPUT_FILE_NAME: &str = "day2.txt";
 pub const DAY_4_INPUT_FILE_NAME: &str = "day4.txt";
 pub const DAY_5_INPUT_FILE_NAME: &str = "day5.txt";
