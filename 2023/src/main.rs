@@ -69,7 +69,7 @@ fn run_day<
     .filter(|line| line.len() > 0)
     .collect();
   let day_str = format!("~ Day {} ~", day_num).bright_green();
-  println!("\n{}\n\n{}", get_day_divider_n(5), day_str);
+  println!("{}", day_str);
 
   let part1_result = run_part(1, &input_lines, part1_fn);
   let mut part2_result: Option<PartResult<T2>> = None;
@@ -79,12 +79,6 @@ fn run_day<
     part2_result = Some(part2_result_val);
   }
   let day_time = day_timer.stop();
-  
-  
-  // print_part_result(&part1_result);
-  // if let Some(ref part2_result) = part2_result {
-  //   print_part_result(&part2_result);
-  // }
 
   let day_result = DayResult {
     day_num,
