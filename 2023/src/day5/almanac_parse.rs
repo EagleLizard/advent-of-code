@@ -6,7 +6,7 @@ use regex::Regex;
 
 use super::almanac::AlmanacMap;
 
-pub fn parse_almanac(input_lines: Vec<String>) -> Almanac {
+pub fn parse_almanac(input_lines: &Vec<String>) -> Almanac {
   let mut curr_amc_state: AmcEntryKind = AmcEntryKind::None;
   let mut almanac_entries_map: HashMap<AmcEntryKind, AlmanacEntry> = HashMap::new();
 

@@ -4,7 +4,7 @@ use::std::iter::zip;
 use super::boat_race::BoatRace;
 
 
-pub fn parse_boat_races(lines: Vec<String>) -> Vec<BoatRace> {
+pub fn parse_boat_races(lines: &Vec<String>) -> Vec<BoatRace> {
 
   let times_str = lines[0].split(":").collect::<Vec<&str>>()[1].trim();
   let distances_str = lines[1].split(":").collect::<Vec<&str>>()[1].trim();
