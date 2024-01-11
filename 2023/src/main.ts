@@ -9,8 +9,15 @@ import { day3Part1, day3Part2 } from './day3/day3-main';
 import { day9Part1, day9Part2 } from './day9/day9-main';
 import { day10Part1 } from './day10/day10-main';
 
-import { DAY10_INPUT_FILE_NAME, DAY1_INPUT_FILE_NAME, DAY3_INPUT_FILE_NAME, DAY9_INPUT_FILE_NAME } from './constants';
+import {
+  DAY1_INPUT_FILE_NAME,
+  DAY2_INPUT_FILE_NAME,
+  DAY3_INPUT_FILE_NAME,
+  DAY9_INPUT_FILE_NAME,
+  DAY10_INPUT_FILE_NAME,
+} from './constants';
 import { RunDayResult, runDay } from './run-aoc';
+import { day2p1 } from './day2/day2-main';
 (async () => {
   try {
     await main();
@@ -34,6 +41,13 @@ async function main() {
     part2Fn: day1p2,
   });
 
+  printDayResult(dayResult);
+
+  dayResult = await runDay({
+    dayNum: 2,
+    inputFileName: DAY2_INPUT_FILE_NAME,
+    part1Fn: day2p1,
+  });
   printDayResult(dayResult);
 
   dayResult = await runDay({
