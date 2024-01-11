@@ -1,29 +1,3 @@
-use once_cell::sync::Lazy;
-use regex::{Regex, Match};
-
-// Compile regexes only once
-static WORD_NUM_RXS: Lazy<Vec<Regex>> = Lazy::new(|| {
-  vec![
-      r"one",
-      r"two",
-      r"three",
-      r"four",
-      r"five",
-      r"six",
-      r"seven",
-      r"eight",
-      r"nine",
-      r"[0-9]",
-  ].iter()
-  .map(|rx_str| Regex::new(rx_str).unwrap())
-   .collect()
-});
-
-// Compile regex only once
-static NUM_RX: Lazy<Regex> = Lazy::new(|| {
-  Regex::new(r"[0-9]+").unwrap()
-});
-
 
 pub fn day1_part1(input_lines: &Vec<String>) -> u16 {
   let calibration_sum = input_lines.iter().fold(0, |acc, curr_line| {
@@ -45,35 +19,67 @@ pub fn day1_part2(input_lines: &Vec<String>) -> u16 {
   })
   // 0
 }
+#[derive(Debug, Clone)]
+struct WordMatch<'a> {
+  word: &'a str,
+  start: usize,
+}
 
 fn get_calibration_value_p2(input_line: &str) -> u16 {
-  let all_matches = WORD_NUM_RXS.iter().fold(Vec::new(), |mut acc, curr_rx| {
-    for mat in curr_rx.find_iter(input_line) {
-      acc.push(mat)
+  let words = [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+  ];
+
+  let mut all_matches = Vec::new();
+  for word in words {
+    input_line.match_indices(word)
+      .for_each(|match_index| {
+        let word_match = WordMatch {
+          word: match_index.1,
+          start: match_index.0
+        };
+        all_matches.push(word_match)
+      });
+  }
+  for (i, c) in input_line.char_indices() {
+    if c.is_digit(10) {
+      let c_str = &input_line[i..i + c.len_utf8()];
+      all_matches.push(WordMatch {
+        word: c_str,
+        start: i,
+      })
     }
-    acc
-  });
-  let mut first_match_opt: Option<Match> = None;
-  let mut last_match_opt: Option<Match> = None;
-  for curr_mat in all_matches {
+  }
+  let mut first_match_opt: Option<WordMatch> = None;
+  let mut last_match_opt: Option<WordMatch> = None;
+  for curr_match in all_matches {
     if first_match_opt.is_none() {
-      first_match_opt = Some(curr_mat);
-    } else if let Some(first_match) = first_match_opt {
-      if curr_mat.start() < first_match.start() {
-        first_match_opt = Some(curr_mat);
+      first_match_opt = Some(curr_match.clone())
+    } else if let Some(ref first_match) = first_match_opt {
+      if curr_match.start < first_match.start {
+        first_match_opt = Some(curr_match.clone());
       }
     }
     if last_match_opt.is_none() {
-      last_match_opt = Some(curr_mat);
-    } else if let Some(last_match) = last_match_opt {
-      if curr_mat.start() > last_match.start() {
-        last_match_opt = Some(curr_mat);
+      last_match_opt = Some(curr_match);
+    } else if let Some(ref last_match) = last_match_opt {
+      if curr_match.start > last_match.start {
+        last_match_opt = Some(curr_match)
       }
     }
   }
-
-  let first_digit = get_digit_from_match_string(first_match_opt.unwrap().as_str());
-  let last_digit = get_digit_from_match_string(last_match_opt.unwrap().as_str());
+  let first_match = first_match_opt.unwrap();
+  let last_match = last_match_opt.unwrap();
+  let first_digit = get_digit_from_match_string(&first_match.word);
+  let last_digit = get_digit_from_match_string(&last_match.word);
   let calibration_str = format!("{}{}", first_digit, last_digit);
   let calibration_val: u16 = calibration_str.parse().unwrap();
   return calibration_val
@@ -81,8 +87,7 @@ fn get_calibration_value_p2(input_line: &str) -> u16 {
 }
 
 fn get_digit_from_match_string(match_str: &str) -> &str {
-  // let num_rx = Regex::new(r"[0-9]+").unwrap();
-  if NUM_RX.is_match(match_str) {
+  if "0123456789".contains(match_str) {
     return match_str
   }
   match match_str {
