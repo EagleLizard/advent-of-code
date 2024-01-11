@@ -87,10 +87,11 @@ fn get_calibration_value_p2(input_line: &str) -> u16 {
 }
 
 fn get_digit_from_match_string(match_str: &str) -> &str {
-  if "0123456789".contains(match_str) {
-    return match_str
-  }
+  // if "0123456789".contains(match_str) {
+  //   return match_str
+  // }
   match match_str {
+    "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => match_str,
     "one" => "1",
     "two" => "2",
     "three" => "3",
