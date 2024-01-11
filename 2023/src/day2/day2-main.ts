@@ -13,6 +13,36 @@ type Game = {
   hands: GameHand[],
 };
 
+export function day2p2(inputLines: string[]): number {
+  let allGames: Game[];
+  let allMinBags: BagContents[];
+  let minBagPowerSetSum: number;
+  allGames = inputLines.map(parseGameLine);
+  allMinBags = allGames.reduce((acc, currGame) => {
+    let minBag: BagContents;
+    minBag = {
+      red: -Infinity,
+      green: -Infinity,
+      blue: -Infinity,
+    };
+    for(let i = 0; i < currGame.hands.length; ++i) {
+      let currHand: GameHand;
+      currHand = currGame.hands[i];
+      minBag.red = Math.max(minBag.red, currHand.red);
+      minBag.green = Math.max(minBag.green, currHand.green);
+      minBag.blue = Math.max(minBag.blue, currHand.blue);
+    }
+    acc.push(minBag);
+    return acc;
+  }, [] as BagContents[]);
+  minBagPowerSetSum = allMinBags.reduce((acc, currMinBag) => {
+    let currPowerSetSum: number;
+    currPowerSetSum = currMinBag.red * currMinBag.green * currMinBag.blue;
+    return acc + currPowerSetSum;
+  }, 0);
+  return minBagPowerSetSum;
+}
+
 export function day2p1(inputLines: string[]): number {
   let idSum: number;
   let allGames: Game[];

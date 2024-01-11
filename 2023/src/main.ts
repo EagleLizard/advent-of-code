@@ -17,7 +17,7 @@ import {
   DAY10_INPUT_FILE_NAME,
 } from './constants';
 import { RunDayResult, runDay } from './run-aoc';
-import { day2p1 } from './day2/day2-main';
+import { day2p1, day2p2 } from './day2/day2-main';
 (async () => {
   try {
     await main();
@@ -47,6 +47,7 @@ async function main() {
     dayNum: 2,
     inputFileName: DAY2_INPUT_FILE_NAME,
     part1Fn: day2p1,
+    part2Fn: day2p2,
   });
   printDayResult(dayResult);
 
