@@ -29,19 +29,17 @@ export type RunDayPartResult = {
   solutionVal: number,
 }
 
-export async function runDay(opts: RunDayParams): Promise<RunDayResult> {
+export async function runDay(
+  dayNum: number,
+  inputFileName: string,
+  part1Fn:(inputLines: string[]) => number,
+  part2Fn?:(inputLines: string[]) => number,
+): Promise<RunDayResult> {
   let dayResult: RunDayResult;
   let part1Result: RunDayPartResult;
   let part2Result: RunDayPartResult | undefined;
   let dayTimer: Timer;
   let dayTime: number;
-
-  const {
-    dayNum,
-    inputFileName,
-    part1Fn,
-    part2Fn,
-  } = opts;
 
   dayTimer = Timer.start();
 
@@ -50,20 +48,10 @@ export async function runDay(opts: RunDayParams): Promise<RunDayResult> {
     .filter(inputLine => inputLine.length > 0)
   ;
 
-  part1Result = await runDayPart({
-    dayNum,
-    partNum: 1,
-    inputLines,
-    fn: part1Fn,
-  });
+  part1Result = await runDayPart(dayNum, 1, inputLines, part1Fn);
 
   if(part2Fn !== undefined) {
-    part2Result = await runDayPart({
-      dayNum,
-      partNum: 2,
-      inputLines,
-      fn: part2Fn,
-    });
+    part2Result = await runDayPart(dayNum, 2, inputLines, part2Fn);
   }
 
   dayTime = dayTimer.stop();
@@ -78,15 +66,14 @@ export async function runDay(opts: RunDayParams): Promise<RunDayResult> {
   return dayResult;
 }
 
-export async function runDayPart(opts: RunDayPartParams): Promise<RunDayPartResult> {
+export async function runDayPart(
+  dayNum: number,
+  partNum: number,
+  inputLines: string[],
+  fn: (inputLines: string[]) => number,
+): Promise<RunDayPartResult> {
   let solutionVal: number | undefined;
   let dayPartResult: RunDayPartResult;
-  const {
-    dayNum,
-    partNum,
-    inputLines,
-    fn,
-  } = opts;
   let funTime = await runAndTime(() => {
     solutionVal = fn(inputLines);
   });

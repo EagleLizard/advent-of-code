@@ -18,6 +18,8 @@ import {
 } from './constants';
 import { RunDayResult, runDay } from './run-aoc';
 import { day2p1, day2p2 } from './day2/day2-main';
+import { getCurrentDateTimeStr } from './util/date-time-util';
+
 (async () => {
   try {
     await main();
@@ -28,52 +30,25 @@ import { day2p1, day2p2 } from './day2/day2-main';
 })();
 
 async function main() {
+  console.log(getCurrentDateTimeStr());
   console.log(`\n${getDayDivider(13)}\n`);
   console.log('EagleLizard - Advent of Code [Typescript]');
   console.log(`\n${getDayDivider(13)}\n`);
 
   let dayResult: RunDayResult;
 
-  dayResult = await runDay({
-    dayNum: 1,
-    inputFileName: DAY1_INPUT_FILE_NAME,
-    part1Fn: day1p1,
-    part2Fn: day1p2,
-  });
-
+  dayResult = await runDay(1, DAY1_INPUT_FILE_NAME, day1p1, day1p2);
   printDayResult(dayResult);
 
-  dayResult = await runDay({
-    dayNum: 2,
-    inputFileName: DAY2_INPUT_FILE_NAME,
-    part1Fn: day2p1,
-    part2Fn: day2p2,
-  });
+  dayResult = await runDay(2, DAY2_INPUT_FILE_NAME, day2p1, day2p2);
   printDayResult(dayResult);
 
-  dayResult = await runDay({
-    dayNum: 3,
-    inputFileName: DAY3_INPUT_FILE_NAME,
-    part1Fn: day3Part1,
-    part2Fn: day3Part2,
-  });
-
+  dayResult = await runDay(3, DAY3_INPUT_FILE_NAME, day3Part1, day3Part2);
   printDayResult(dayResult);
 
-  dayResult = await runDay({
-    dayNum: 9,
-    inputFileName: DAY9_INPUT_FILE_NAME,
-    part1Fn: day9Part1,
-    part2Fn: day9Part2,
-  });
-
+  dayResult = await runDay(9, DAY9_INPUT_FILE_NAME, day9Part1, day9Part2);
   printDayResult(dayResult);
 
-  dayResult = await runDay({
-    dayNum: 10,
-    inputFileName: DAY10_INPUT_FILE_NAME,
-    part1Fn: day10Part1,
-  });
-
+  dayResult = await runDay(10, DAY10_INPUT_FILE_NAME, day10Part1);
   printDayResult(dayResult);
 }
