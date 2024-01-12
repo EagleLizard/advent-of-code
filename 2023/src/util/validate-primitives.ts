@@ -15,3 +15,14 @@ export function isPromise(val: unknown): val is Promise<unknown> {
   }
   return ((typeof (val as any)?.then) === 'function');
 }
+
+export function isNumber(val: unknown): val is number {
+  if(typeof val !== 'number') {
+    return false;
+  }
+  return !isNaN(val);
+}
+
+export function isString(val: unknown): val is string {
+  return (typeof val) === 'string';
+}

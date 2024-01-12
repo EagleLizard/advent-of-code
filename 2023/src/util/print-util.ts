@@ -94,7 +94,7 @@ export function printDayResult(dayResult: RunDayResult) {
   dayTotalTimeStr = `${dayTotalDividerStr}\n${dayTextClr}${dayTimeClr}`;
 
   linesToPrint = [
-    `\n${getDayDivider(5)}\n`,
+    // `\n${getDayDivider(5)}\n`,
     `${dayClr}`,
     part1Str,
     part2Str ?? '',
