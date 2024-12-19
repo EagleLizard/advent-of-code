@@ -15,10 +15,12 @@ import {
   DAY3_INPUT_FILE_NAME,
   DAY9_INPUT_FILE_NAME,
   DAY10_INPUT_FILE_NAME,
+  DAY4_TEST_INPUT_FILE_NAME,
 } from './constants';
 import { RunDayResult, runDay } from './run-aoc';
 import { day2p1, day2p2 } from './day2/day2-main';
 import { getCurrentDateTimeStr } from './util/date-time-util';
+import { day4Part1 } from './day4/day4-main';
 
 (async () => {
   try {
@@ -44,6 +46,9 @@ async function main() {
   printDayResult(dayResult);
 
   dayResult = await runDay(3, DAY3_INPUT_FILE_NAME, day3Part1, day3Part2);
+  printDayResult(dayResult);
+
+  dayResult = await runDay(4, DAY4_TEST_INPUT_FILE_NAME, day4Part1);
   printDayResult(dayResult);
 
   dayResult = await runDay(9, DAY9_INPUT_FILE_NAME, day9Part1, day9Part2);
