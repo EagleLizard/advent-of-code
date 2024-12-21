@@ -1,5 +1,6 @@
 {
-  "files.autoSave": "afterDelay",
+  // "files.autoSave": "afterDelay",
+  "files.autoSave": "off",
   "files.autoSaveDelay": 20,
   "files.associations": {
     "*.ejs": "html",
