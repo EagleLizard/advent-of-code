@@ -17,7 +17,8 @@ func Day1Pt1() {
 		panic(err)
 	}
 	fmt.Printf("wd: %s\n", wd)
-	list1, list2 := parseInput("day1_test1.txt")
+	// list1, list2 := parseInput("day1_test1.txt")
+	list1, list2 := parseInput("day1.txt")
 	cmpFn := func(i int, j int) int {
 		return i - j
 	}
