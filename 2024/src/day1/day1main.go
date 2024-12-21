@@ -10,13 +10,28 @@ import (
 	"strconv"
 )
 
-func Day1Pt1() {
-	fmt.Println("Day1 Pt1")
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
+func Day1Pt2() {
+	// list1, list2 := parseInput("day1_test1.txt")
+	list1, list2 := parseInput("day1.txt")
+	scores := []int{}
+	for _, l := range list1 {
+		rCount := 0
+		for _, r := range list2 {
+			if l == r {
+				rCount++
+			}
+		}
+		score := l * rCount
+		scores = append(scores, score)
 	}
-	fmt.Printf("wd: %s\n", wd)
+	scoreSum := 0
+	for _, score := range scores {
+		scoreSum += score
+	}
+	fmt.Printf("%d\n", scoreSum)
+}
+
+func Day1Pt1() {
 	// list1, list2 := parseInput("day1_test1.txt")
 	list1, list2 := parseInput("day1.txt")
 	cmpFn := func(i int, j int) int {

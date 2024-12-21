@@ -8,7 +8,11 @@ import (
 
 func main() {
 	aocBanner()
+	fmt.Println("~ Day 1 ~")
+	fmt.Println("Part 1:")
 	day1.Day1Pt1()
+	fmt.Println("Part 2:")
+	day1.Day1Pt2()
 }
 
 func aocBanner() {
