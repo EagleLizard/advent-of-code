@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/EagleLizard/advent-of-code/2024/src/day1"
+	"github.com/EagleLizard/advent-of-code/2024/src/day2"
 )
 
 func main() {
@@ -13,6 +14,10 @@ func main() {
 	day1.Day1Pt1()
 	fmt.Println("Part 2:")
 	day1.Day1Pt2()
+
+	fmt.Println("~ Day 2 ~")
+	fmt.Println("Part 1:")
+	day2.Day2Pt1()
 }
 
 func aocBanner() {
