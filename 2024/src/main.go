@@ -18,6 +18,8 @@ func main() {
 	fmt.Println("~ Day 2 ~")
 	fmt.Println("Part 1:")
 	day2.Day2Pt1()
+	fmt.Println("Part 2:")
+	day2.Day2Pt2()
 }
 
 func aocBanner() {

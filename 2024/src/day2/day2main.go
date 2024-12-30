@@ -6,13 +6,15 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 )
 
 /*
-318 - too high
-
-223 - too low
+part1:
+	318 - too high
+	223 - too low
+part2:
 */
 
 func Day2Pt1() {
@@ -26,6 +28,35 @@ func Day2Pt1() {
 		}
 	}
 	fmt.Printf("%v\n", safeReportCount)
+}
+
+func Day2Pt2() {
+	// reports := parseInput("day2_test.txt")
+	reports := parseInput("day2.txt")
+	safeReportCount := 0
+	for i := 0; i < len(reports); i++ {
+		reportSafe := checkReportSafe2(reports[i])
+		if reportSafe {
+			safeReportCount++
+		}
+	}
+	fmt.Printf("%d\n", safeReportCount)
+}
+
+func checkReportSafe2(report []int) bool {
+	reportSafe := checkReportSafe(report)
+	for i := 0; !reportSafe && i < len(report); i++ {
+		/*
+			Remove every level and retest
+				(brute force)
+		*/
+		dampReport := slices.Delete(slices.Clone(report), i, i+1)
+		reportSafe = checkReportSafe(dampReport)
+		if reportSafe {
+			break
+		}
+	}
+	return reportSafe
 }
 
 func checkReportSafe(report []int) bool {
