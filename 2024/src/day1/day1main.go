@@ -1,18 +1,15 @@
 package day1
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
 )
 
-func Day1Pt2() {
+func Day1Pt2(inputLines []string) int {
 	// list1, list2 := parseInput("day1_test1.txt")
-	list1, list2 := parseInput("day1.txt")
+	// list1, list2 := parseInput("day1.txt")
+	list1, list2 := parseInput(inputLines)
 	scores := []int{}
 	for _, l := range list1 {
 		rCount := 0
@@ -28,12 +25,13 @@ func Day1Pt2() {
 	for _, score := range scores {
 		scoreSum += score
 	}
-	fmt.Printf("%d\n", scoreSum)
+	return scoreSum
 }
 
-func Day1Pt1() {
+func Day1Pt1(inputLines []string) int {
 	// list1, list2 := parseInput("day1_test1.txt")
-	list1, list2 := parseInput("day1.txt")
+	// list1, list2 := parseInput("day1.txt")
+	list1, list2 := parseInput(inputLines)
 	cmpFn := func(i int, j int) int {
 		return i - j
 	}
@@ -52,25 +50,14 @@ func Day1Pt1() {
 	for _, n := range listDiffs {
 		diffSum += n
 	}
-	fmt.Printf("%d\n", diffSum)
+	return diffSum
 }
 
-func parseInput(inputFileName string) ([]int, []int) {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	inputFilePath := filepath.Join(wd, "input", inputFileName)
-	f, err := os.Open(inputFilePath)
-	if err != nil {
-		panic(err)
-	}
-	sc := bufio.NewScanner(f)
+func parseInput(inputLines []string) ([]int, []int) {
 	list1 := []int{}
 	list2 := []int{}
 	rx := regexp.MustCompile(`^(\d+)\s+(\d+)$`)
-	for sc.Scan() {
-		currLine := sc.Text()
+	for _, currLine := range inputLines {
 		rxMatch := rx.FindStringSubmatch(currLine)
 		n1, err := strconv.Atoi(rxMatch[1])
 		if err != nil {
