@@ -15,20 +15,16 @@ type DayPartFn func([]string) int
 const (
 	// day1InputFileName = "day1_test1.txt"
 	day1InputFileName = "day1.txt"
+	// day2InputFileName = "day2_test.txt"
+	day2InputFileName = "day2.txt"
 )
 
 func main() {
 	aocBanner()
 
-	fmt.Println("~ Day 2 ~")
-	fmt.Println("Part 1:")
-	day2.Day2Pt1()
-	fmt.Println("Part 2:")
-	day2.Day2Pt2()
-
 	fmt.Print("\n")
-	// runDay(1, "day1.txt", day1.Day1Pt1, day1.Day1Pt2)
 	runDay(1, day1InputFileName, day1.Day1Pt1, day1.Day1Pt2)
+	runDay(2, day2InputFileName, day2.Day2Pt1, day2.Day2Pt2)
 }
 
 func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {

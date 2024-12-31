@@ -1,10 +1,6 @@
 package day2
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
@@ -17,9 +13,10 @@ part1:
 part2:
 */
 
-func Day2Pt1() {
+func Day2Pt1(inputLines []string) int {
 	// reports := parseInput("day2_test.txt")
-	reports := parseInput("day2.txt")
+	// reports := parseInput("day2.txt")
+	reports := parseInput(inputLines)
 	safeReportCount := 0
 	for _, report := range reports {
 		reportSafe := checkReportSafe(report)
@@ -27,12 +24,13 @@ func Day2Pt1() {
 			safeReportCount++
 		}
 	}
-	fmt.Printf("%v\n", safeReportCount)
+	return safeReportCount
 }
 
-func Day2Pt2() {
+func Day2Pt2(inputLines []string) int {
 	// reports := parseInput("day2_test.txt")
-	reports := parseInput("day2.txt")
+	// reports := parseInput("day2.txt")
+	reports := parseInput(inputLines)
 	safeReportCount := 0
 	for i := 0; i < len(reports); i++ {
 		reportSafe := checkReportSafe2(reports[i])
@@ -40,7 +38,7 @@ func Day2Pt2() {
 			safeReportCount++
 		}
 	}
-	fmt.Printf("%d\n", safeReportCount)
+	return safeReportCount
 }
 
 func checkReportSafe2(report []int) bool {
@@ -94,21 +92,10 @@ func checkReportSafe(report []int) bool {
 	return reportSafe
 }
 
-func parseInput(inputFileName string) [][]int {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	inputFilePath := filepath.Join(wd, "input", inputFileName)
-	f, err := os.Open(inputFilePath)
-	if err != nil {
-		panic(err)
-	}
-	sc := bufio.NewScanner(f)
+func parseInput(inputLines []string) [][]int {
 	levelRx := regexp.MustCompile(`\d+`)
 	reports := [][]int{}
-	for sc.Scan() {
-		currLine := sc.Text()
+	for _, currLine := range inputLines {
 		lvlStrs := levelRx.FindAllString(currLine, -1)
 		currLvls := []int{}
 		for _, lvlStr := range lvlStrs {
@@ -121,5 +108,4 @@ func parseInput(inputFileName string) [][]int {
 		reports = append(reports, currLvls)
 	}
 	return reports
-
 }
