@@ -5,12 +5,19 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/EagleLizard/advent-of-code/2024/src/day1"
 	"github.com/EagleLizard/advent-of-code/2024/src/day2"
 )
 
 type DayPartFn func([]string) int
+
+type RunPartRes struct {
+	PartNum  int
+	FnTime   time.Duration
+	Solution int
+}
 
 const (
 	// day1InputFileName = "day1_test1.txt"
@@ -32,15 +39,29 @@ func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {
 	inputLines := getInputLines(inputFileName)
 
 	if pt1Fn != nil {
-		fmt.Print("Part 1:\n")
-		pt1Res := pt1Fn(inputLines)
-		fmt.Printf("%d\n", pt1Res)
+		pt1Res := runPart(1, inputLines, pt1Fn)
+		printPart(pt1Res)
 	}
 	if pt2Fn != nil {
-		fmt.Print("Part 2:\n")
-		pt2Res := pt2Fn(inputLines)
-		fmt.Printf("%v\n", pt2Res)
+		pt2Res := runPart(2, inputLines, pt2Fn)
+		printPart(pt2Res)
 	}
+}
+
+func runPart(ptNum int, inputLines []string, ptFn DayPartFn) RunPartRes {
+	startTime := time.Now()
+	ptSolution := ptFn(inputLines)
+	elapsed := time.Since(startTime)
+	partRes := RunPartRes{
+		PartNum:  ptNum,
+		FnTime:   elapsed,
+		Solution: ptSolution,
+	}
+	return partRes
+}
+
+func printPart(ptRes RunPartRes) {
+	fmt.Printf("Part %d: %d | %v\n", ptRes.PartNum, ptRes.Solution, ptRes.FnTime)
 }
 
 func getInputLines(inputFileName string) []string {
