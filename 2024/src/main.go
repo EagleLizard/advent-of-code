@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/EagleLizard/advent-of-code/2024/src/day1"
@@ -38,6 +39,7 @@ func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {
 	fmt.Printf("~ Day %d ~\n", day)
 	inputLines := getInputLines(inputFileName)
 
+	totalStart := time.Now()
 	if pt1Fn != nil {
 		pt1Res := runPart(1, inputLines, pt1Fn)
 		printPart(pt1Res)
@@ -46,6 +48,12 @@ func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {
 		pt2Res := runPart(2, inputLines, pt2Fn)
 		printPart(pt2Res)
 	}
+	totalElapsedTime := time.Since(totalStart)
+
+	divWidth := 6
+	divStr := strings.Repeat("-", divWidth)
+	fmt.Printf("total: %v\n", totalElapsedTime)
+	fmt.Printf("%s\n", divStr)
 }
 
 func runPart(ptNum int, inputLines []string, ptFn DayPartFn) RunPartRes {
