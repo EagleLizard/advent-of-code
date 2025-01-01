@@ -1,9 +1,9 @@
 package day3
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type MulInstruction struct {
@@ -21,9 +21,9 @@ func Day3Pt1(inputLines []string) int {
 }
 
 func Day3Pt2(inputLines []string) int {
-	// rx := regexp.MustCompile(`(do\(\))|(don't\(\))|mul\(([0-9]{1,3}),([0-9]{1,3})\)`)
-	// rx := regexp.MustCompile(`(do\(\)|don't\(\))`)
 	rx := regexp.MustCompile(`(do\(\)|don't\(\))|mul\(([0-9]{1,3}),([0-9]{1,3})\)`)
+	doMul := true
+	mulSum := 0
 	for _, inputLine := range inputLines {
 		lineLen := len(inputLine)
 		for cursorPos := 0; cursorPos < lineLen; {
@@ -41,12 +41,31 @@ func Day3Pt2(inputLines []string) int {
 				fullMatchEnd = cursorPos + match[1]
 			}
 			fullMatchStr := inputLine[fullMatchStart:fullMatchEnd]
+			if fullMatchStr == "do()" {
+				doMul = true
+			} else if fullMatchStr == "don't()" {
+				doMul = false
+			} else if doMul && strings.HasPrefix(fullMatchStr, "mul") {
+				lhsStart := cursorPos + match[4]
+				lhsEnd := cursorPos + match[5]
+				rhsStart := cursorPos + match[6]
+				rhsEnd := cursorPos + match[7]
+				lhsStr := inputLine[lhsStart:lhsEnd]
+				rhsStr := inputLine[rhsStart:rhsEnd]
+				lhs, err := strconv.Atoi(lhsStr)
+				if err != nil {
+					panic(err)
+				}
+				rhs, err := strconv.Atoi(rhsStr)
+				if err != nil {
+					panic(err)
+				}
+				mulSum += lhs * rhs
+			}
 			cursorPos += match[1]
-			fmt.Printf("%v\n", match)
-			fmt.Printf("%s\n", fullMatchStr)
 		}
 	}
-	return -1
+	return mulSum
 }
 
 func parseInput(inputLines []string) []MulInstruction {

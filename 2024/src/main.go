@@ -27,8 +27,8 @@ const (
 	// day2InputFileName = "day2_test.txt"
 	day2InputFileName = "day2.txt"
 	// day3InputFileName = "day3_test.txt"
-	day3InputFileName = "day3_test2.txt"
-	// day3InputFileName = "day3.txt"
+	// day3InputFileName = "day3_test2.txt"
+	day3InputFileName = "day3.txt"
 )
 
 func main() {
