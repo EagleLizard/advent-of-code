@@ -23,11 +23,6 @@ func Day4Pt1(inputLines []string) int {
 	for y, parsedLine := range parsedLines {
 		lineLen := len(parsedLine)
 		for x, currChar := range parsedLine {
-			// if currChar == searchChars[0] {
-			// 	fmt.Printf("%q ", currChar)
-			// } else {
-			// 	fmt.Print("' ' ")
-			// }
 			var forwardMatch bool
 			var downMatch bool
 			var backMatch bool
@@ -35,71 +30,64 @@ func Day4Pt1(inputLines []string) int {
 			if currChar != searchChars[0] {
 				continue
 			}
+			lookForward := x+searchStrLen < lineLen
+			lookDown := y+searchStrLen < numLines
+			lookLeft := x-searchStrLen > 0
+			lookUp := y-searchStrLen > 0
 			// fmt.Printf("%q,", currChar)
-			if x+searchStrLen < lineLen {
+			if lookForward {
 				/* look forward */
 				forwardMatch = true
-				for i := 1; i < searchStrLen; i++ {
+				for i := 1; forwardMatch && i < searchStrLen; i++ {
 					forwardMatch = parsedLine[x+i] == searchChars[i]
-					if !forwardMatch {
-						break
-					}
 				}
 				if forwardMatch {
-					forwardMatches = append(forwardMatches, Point{
-						x: x,
-						y: y,
-					})
+					forwardMatches = append(forwardMatches, Point{x, y})
 				}
 			}
-			if y+searchStrLen < numLines {
+			if lookDown {
 				/* look down */
 				downMatch = true
-				for i := 1; i < searchStrLen; i++ {
+				for i := 1; downMatch && i < searchStrLen; i++ {
 					downMatch = parsedLines[y+i][x] == searchChars[i]
-					if !downMatch {
-						break
-					}
 				}
 				if downMatch {
 					fmt.Printf("%q\n", parsedLine)
-					downMatches = append(downMatches, Point{
-						x: x,
-						y: y,
-					})
+					downMatches = append(downMatches, Point{x, y})
 				}
 			}
-			if x-searchStrLen > 0 {
+			if lookLeft {
 				/* look left */
 				backMatch = true
-				for i := 1; i < searchStrLen; i++ {
+				for i := 1; backMatch && i < searchStrLen; i++ {
 					backMatch = parsedLine[x-i] == searchChars[i]
-					if !backMatch {
-						break
-					}
 				}
 				if backMatch {
-					backMatches = append(backMatches, Point{
-						x: x,
-						y: y,
-					})
+					backMatches = append(backMatches, Point{x, y})
 				}
 			}
-			if y-searchStrLen > 0 {
+			if lookUp {
 				/* look up */
 				upMatch = true
-				for i := 1; i < searchStrLen; i++ {
+				for i := 1; upMatch && i < searchStrLen; i++ {
 					upMatch = parsedLines[y-i][x] == searchChars[i]
-					if !upMatch {
-						break
-					}
 				}
 				if upMatch {
-					upMatches = append(upMatches, Point{
-						x: x,
-						y: y,
-					})
+					upMatches = append(upMatches, Point{x, y})
 				}
+			}
+
+			if lookForward && lookDown {
+				/* look SE */
+			}
+			if lookForward && lookUp {
+				/* look NE */
+			}
+			if lookLeft && lookDown {
+				/* look SW */
+			}
+			if lookLeft && lookUp {
+				/* look NW */
 			}
 		}
 		// fmt.Print("\n")
