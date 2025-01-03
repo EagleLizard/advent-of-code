@@ -1,5 +1,96 @@
 package day4
 
+import (
+	"fmt"
+
+	"github.com/EagleLizard/advent-of-code/2024/src/util/geom"
+)
+
+func Day4Pt2(inputLines []string) int {
+	searchChars := []rune{'M', 'A', 'S'}
+	searchStrLen := len(searchChars)
+	fmt.Printf("%q\n", searchChars)
+	parsedLines := parseInput(inputLines)
+	numLines := len(parsedLines)
+	matchCount := 0
+	pivotIdx := searchStrLen / 2
+	pivotChar := searchChars[pivotIdx]
+
+	neMatches := []geom.Point[int]{}
+	for y, parsedLine := range parsedLines {
+		// fmt.Printf("%q %d\n", parsedLine, y)
+		lineLen := len(parsedLine)
+		for x := range parsedLine {
+			currChar := parsedLines[y][x]
+			// if currChar == pivotChar {
+			// 	fmt.Printf("%c", pivotChar)
+			// } else {
+			// 	fmt.Printf(".")
+			// }
+			if currChar != pivotChar {
+				continue
+			}
+			// lookRight := x+(searchStrLen-1) < lineLen
+			// lookDown := y+(searchStrLen-1) < numLines
+			// lookLeft := x-(searchStrLen-1) >= 0
+			// lookUp := y-(searchStrLen-1) >= 0
+
+			// var (
+			// 	neMatch bool
+			// 	seMatch bool
+			// 	swMatch bool
+			// 	nwMatch bool
+			// )
+			crossWidth := searchStrLen / 2
+			checkCross := ((x+crossWidth < lineLen) &&
+				(y+crossWidth < numLines) &&
+				(x-crossWidth >= 0) &&
+				(y-crossWidth >= 0))
+			if checkCross {
+				// fmt.Printf("%d, %d\n", x, y)
+				/* check SW-> NE */
+				var matchUp bool
+				// var matchDown bool
+				if parsedLines[y+crossWidth][x-crossWidth] == searchChars[0] {
+					/* forward */
+					matchUp = true
+					for i := 0; matchUp && i < searchStrLen; i++ {
+						matchUp = parsedLines[y-crossWidth+i][(x-crossWidth)+i] == searchChars[i]
+					}
+					if matchUp {
+						neMatches = append(neMatches, geom.Point[int]{X: x, Y: y})
+					} else {
+						/* backward */
+						matchUp = true
+						for i := 0; matchUp && i < searchStrLen; i++ {
+							matchUp = parsedLines[y-crossWidth+i][(x-crossWidth)+i] == searchChars[searchStrLen-i-1]
+						}
+						if matchUp {
+							neMatches = append(neMatches, geom.Point[int]{X: x, Y: y})
+						}
+					}
+				}
+				/* check NW-> SE */
+			}
+			// if lookUp && lookRight {
+			// 	/* NE */
+			// }
+			// if lookDown && lookRight {
+			// 	/* SE */
+			// }
+			// if lookDown && lookLeft {
+			// 	/* SW */
+			// }
+			// if lookUp && lookLeft {
+			// 	/* NW */
+			// }
+		}
+		fmt.Print("\n")
+	}
+	fmt.Printf("neMatches:\n%v\n", neMatches)
+	return matchCount
+}
+
 /*
 2310 - too low
 2336 - correct
