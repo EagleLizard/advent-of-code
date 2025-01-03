@@ -1,0 +1,132 @@
+package day4
+
+/*
+2310 - too low
+2336 - correct
+*/
+func Day4Pt1(inputLines []string) int {
+	searchChars := []rune{'X', 'M', 'A', 'S'}
+	searchStrLen := len(searchChars)
+	numLines := len(inputLines)
+	parsedLines := parseInput(inputLines)
+
+	matchCount := 0
+	// fmt.Printf("%q\n", parsedLines)
+	for y, parsedLine := range parsedLines {
+		lineLen := len(parsedLine)
+		for x, currChar := range parsedLine {
+			var forwardMatch bool
+			var downMatch bool
+			var backMatch bool
+			var upMatch bool
+			/* diagonal */
+			var seMatch bool
+			var neMatch bool
+			var swMatch bool
+			var nwMatch bool
+			if currChar != searchChars[0] {
+				continue
+			}
+			lookForward := x+(searchStrLen-1) < lineLen
+			lookDown := y+(searchStrLen-1) < numLines
+			lookLeft := x-(searchStrLen-1) >= 0
+			lookUp := y-(searchStrLen-1) >= 0
+			if lookForward {
+				/* look forward */
+				forwardMatch = true
+				for i := 1; forwardMatch && i < searchStrLen; i++ {
+					forwardMatch = parsedLine[x+i] == searchChars[i]
+				}
+				if forwardMatch {
+					matchCount++
+				}
+			}
+			if lookDown {
+				/* look down */
+				downMatch = true
+				for i := 1; downMatch && i < searchStrLen; i++ {
+					downMatch = parsedLines[y+i][x] == searchChars[i]
+				}
+				if downMatch {
+					matchCount++
+				}
+			}
+			if lookLeft {
+				/* look left */
+				backMatch = true
+				for i := 1; backMatch && i < searchStrLen; i++ {
+					backMatch = parsedLine[x-i] == searchChars[i]
+				}
+				if backMatch {
+					matchCount++
+				}
+			}
+			if lookUp {
+				/* look up */
+				upMatch = true
+				for i := 1; upMatch && i < searchStrLen; i++ {
+					upMatch = parsedLines[y-i][x] == searchChars[i]
+				}
+				if upMatch {
+					matchCount++
+				}
+			}
+
+			if lookForward && lookDown {
+				/* look SE */
+				seMatch = true
+				for i := 1; seMatch && i < searchStrLen; i++ {
+					seMatch = parsedLines[y+i][x+i] == searchChars[i]
+				}
+				if seMatch {
+					matchCount++
+				}
+			}
+			if lookForward && lookUp {
+				/* look NE */
+				neMatch = true
+				for i := 1; neMatch && i < searchStrLen; i++ {
+					neMatch = parsedLines[y-i][x+i] == searchChars[i]
+				}
+				if neMatch {
+					matchCount++
+				}
+			}
+			if lookLeft && lookDown {
+				/* look SW */
+				swMatch = true
+				for i := 1; swMatch && i < searchStrLen; i++ {
+					swMatch = parsedLines[y+i][x-i] == searchChars[i]
+				}
+				if swMatch {
+					matchCount++
+				}
+			}
+			if lookLeft && lookUp {
+				/* look NW */
+				nwMatch = true
+				for i := 1; nwMatch && i < searchStrLen; i++ {
+					nwMatch = parsedLines[y-i][x-i] == searchChars[i]
+				}
+				if nwMatch {
+					matchCount++
+				}
+			}
+		}
+		// fmt.Print("\n")
+	}
+
+	return matchCount
+}
+
+func parseInput(inputLines []string) [][]rune {
+	parsedLines := [][]rune{}
+	for _, inputLine := range inputLines {
+		currChars := []rune{}
+		for _, currChar := range inputLine {
+			currChars = append(currChars, currChar)
+		}
+		parsedLines = append(parsedLines, currChars)
+	}
+	return parsedLines
+}
