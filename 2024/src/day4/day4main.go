@@ -1,32 +1,18 @@
 package day4
 
-import (
-	"fmt"
-
-	"github.com/EagleLizard/advent-of-code/2024/src/util/geom"
-)
-
 func Day4Pt2(inputLines []string) int {
 	searchChars := []rune{'M', 'A', 'S'}
 	searchStrLen := len(searchChars)
-	fmt.Printf("%q\n", searchChars)
 	parsedLines := parseInput(inputLines)
 	numLines := len(parsedLines)
 	matchCount := 0
 	pivotIdx := searchStrLen / 2
 	pivotChar := searchChars[pivotIdx]
 
-	neMatches := []geom.Point[int]{}
 	for y, parsedLine := range parsedLines {
-		// fmt.Printf("%q %d\n", parsedLine, y)
 		lineLen := len(parsedLine)
 		for x := range parsedLine {
 			currChar := parsedLines[y][x]
-			// if currChar == pivotChar {
-			// 	fmt.Printf("%c", pivotChar)
-			// } else {
-			// 	fmt.Printf(".")
-			// }
 			if currChar != pivotChar {
 				continue
 			}
@@ -36,10 +22,9 @@ func Day4Pt2(inputLines []string) int {
 				(x-crossWidth >= 0) &&
 				(y-crossWidth >= 0))
 			if checkCross {
-				// fmt.Printf("%d, %d\n", x, y)
 				/* check SW-> NE */
 				var matchUp bool
-				// var matchDown bool
+				var matchDown bool
 				if parsedLines[y+crossWidth][x-crossWidth] == searchChars[0] {
 					/* forward */
 					matchUp = true
@@ -52,17 +37,27 @@ func Day4Pt2(inputLines []string) int {
 					for i := 0; matchUp && i < searchStrLen; i++ {
 						matchUp = parsedLines[(y+crossWidth)-i][(x-crossWidth)+i] == searchChars[searchStrLen-i-1]
 					}
-					// matchUp = false
-				}
-				if matchUp {
-					neMatches = append(neMatches, geom.Point[int]{X: x, Y: y})
 				}
 				/* check NW-> SE */
+				if parsedLines[y-crossWidth][x-crossWidth] == searchChars[0] {
+					/* forward */
+					matchDown = true
+					for i := 0; matchDown && i < searchStrLen; i++ {
+						matchDown = parsedLines[(y-crossWidth)+i][(x-crossWidth)+i] == searchChars[i]
+					}
+				} else if parsedLines[y-crossWidth][x-crossWidth] == searchChars[searchStrLen-1] {
+					/* backward */
+					matchDown = true
+					for i := 0; matchDown && i < searchStrLen; i++ {
+						matchDown = parsedLines[(y-crossWidth)+i][(x-crossWidth)+i] == searchChars[searchStrLen-i-1]
+					}
+				}
+				if matchUp && matchDown {
+					matchCount++
+				}
 			}
 		}
-		fmt.Print("\n")
 	}
-	fmt.Printf("neMatches:\n%v\n", neMatches)
 	return matchCount
 }
 
