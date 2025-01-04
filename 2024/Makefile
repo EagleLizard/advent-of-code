@@ -10,4 +10,7 @@ run-go:
 	$(BIN_DIR)/$(GO_BIN)
 watch-go:
 	air --build.cmd "make build-go" --build.bin "make run-go"
-
+run-lua:
+	lua init.lua
+watch-lua:
+	fswatch -r ./src | xargs -n1 -I{} make run-lua

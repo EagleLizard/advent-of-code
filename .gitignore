@@ -27,6 +27,11 @@ Cargo.lock
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# Lua
+**/luarocks
+**/lua
+**/lua_modules
+**/.luarocks
 
 2024/bin
 2024/tmp
