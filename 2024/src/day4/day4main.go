@@ -30,17 +30,6 @@ func Day4Pt2(inputLines []string) int {
 			if currChar != pivotChar {
 				continue
 			}
-			// lookRight := x+(searchStrLen-1) < lineLen
-			// lookDown := y+(searchStrLen-1) < numLines
-			// lookLeft := x-(searchStrLen-1) >= 0
-			// lookUp := y-(searchStrLen-1) >= 0
-
-			// var (
-			// 	neMatch bool
-			// 	seMatch bool
-			// 	swMatch bool
-			// 	nwMatch bool
-			// )
 			crossWidth := searchStrLen / 2
 			checkCross := ((x+crossWidth < lineLen) &&
 				(y+crossWidth < numLines) &&
@@ -55,35 +44,21 @@ func Day4Pt2(inputLines []string) int {
 					/* forward */
 					matchUp = true
 					for i := 0; matchUp && i < searchStrLen; i++ {
-						matchUp = parsedLines[y-crossWidth+i][(x-crossWidth)+i] == searchChars[i]
+						matchUp = parsedLines[(y+crossWidth)-i][(x-crossWidth)+i] == searchChars[i]
 					}
-					if matchUp {
-						neMatches = append(neMatches, geom.Point[int]{X: x, Y: y})
-					} else {
-						/* backward */
-						matchUp = true
-						for i := 0; matchUp && i < searchStrLen; i++ {
-							matchUp = parsedLines[y-crossWidth+i][(x-crossWidth)+i] == searchChars[searchStrLen-i-1]
-						}
-						if matchUp {
-							neMatches = append(neMatches, geom.Point[int]{X: x, Y: y})
-						}
+				} else if parsedLines[y+crossWidth][x-crossWidth] == searchChars[searchStrLen-1] {
+					/* backward */
+					matchUp = true
+					for i := 0; matchUp && i < searchStrLen; i++ {
+						matchUp = parsedLines[(y+crossWidth)-i][(x-crossWidth)+i] == searchChars[searchStrLen-i-1]
 					}
+					// matchUp = false
+				}
+				if matchUp {
+					neMatches = append(neMatches, geom.Point[int]{X: x, Y: y})
 				}
 				/* check NW-> SE */
 			}
-			// if lookUp && lookRight {
-			// 	/* NE */
-			// }
-			// if lookDown && lookRight {
-			// 	/* SE */
-			// }
-			// if lookDown && lookLeft {
-			// 	/* SW */
-			// }
-			// if lookUp && lookLeft {
-			// 	/* NW */
-			// }
 		}
 		fmt.Print("\n")
 	}
