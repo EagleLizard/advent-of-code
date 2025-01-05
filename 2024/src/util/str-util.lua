@@ -11,7 +11,7 @@ local function split(s, delim)
     end
     subStr = string.sub(s, i, startIdx - 1)
     table.insert(subStrs, subStr)
-    i = i + endIdx
+    i = endIdx + 1
   end
   if i < strLen then
     -- get remainder
