@@ -4,6 +4,9 @@ local lfs = require("lfs")
 local files = require("./util/files")
 local day5 = require("./day5/day5-main")
 
+-- local DAY_5_FILE_NAME = "day5_test.txt"
+local DAY_5_FILE_NAME = "day5.txt"
+
 local function aocBanner()
   local padStr = "*"
   local pre = padStr
@@ -58,7 +61,7 @@ local function main()
   local bannerStr = aocBanner()
   io.write(string.format("\n%s\n\n", bannerStr))
 
-  runDay(5, "day5_test.txt", day5.day5pt1)
+  runDay(5, DAY_5_FILE_NAME, day5.day5pt1)
 end
 
 main()
