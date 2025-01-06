@@ -74,21 +74,17 @@ local function checkUpdate(update, allRules)
       return false
     end
     table.insert(pagesSoFar, currPageNum)
-    -- printf("\n")
   end
-  -- printf("\n")
   return true
 end
 
 local function day5Pt1(inputLines)
   local parsedInput = parseInput(inputLines)
-  -- printf("num rules: %d\nnum updates: %d\n", #parsedInput.rules, #parsedInput.updates)
   local rules = parsedInput.rules
   local updates = parsedInput.updates
   local validUpdates = {}
   for _, update in ipairs(updates) do
     local validUpdate = checkUpdate(update, rules)
-    -- printf("[ %s ] | %s\n", strUtil.join(update, ", "), validUpdate)
     if validUpdate then
       table.insert(validUpdates, update)
     end
@@ -97,7 +93,6 @@ local function day5Pt1(inputLines)
   for _, validUpdate in ipairs(validUpdates) do
     local midIdx = math.floor(#validUpdate / 2)
     midPageSum = midPageSum + validUpdate[midIdx + 1]
-    -- printf("%s | %s\n", strUtil.join(validUpdate, ", "), validUpdate[midIdx])
   end
   return midPageSum
 end
