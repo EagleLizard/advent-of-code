@@ -10,6 +10,17 @@ local function findIndex(arr, compFn)
   return foundIdx
 end
 
+local function indexOf(arr, searchVal)
+  local foundIdx = nil
+  for i, v in ipairs(arr) do
+    if searchVal == v then
+      foundIdx = i
+      break
+    end
+  end
+  return foundIdx
+end
+
 local function contains(tab, searchEl)
   for _, val in pairs(tab) do
     if searchEl == val then
@@ -30,6 +41,7 @@ end
 
 local arrUtilModule = {
   findIndex = findIndex,
+  indexOf = indexOf,
   contains = contains,
   copy = copy,
 }

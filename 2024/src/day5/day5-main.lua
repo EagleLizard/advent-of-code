@@ -41,16 +41,8 @@ local function getRelevantRules(update, allRules)
   -- filter rules to only include rules for which are being
   --  updated
   local rules = {}
-  for i, rule in ipairs(allRules) do
-    local lhs = rule.lhs
-    local rhs = rule.rhs
-    local lhsIdx = arr.findIndex(update, function (pageNum)
-      return lhs == pageNum
-    end)
-    local rhsIdx = arr.findIndex(update, function (pageNum)
-      return rhs == pageNum
-    end)
-    if lhsIdx ~= nil and rhsIdx ~= nil then
+  for _, rule in ipairs(allRules) do
+    if arr.contains(update, rule.lhs) and arr.contains(update, rule.rhs) then
       table.insert(rules, rule)
     end
   end
@@ -81,39 +73,16 @@ local function checkUpdate(update, allRules)
 end
 
 local function getBrokenRules(update, rules)
-  local pagesSoFar = {}
+  local visitedPages = {}
   local rulesBroken = {}
 
   for _, currPage in ipairs(update) do
-    local currRulesBroken = {}
-    local validPage = true
     for _, rule in ipairs(rules) do
-      if rule.rhs == currPage then
-        if not arr.contains(pagesSoFar, rule.lhs) then
-          table.insert(currRulesBroken, rule)
-          validPage = false
-        end
+      if rule.rhs == currPage and not visitedPages[rule.lhs] then
+        table.insert(rulesBroken, rule)
       end
     end
-    if not validPage then
-      -- only keep the rule that was broken
-      --   for the page number with the max index
-      local maxRule
-      local maxRuleIdx = -1
-      for _, rule in ipairs(currRulesBroken) do
-        local resIdx = arr.findIndex(update, function (pageNum, pageIdx)
-          return pageNum == rule.lhs
-        end)
-        if resIdx ~= nil and resIdx > maxRuleIdx then
-          maxRuleIdx = resIdx
-          maxRule = rule
-        end
-      end
-      if maxRule ~= nil then
-        table.insert(rulesBroken, maxRule)
-      end
-    end
-    table.insert(pagesSoFar, currPage)
+    visitedPages[currPage] = true
   end
   return rulesBroken
 end
@@ -125,15 +94,17 @@ local function sortUpdate(update, allRules)
   while #rulesBroken > 0 do
     -- fix first broken rule, then get broken rules again
     local ruleToFix = rulesBroken[1]
-    local lhsIdx = arr.findIndex(update, function (pageNum)
-      return pageNum == ruleToFix.lhs
-    end)
+    -- local lhsIdx = arr.findIndex(update, function (pageNum)
+    --   return pageNum == ruleToFix.lhs
+    -- end)
+    local lhsIdx = arr.indexOf(update, ruleToFix.lhs)
     if not lhsIdx then
       error(string.format("page not found: %d", ruleToFix.lhs))
     end
-    local rhsIdx = arr.findIndex(update, function (pageNum)
-      return pageNum == ruleToFix.rhs
-    end)
+    -- local rhsIdx = arr.findIndex(update, function (pageNum)
+    --   return pageNum == ruleToFix.rhs
+    -- end)
+    local rhsIdx = arr.indexOf(update, ruleToFix.rhs)
     if not rhsIdx then
       error(string.format("page not found: %d", ruleToFix.rhs))
     end
