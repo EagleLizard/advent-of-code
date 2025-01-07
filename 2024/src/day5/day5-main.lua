@@ -51,61 +51,51 @@ end
 
 local function checkUpdate(update, allRules)
   local rules = getRelevantRules(update, allRules)
-  local pagesSoFar = {}
-  for i, currPageNum in ipairs(update) do
+  local visitedPages = {}
+  for _, currPageNum in ipairs(update) do
     -- get all rules containing the current page
-    local validPage = true
     for _, rule in ipairs(rules) do
-      if rule.rhs == currPageNum then
-        -- lhs must come before
-        if not arr.contains(pagesSoFar, rule.lhs) then
-          validPage = false
-          break
-        end
+      -- lhs must come before
+      if rule.rhs == currPageNum and not visitedPages[rule.lhs] then
+        return false
       end
     end
-    if not validPage then
-      return false
-    end
-    table.insert(pagesSoFar, currPageNum)
+    visitedPages[currPageNum] = true
   end
   return true
 end
 
-local function getBrokenRules(update, rules)
+local function getBrokenRule(update, rules)
   local visitedPages = {}
-  local rulesBroken = {}
-
   for _, currPage in ipairs(update) do
     for _, rule in ipairs(rules) do
       if rule.rhs == currPage and not visitedPages[rule.lhs] then
-        table.insert(rulesBroken, rule)
+        return rule
       end
     end
     visitedPages[currPage] = true
   end
-  return rulesBroken
+  return nil
 end
 
 local function sortUpdate(update, allRules)
   update = arr.copy(update)
   local rules = getRelevantRules(update, allRules)
-  local rulesBroken = getBrokenRules(update, rules)
-  while #rulesBroken > 0 do
+  local ruleBroken = getBrokenRule(update, rules)
+  while ruleBroken do
     -- fix first broken rule, then get broken rules again
-    local ruleToFix = rulesBroken[1]
-    local lhsIdx = arr.indexOf(update, ruleToFix.lhs)
+    local lhsIdx = arr.indexOf(update, ruleBroken.lhs)
     if not lhsIdx then
-      error(string.format("page not found: %d", ruleToFix.lhs))
+      error(string.format("page not found: %d", ruleBroken.lhs))
     end
-    local rhsIdx = arr.indexOf(update, ruleToFix.rhs)
+    local rhsIdx = arr.indexOf(update, ruleBroken.rhs)
     if not rhsIdx then
-      error(string.format("page not found: %d", ruleToFix.rhs))
+      error(string.format("page not found: %d", ruleBroken.rhs))
     end
 
-    update[lhsIdx] = ruleToFix.rhs
-    update[rhsIdx] = ruleToFix.lhs
-    rulesBroken = getBrokenRules(update, rules)
+    update[lhsIdx] = ruleBroken.rhs
+    update[rhsIdx] = ruleBroken.lhs
+    ruleBroken = getBrokenRule(update, rules)
   end
   return update
 end
