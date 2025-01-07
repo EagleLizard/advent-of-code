@@ -6,8 +6,8 @@ local day5 = require("./day5/day5-main")
 
 local printf = require("./util/printf")
 
-local DAY_5_FILE_NAME = "day5_test.txt"
--- local DAY_5_FILE_NAME = "day5.txt"
+-- local DAY_5_FILE_NAME = "day5_test.txt"
+local DAY_5_FILE_NAME = "day5.txt"
 
 local function aocBanner()
   local padStr = "*"
@@ -75,7 +75,7 @@ local function main()
   local bannerStr = aocBanner()
   printf("\n%s\n\n", bannerStr)
 
-  runDay(5, DAY_5_FILE_NAME, day5.day5pt1)
+  runDay(5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2)
 end
 
 main()

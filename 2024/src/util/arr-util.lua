@@ -19,9 +19,19 @@ local function contains(tab, searchEl)
   return false
 end
 
+-- shallow clone
+local function copy(tab)
+  local tabCopy = {}
+  for k, v in pairs(tab) do
+    tabCopy[k] = v
+  end
+  return tabCopy
+end
+
 local arrUtilModule = {
   findIndex = findIndex,
   contains = contains,
+  copy = copy,
 }
 
 return arrUtilModule
