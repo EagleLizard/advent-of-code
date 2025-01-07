@@ -94,16 +94,10 @@ local function sortUpdate(update, allRules)
   while #rulesBroken > 0 do
     -- fix first broken rule, then get broken rules again
     local ruleToFix = rulesBroken[1]
-    -- local lhsIdx = arr.findIndex(update, function (pageNum)
-    --   return pageNum == ruleToFix.lhs
-    -- end)
     local lhsIdx = arr.indexOf(update, ruleToFix.lhs)
     if not lhsIdx then
       error(string.format("page not found: %d", ruleToFix.lhs))
     end
-    -- local rhsIdx = arr.findIndex(update, function (pageNum)
-    --   return pageNum == ruleToFix.rhs
-    -- end)
     local rhsIdx = arr.indexOf(update, ruleToFix.rhs)
     if not rhsIdx then
       error(string.format("page not found: %d", ruleToFix.rhs))
