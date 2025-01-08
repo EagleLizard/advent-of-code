@@ -79,7 +79,7 @@ local function main()
   local bannerStr = aocBanner()
   printf("\n%s\n\n", bannerStr)
 
-  runDay(1, DAY_1_FILE_NAME, day1.day1Pt1, nil)
+  runDay(1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day2Pt2)
   runDay(5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2)
 end
 

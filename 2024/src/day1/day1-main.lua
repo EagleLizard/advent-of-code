@@ -16,6 +16,28 @@ local function parseInput(inputLines)
   return res
 end
 
+local function day2Pt2(inputLines)
+  local parsedInput = parseInput(inputLines)
+  local list1 = parsedInput.list1
+  local list2 = parsedInput.list2
+  local scores = {}
+  for _, l in ipairs(list1) do
+    local rCount = 0
+    for _, r in ipairs(list2) do
+      if l == r then
+        rCount = rCount + 1
+      end
+    end
+    local score = l * rCount
+    table.insert(scores, score)
+  end
+  local scoreSum = 0
+  for _, score in ipairs(scores) do
+    scoreSum = scoreSum + score
+  end
+  return scoreSum
+end
+
 --[[ 
   2196996 - correct
 ]]
@@ -39,6 +61,7 @@ end
 
 local day1Module = {
   day1Pt1 = day1Pt1,
+  day2Pt2 = day2Pt2,
 }
 
 return day1Module
