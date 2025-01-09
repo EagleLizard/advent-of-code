@@ -4,12 +4,15 @@ local lfs = require("lfs")
 local files = require("./util/files")
 
 local day1 = require("./day1/day1-main")
+local day2 = require("./day2/day2-main")
 local day5 = require("./day5/day5-main")
 
 local printf = require("./util/printf")
 
 -- local DAY_1_FILE_NAME = "day1_test1.txt"
 local DAY_1_FILE_NAME = "day1.txt"
+-- local DAY_2_FILE_NAME = "day2_test.txt"
+local DAY_2_FILE_NAME = "day2.txt"
 -- local DAY_5_FILE_NAME = "day5_test.txt"
 local DAY_5_FILE_NAME = "day5.txt"
 
@@ -80,6 +83,7 @@ local function main()
   printf("\n%s\n\n", bannerStr)
 
   runDay(1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day2Pt2)
+  runDay(2, DAY_2_FILE_NAME, day2.day2Pt1, nil)
   runDay(5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2)
 end
 
