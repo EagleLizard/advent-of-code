@@ -1,6 +1,7 @@
 package day5
 
 import (
+	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -14,6 +15,33 @@ type Rule struct {
 type Day5Input struct {
 	Rules   []Rule
 	Updates [][]int
+}
+
+/*
+4507 - correct
+*/
+func Day5Pt2(inputLines []string) int {
+	parsedInput := parseInput(inputLines)
+	rules := parsedInput.Rules
+	updates := parsedInput.Updates
+	invalidUpdates := [][]int{}
+	for _, update := range updates {
+		invalidUpdate := !checkUpdate(update, rules)
+		if invalidUpdate {
+			invalidUpdates = append(invalidUpdates, update)
+		}
+	}
+	sortedUpdates := [][]int{}
+	for _, update := range invalidUpdates {
+		sortedUpdate := sortUpdate(update, rules)
+		sortedUpdates = append(sortedUpdates, sortedUpdate)
+	}
+	midPageSum := 0
+	for _, sortedUpdate := range sortedUpdates {
+		midIdx := len(sortedUpdate) / 2
+		midPageSum += sortedUpdate[midIdx]
+	}
+	return midPageSum
 }
 
 /*
@@ -36,6 +64,40 @@ func Day5Pt1(inputLines []string) int {
 		midPageSum += validUpdate[midIdx]
 	}
 	return midPageSum
+}
+
+func sortUpdate(update []int, allRules []Rule) []int {
+	rules := getRelevantRules(update, allRules)
+	sortedUpdate := update[:]
+	ruleBroken := getBrokenRule(sortedUpdate, rules)
+	for ruleBroken != nil {
+		lhsIdx := slices.Index(sortedUpdate, ruleBroken.Lhs)
+		if lhsIdx == -1 {
+			panic(fmt.Sprintf("page not found: %d", ruleBroken.Lhs))
+		}
+		rhsIdx := slices.Index(sortedUpdate, ruleBroken.Rhs)
+		if rhsIdx == -1 {
+			panic(fmt.Sprintf("page not found: %d", ruleBroken.Rhs))
+		}
+
+		sortedUpdate[lhsIdx] = ruleBroken.Rhs
+		sortedUpdate[rhsIdx] = ruleBroken.Lhs
+		ruleBroken = getBrokenRule(sortedUpdate, rules)
+	}
+	return sortedUpdate
+}
+
+func getBrokenRule(update []int, rules []Rule) *Rule {
+	visitedPages := make(map[int]bool)
+	for _, currPage := range update {
+		for _, rule := range rules {
+			if rule.Rhs == currPage && !visitedPages[rule.Lhs] {
+				return &rule
+			}
+		}
+		visitedPages[currPage] = true
+	}
+	return nil
 }
 
 func checkUpdate(update []int, allRules []Rule) bool {

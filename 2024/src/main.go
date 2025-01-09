@@ -45,7 +45,7 @@ func main() {
 	runDay(2, day2InputFileName, day2.Day2Pt1, day2.Day2Pt2)
 	runDay(3, day3InputFileName, day3.Day3Pt1, day3.Day3Pt2)
 	runDay(4, day4InputFileName, day4.Day4Pt1, day4.Day4Pt2)
-	runDay(5, day5InputFileName, day5.Day5Pt1, nil)
+	runDay(5, day5InputFileName, day5.Day5Pt1, day5.Day5Pt2)
 }
 
 func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {
