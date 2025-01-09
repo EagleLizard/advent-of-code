@@ -39,11 +39,25 @@ local function copy(tab)
   return tabCopy
 end
 
+--[[ 
+  remove elem at idx and return copy
+]]
+local function removeIdx(tab, idx)
+  local resTab = {}
+  for k, v in ipairs(tab) do
+    if k ~= idx then
+      table.insert(resTab, v)
+    end
+  end
+  return resTab
+end
+
 local arrUtilModule = {
   findIndex = findIndex,
   indexOf = indexOf,
   contains = contains,
   copy = copy,
+  removeIdx = removeIdx,
 }
 
 return arrUtilModule

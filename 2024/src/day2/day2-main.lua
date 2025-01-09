@@ -1,7 +1,5 @@
 
-local strUtil = require("../util/str-util")
-
-local printf = require("../util/printf")
+local arr = require("../util/arr-util")
 
 local function parseInput(inputLines)
    local reports = {}
@@ -38,7 +36,34 @@ local function checkReport(report)
     end
   end
   return true
-  -- printf("%s\n", strUtil.join(diffs, " "))
+end
+
+local function checkDampReport(report)
+  if checkReport(report) then
+    return true
+  end
+  for i=1, #report do
+    local dampReport = arr.removeIdx(report, i)
+    if checkReport(dampReport) then
+      return true
+    end
+  end
+  return false
+end
+
+--[[ 
+366 - correct
+]]
+local function day2Pt2(inputLines)
+  local reports = parseInput(inputLines)
+  local safeReportCount = 0
+  for _, report in ipairs(reports) do
+    local reportSafe = checkDampReport(report)
+    if reportSafe then
+      safeReportCount = safeReportCount + 1
+    end
+  end
+  return safeReportCount
 end
 
 --[[
@@ -52,13 +77,13 @@ local function day2Pt1(inputLines)
     if reportSafe then
       safeReportCount = safeReportCount + 1
     end
-    -- printf("%s | %s\n", strUtil.join(report, " "), reportSafe)
   end
   return safeReportCount
 end
 
 local day2MainModule = {
   day2Pt1 = day2Pt1,
+  day2Pt2 = day2Pt2,
 }
 
 return day2MainModule

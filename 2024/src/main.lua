@@ -83,7 +83,7 @@ local function main()
   printf("\n%s\n\n", bannerStr)
 
   runDay(1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day2Pt2)
-  runDay(2, DAY_2_FILE_NAME, day2.day2Pt1, nil)
+  runDay(2, DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2)
   runDay(5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2)
 end
 
