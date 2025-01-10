@@ -13,6 +13,7 @@ import (
 	"github.com/EagleLizard/advent-of-code/2024/src/day3"
 	"github.com/EagleLizard/advent-of-code/2024/src/day4"
 	"github.com/EagleLizard/advent-of-code/2024/src/day5"
+	"github.com/EagleLizard/advent-of-code/2024/src/day6"
 )
 
 type DayPartFn func([]string) int
@@ -35,6 +36,8 @@ const (
 	day4InputFileName = "day4.txt"
 	// day5InputFileName = "day5_test.txt"
 	day5InputFileName = "day5.txt"
+	// day6InputFileName = "day6_test.txt"
+	day6InputFileName = "day6.txt"
 )
 
 func main() {
@@ -46,6 +49,7 @@ func main() {
 	runDay(3, day3InputFileName, day3.Day3Pt1, day3.Day3Pt2)
 	runDay(4, day4InputFileName, day4.Day4Pt1, day4.Day4Pt2)
 	runDay(5, day5InputFileName, day5.Day5Pt1, day5.Day5Pt2)
+	runDay(6, day6InputFileName, day6.Day6Pt1, nil)
 }
 
 func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {
