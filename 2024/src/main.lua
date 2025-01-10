@@ -26,6 +26,7 @@ local DAY_1_FILE_NAME = "day1.txt"
 -- local DAY_2_FILE_NAME = "day2_test.txt"
 local DAY_2_FILE_NAME = "day2.txt"
 -- local DAY_3_FILE_NAME = "day3_test.txt"
+-- local DAY_3_FILE_NAME = "day3_test2.txt"
 local DAY_3_FILE_NAME = "day3.txt"
 -- local DAY_5_FILE_NAME = "day5_test.txt"
 local DAY_5_FILE_NAME = "day5.txt"
@@ -113,7 +114,7 @@ local function main()
 
   runDay(1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day2Pt2)
   runDay(2, DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2)
-  runDay(3, DAY_3_FILE_NAME, day3.day3Pt1, nil)
+  runDay(3, DAY_3_FILE_NAME, day3.day3Pt1, day3.day3Pt2)
   runDay(5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2)
 end
 
