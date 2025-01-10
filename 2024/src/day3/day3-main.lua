@@ -25,28 +25,27 @@ local function day3Pt2(inputLines)
   local dontStr = "don't()"
   local doStr = "do()"
   local startDoDontChar = dontStr:sub(1,1)
-  local charStack = {}
+  local charStack = ""
   local parseDoDont = false
   local doDontIdx = 1
   local doMul = true
   local mulLines = {}
 
   local function consumeCharStack()
-    local str = strUtil.join(charStack, "")
-    charStack = {}
-    if str == dontStr then
+    if charStack == dontStr then
       doMul = false
-    elseif str == doStr then
+    elseif charStack == doStr then
       doMul = true
     end
+    charStack = ""
   end
   for _, inputLine in ipairs(inputLines) do
-    local mulChars = {}
+    local mulChars = ""
     for i = 1, #inputLine do
       local c = inputLine:sub(i, i)
       if c == startDoDontChar then
         parseDoDont = true
-        charStack = {}
+        charStack = ""
         doDontIdx = 1
       end
       if parseDoDont then
@@ -54,7 +53,7 @@ local function day3Pt2(inputLines)
           (c == dontStr:sub(doDontIdx, doDontIdx))
           or (c == doStr:sub(doDontIdx, doDontIdx))
         ) then
-          table.insert(charStack, c)
+          charStack = charStack..c
           doDontIdx = doDontIdx + 1
         else
           consumeCharStack()
@@ -62,10 +61,10 @@ local function day3Pt2(inputLines)
         end
       end
       if doMul then
-        table.insert(mulChars, c)
+        mulChars = mulChars..c
       end
     end
-    table.insert(mulLines, strUtil.join(mulChars, ""))
+    table.insert(mulLines, mulChars)
   end
   local mulInstructions = parseInput(mulLines)
   local mulSum = 0
