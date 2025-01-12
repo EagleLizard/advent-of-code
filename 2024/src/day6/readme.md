@@ -16,3 +16,6 @@ In Go, the first initial solution took ~6.9 seconds.
 This works because any points not on the guards path have 0 chance of being hit as an obstacle in this scenario anyway.
 
 In Go, this reduced the solution time from 6.9s to ~1.5s
+
+**update2:*
+I can get some time back from breaking from the test walk as soon as I detect a loop
