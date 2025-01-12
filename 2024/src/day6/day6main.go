@@ -76,12 +76,93 @@ func Day6Pt2(inputLines []string) int {
 			- detect if loop exists
 	*/
 	testPoints := []geom.Point{}
+	/*
+		only need to test points that are adjacent to points visited on the path
+	*/
+	firstGuard := sourceLabGuard.Copy()
+	walkedPointsMap := map[geom.Point]*VisitedDirection{}
+	walkedPointsMap[firstGuard.Pos] = &VisitedDirection{}
+	walkedPointsMap[firstGuard.Pos].SetDirection(firstGuard.Direction)
+	for firstGuard.Step(sourceGrid) {
+		vp := walkedPointsMap[firstGuard.Pos]
+		if vp == nil {
+			vp = &VisitedDirection{}
+			walkedPointsMap[firstGuard.Pos] = vp
+		}
+		vp.SetDirection(firstGuard.Direction)
+	}
+	gridCopy := [][]rune{}
 	for y := range sourceGrid {
-		for x := range sourceGrid[y] {
-			if sourceGrid[y][x] != '#' {
-				testPoints = append(testPoints, geom.Point{X: x, Y: y})
+		gridCopy = append(gridCopy, []rune{})
+		gridCopy[y] = append(gridCopy[y], sourceGrid[y]...)
+	}
+
+	adjPoints := map[geom.Point]bool{}
+	for walkedPt, vd := range walkedPointsMap {
+		/* up */
+		if vd.Up && walkedPt.Y > 0 {
+			upPt := geom.Point{X: walkedPt.X, Y: walkedPt.Y - 1}
+			/*
+				if the tile above is not visited
+					& the tile above is not in adjPoints
+					& the tile above is not an obstacle
+			*/
+			if !adjPoints[upPt] && gridCopy[upPt.Y][upPt.X] != '#' {
+				adjPoints[upPt] = true
 			}
 		}
+		/* right */
+		if vd.Right && walkedPt.X < day6Input.Witdh-1 {
+			rightPt := geom.Point{X: walkedPt.X + 1, Y: walkedPt.Y}
+			if !adjPoints[rightPt] && gridCopy[rightPt.Y][rightPt.X] != '#' {
+				adjPoints[rightPt] = true
+			}
+		}
+		/* down */
+		if vd.Down && walkedPt.Y < day6Input.Height-1 {
+			downPt := geom.Point{X: walkedPt.X, Y: walkedPt.Y + 1}
+			if !adjPoints[downPt] && gridCopy[downPt.Y][downPt.X] != '#' {
+				adjPoints[downPt] = true
+			}
+		}
+		/* left */
+		if vd.Left && walkedPt.X > 0 {
+			leftPt := geom.Point{X: walkedPt.X - 1, Y: walkedPt.Y}
+			if !adjPoints[leftPt] && gridCopy[leftPt.Y][leftPt.X] != '#' {
+				adjPoints[leftPt] = true
+			}
+		}
+	}
+
+	for adjPt := range adjPoints {
+		gridCopy[adjPt.Y][adjPt.X] = '$'
+	}
+
+	// printGrid(gridCopy, map[geom.Point]*VisitedDirection{}, sourceLabGuard.Copy())
+
+	// for y := range gridCopy {
+	// 	for x := range gridCopy[y] {
+	// 		currPt := geom.Point{X: x, Y: y}
+	// 		currTile := gridCopy[y][x]
+	// 		if currTile != '#' &&  {
+
+	// 		}
+	// 	}
+	// }
+
+	// printGrid(sourceGrid, walkedPointsMap, sourceLabGuard.Copy())
+	// printGrid(sourceGrid, map[geom.Point]*VisitedDirection{}, sourceLabGuard.Copy())
+
+	// for y := range sourceGrid {
+	// 	for x := range sourceGrid[y] {
+	// 		if sourceGrid[y][x] != '#' {
+	// 			testPoints = append(testPoints, geom.Point{X: x, Y: y})
+	// 		}
+	// 	}
+	// }
+
+	for adjPt := range adjPoints {
+		testPoints = append(testPoints, adjPt)
 	}
 
 	possibleObstuctionPoints := []geom.Point{}
@@ -137,6 +218,7 @@ func Day6Pt2(inputLines []string) int {
 }
 
 func printGrid(grid [][]rune, visitedMap map[geom.Point]*VisitedDirection, labGuard LabGuard) {
+	fmt.Print("\n")
 	for y := range grid {
 		for x := range grid[y] {
 			if x == labGuard.Pos.X && y == labGuard.Pos.Y {
