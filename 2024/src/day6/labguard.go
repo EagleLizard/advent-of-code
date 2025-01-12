@@ -44,3 +44,10 @@ func (g *LabGuard) Step(grid [][]rune) bool {
 	}
 	return destVal != terminal_dest
 }
+
+func (lg *LabGuard) Copy() LabGuard {
+	return LabGuard{
+		Pos:       lg.Pos,
+		Direction: lg.Direction,
+	}
+}
