@@ -108,28 +108,64 @@ func Day6Pt2(inputLines []string) int {
 					& the tile above is not an obstacle
 			*/
 			if !adjPoints[upPt] && gridCopy[upPt.Y][upPt.X] != '#' {
-				adjPoints[upPt] = true
+				obsIntersect := false
+				for _, obsPt := range day6Input.Obstructions {
+					if obsPt.Y == walkedPt.Y && obsPt.X > walkedPt.X {
+						obsIntersect = true
+						break
+					}
+				}
+				if obsIntersect {
+					adjPoints[upPt] = true
+				}
 			}
 		}
 		/* right */
 		if vd.Right && walkedPt.X < day6Input.Witdh-1 {
 			rightPt := geom.Point{X: walkedPt.X + 1, Y: walkedPt.Y}
 			if !adjPoints[rightPt] && gridCopy[rightPt.Y][rightPt.X] != '#' {
-				adjPoints[rightPt] = true
+				obsIntersect := false
+				for _, obsPt := range day6Input.Obstructions {
+					if obsPt.X == walkedPt.X && obsPt.Y > walkedPt.Y {
+						obsIntersect = true
+						break
+					}
+				}
+				if obsIntersect {
+					adjPoints[rightPt] = true
+				}
 			}
 		}
 		/* down */
 		if vd.Down && walkedPt.Y < day6Input.Height-1 {
 			downPt := geom.Point{X: walkedPt.X, Y: walkedPt.Y + 1}
 			if !adjPoints[downPt] && gridCopy[downPt.Y][downPt.X] != '#' {
-				adjPoints[downPt] = true
+				obsIntersect := false
+				for _, obsPt := range day6Input.Obstructions {
+					if obsPt.Y == walkedPt.Y && obsPt.X < walkedPt.X {
+						obsIntersect = true
+						break
+					}
+				}
+				if obsIntersect {
+					adjPoints[downPt] = true
+				}
 			}
 		}
 		/* left */
 		if vd.Left && walkedPt.X > 0 {
 			leftPt := geom.Point{X: walkedPt.X - 1, Y: walkedPt.Y}
 			if !adjPoints[leftPt] && gridCopy[leftPt.Y][leftPt.X] != '#' {
-				adjPoints[leftPt] = true
+				obsIntersect := false
+				for _, obsPt := range day6Input.Obstructions {
+					if obsPt.X == walkedPt.X && obsPt.Y < walkedPt.Y {
+						obsIntersect = true
+						break
+					}
+				}
+				if obsIntersect {
+					adjPoints[leftPt] = true
+				}
 			}
 		}
 	}
@@ -139,16 +175,6 @@ func Day6Pt2(inputLines []string) int {
 	}
 
 	// printGrid(gridCopy, map[geom.Point]*VisitedDirection{}, sourceLabGuard.Copy())
-
-	// for y := range gridCopy {
-	// 	for x := range gridCopy[y] {
-	// 		currPt := geom.Point{X: x, Y: y}
-	// 		currTile := gridCopy[y][x]
-	// 		if currTile != '#' &&  {
-
-	// 		}
-	// 	}
-	// }
 
 	// printGrid(sourceGrid, walkedPointsMap, sourceLabGuard.Copy())
 	// printGrid(sourceGrid, map[geom.Point]*VisitedDirection{}, sourceLabGuard.Copy())
@@ -211,6 +237,7 @@ func Day6Pt2(inputLines []string) int {
 		}
 		if hasLoop {
 			possibleObstuctionPoints = append(possibleObstuctionPoints, tp)
+			// break
 		}
 		// fmt.Printf("hasLoop: %v", hasLoop)
 	}
