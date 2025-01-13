@@ -53,3 +53,6 @@ So, I could restrict the initial set of obstructions to test by checking if *any
 
 **update2:*
 This worked, but didn't yield great gains. From 1.5s to ~1.3s
+
+**update3:*
+I might be able to optimize the actual walk by advancing multiple steps each iteration. This will advance the guard to the closest obstacle in their path.
