@@ -34,6 +34,11 @@ func Day7Pt1(inputLines []string) int {
 	return calibrationResult
 }
 
+func Day7Pt2(inputLines []string) int {
+	// day7Inputs := parseInput(inputLines)
+	return -1
+}
+
 func checkEquation(testVal int, nums []int, ops []string, res int) bool {
 	if len(nums) == 0 {
 		return res == testVal
@@ -58,6 +63,12 @@ func doOp(op string, a int, b int) int {
 		return a + b
 	case "*":
 		return a * b
+	case "||":
+		res, err := strconv.Atoi(fmt.Sprintf("%d%d", a, b))
+		if err != nil {
+			panic(err)
+		}
+		return res
 	}
 	panic(fmt.Sprintf("invalid op: %s", op))
 }
