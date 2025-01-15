@@ -25,7 +25,8 @@ func Day7Pt1(inputLines []string) int {
 		// }
 		// fmt.Print("\n")
 		ops := []string{"+", "*"}
-		validEq := checkEquation(currInput.TestVal, currInput.Nums[1:], ops, currInput.Nums[0])
+		validEq := checkEquation2(currInput.TestVal, currInput.Nums, ops)
+		// fmt.Print("\n")
 		if validEq {
 			calibrationResult += currInput.TestVal
 		}
@@ -41,8 +42,9 @@ func Day7Pt2(inputLines []string) int {
 	day7Inputs := parseInput(inputLines)
 	calibrationResult := 0
 	for _, currInput := range day7Inputs {
-		ops := []string{"+", "*", "||"}
-		validEq := checkEquation(currInput.TestVal, currInput.Nums[1:], ops, currInput.Nums[0])
+		// ops := []string{"+", "*", "||"}
+		ops := []string{"||", "*", "+"}
+		validEq := checkEquation2(currInput.TestVal, currInput.Nums, ops)
 		if validEq {
 			calibrationResult += currInput.TestVal
 		}
@@ -50,19 +52,36 @@ func Day7Pt2(inputLines []string) int {
 	return calibrationResult
 }
 
-func checkEquation(testVal int, nums []int, ops []string, res int) bool {
-	if len(nums) == 0 {
-		return res == testVal
-	}
+func checkEquation2(testVal int, nums []int, ops []string) bool {
 	/*
-		try different combinations
-		1 2 3 4
+		iterative
 	*/
-	for _, op := range ops {
-		currRes := doOp(op, res, nums[0])
-		isValid := checkEquation(testVal, nums[1:], ops, currRes)
-		if isValid {
-			return true
+	type StackVal struct {
+		res int
+		idx int
+	}
+	stack := []StackVal{{
+		res: nums[0],
+		idx: 0,
+	}}
+	for len(stack) > 0 {
+		currItem := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		if currItem.idx >= len(nums)-1 {
+			if currItem.res == testVal {
+				return true
+			}
+		} else if currItem.idx < len(nums)-1 {
+			for _, op := range ops {
+				nextRes := doOp(op, currItem.res, nums[currItem.idx+1])
+				if nextRes <= testVal {
+					stack = append(stack, StackVal{
+						res: nextRes,
+						idx: currItem.idx + 1,
+					})
+				}
+			}
 		}
 	}
 	return false
