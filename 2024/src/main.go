@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -17,12 +19,23 @@ import (
 	"github.com/EagleLizard/advent-of-code/2024/src/day7"
 )
 
+type CliOpts struct {
+	Day int
+}
+
 type DayPartFn func([]string) int
 
 type RunPartRes struct {
 	PartNum  int
 	FnTime   time.Duration
 	Solution int
+}
+
+type RunDayOpts struct {
+	Day           int
+	InputFileName string
+	Part1Fn       DayPartFn
+	Part2Fn       DayPartFn
 }
 
 const (
@@ -43,18 +56,48 @@ const (
 	day7InputFileName = "day7.txt"
 )
 
+var dayOptsArr = []RunDayOpts{
+	{1, day1InputFileName, day1.Day1Pt1, day1.Day1Pt2},
+	{2, day2InputFileName, day2.Day2Pt1, day2.Day2Pt2},
+	{3, day3InputFileName, day3.Day3Pt1, day3.Day3Pt2},
+	{4, day4InputFileName, day4.Day4Pt1, day4.Day4Pt2},
+	{5, day5InputFileName, day5.Day5Pt1, day5.Day5Pt2},
+	{6, day6InputFileName, day6.Day6Pt1, day6.Day6Pt2},
+	{7, day7InputFileName, day7.Day7Pt1, day7.Day7Pt2},
+}
+
 func main() {
+	cliOpts := initCli()
+	fmt.Printf("%+v\n", cliOpts)
 	aocBanner()
 
 	fmt.Print("\n")
-	runDay(1, day1InputFileName, day1.Day1Pt1, day1.Day1Pt2)
-	runDay(2, day2InputFileName, day2.Day2Pt1, day2.Day2Pt2)
-	runDay(3, day3InputFileName, day3.Day3Pt1, day3.Day3Pt2)
-	runDay(4, day4InputFileName, day4.Day4Pt1, day4.Day4Pt2)
-	runDay(5, day5InputFileName, day5.Day5Pt1, day5.Day5Pt2)
-	runDay(6, day6InputFileName, day6.Day6Pt1, day6.Day6Pt2)
-	// runDay(7, day7InputFileName, day7.Day7Pt1, day7.Day7Pt2)
-	runDay(7, day7InputFileName, day7.Day7Pt1, day7.Day7Pt2)
+	daysToRun := []RunDayOpts{}
+
+	if cliOpts.Day == 0 {
+		daysToRun = dayOptsArr[:]
+	} else {
+		foundIdx := slices.IndexFunc(dayOptsArr, func(dayOpts RunDayOpts) bool {
+			return dayOpts.Day == cliOpts.Day
+		})
+		if foundIdx == -1 {
+			panic(fmt.Sprintf("Day not found: %d", cliOpts.Day))
+		}
+		daysToRun = append(daysToRun, dayOptsArr[foundIdx])
+	}
+
+	for _, dayOpts := range daysToRun {
+		runDay(dayOpts.Day, dayOpts.InputFileName, dayOpts.Part1Fn, dayOpts.Part2Fn)
+	}
+}
+
+func initCli() CliOpts {
+	dayFlag := flag.Int("d", 0, "aoc2024 day to run")
+	flag.Parse()
+	res := CliOpts{
+		Day: *dayFlag,
+	}
+	return res
 }
 
 func runDay(day int, inputFileName string, pt1Fn DayPartFn, pt2Fn DayPartFn) {
