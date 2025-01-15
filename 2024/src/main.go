@@ -17,6 +17,7 @@ import (
 	"github.com/EagleLizard/advent-of-code/2024/src/day5"
 	"github.com/EagleLizard/advent-of-code/2024/src/day6"
 	"github.com/EagleLizard/advent-of-code/2024/src/day7"
+	"github.com/EagleLizard/advent-of-code/2024/src/day8"
 )
 
 type CliOpts struct {
@@ -50,10 +51,12 @@ const (
 	day4InputFileName = "day4.txt"
 	// day5InputFileName = "day5_test.txt"
 	day5InputFileName = "day5.txt"
-	day6InputFileName = "day6_test.txt"
-	// day6InputFileName = "day6.txt"
+	// day6InputFileName = "day6_test.txt"
+	day6InputFileName = "day6.txt"
 	// day7InputFileName = "day7_test.txt"
 	day7InputFileName = "day7.txt"
+	// day8InputFileName = "day8_test.txt"
+	day8InputFileName = "day8.txt"
 )
 
 var dayOptsArr = []RunDayOpts{
@@ -64,11 +67,12 @@ var dayOptsArr = []RunDayOpts{
 	{5, day5InputFileName, day5.Day5Pt1, day5.Day5Pt2},
 	{6, day6InputFileName, day6.Day6Pt1, day6.Day6Pt2},
 	{7, day7InputFileName, day7.Day7Pt1, day7.Day7Pt2},
+	{8, day8InputFileName, day8.Day8Pt1, nil},
 }
 
 func main() {
 	cliOpts := initCli()
-	fmt.Printf("%+v\n", cliOpts)
+	// fmt.Printf("%+v\n", cliOpts)
 	aocBanner()
 
 	fmt.Print("\n")
