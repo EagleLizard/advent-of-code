@@ -5,3 +5,5 @@
 
 ## Part 2
 `[01/15/2025][go]` Going to need a line equation
+
+`[01/16/2025][go]` lots of trial and error figuring out the equations for this one. I tried to derive them myself at first, but ended up getting them wrong, so I followed some math tutorials online.
