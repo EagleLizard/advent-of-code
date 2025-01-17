@@ -1,6 +1,7 @@
 
 local strUtil = require("../util/str-util")
 local arr = require("../util/arr-util")
+local dateTimeUtil = require("../util/date-time-util")
 
 local printf = require("../util/printf")
 local errorf = require("../util/errorf")
@@ -41,53 +42,60 @@ local function parseInput(inputLine)
   return diskFiles
 end
 
-local function checkDiskHasGaps(disk)
-  local parseFree = false
-  for _, block in ipairs(disk) do
-    if not parseFree then
-      if block == "." then
-        parseFree = true
-      end
-    else
-      --[[ 
-        if we encounter a block that is not free,
-          then a gap exists
-      ]]
+local function countGaps(disk, startIdx, endIdx)
+  if startIdx == nil then
+    startIdx = 1
+  end
+  if endIdx == nil then
+    endIdx = #disk
+  end
+  local parseGap = false
+  local currGaps = 0
+  local totalGaps = 0
+  for i = startIdx, endIdx do
+    local block = disk[i]
+    if not parseGap and block == "." then
+      parseGap = true
+    end
+    if parseGap then
       if block ~= "." then
-        return true
+        parseGap = false
+        totalGaps = totalGaps + currGaps
+        currGaps = 0
+      else
+        currGaps = currGaps + 1
       end
     end
   end
-  return false
+  return totalGaps
 end
 
-local function makeCompactDisk(diskArr)
-  local diskCopy = arr.copy(diskArr)
-  while checkDiskHasGaps(diskCopy) do
-    --[[ 
-      find last block idx, then find first free block idx
-    ]]
-    local blockIdx = -1
-    local freeIdx = -1
-    for i = #diskCopy, 1, -1 do
-      if string.match(diskCopy[i], "%d") then
-        blockIdx = i
-        break
-      end
+local function makeCompactDisk2(diskArr)
+  local disk = arr.copy(diskArr)
+  --[[ 
+    find number of gap blocks
+  ]]
+  local totalGaps = 0
+  totalGaps = countGaps(disk)
+  local gapPtr = 1
+  local blockPtr = #disk
+  while totalGaps > 0 do
+    if disk[gapPtr] ~= "." then
+      gapPtr = gapPtr + 1
     end
-    for i = 1, #diskCopy do
-      if string.match(diskCopy[i], "%.") then
-        freeIdx = i
-        break
-      end
+    if disk[blockPtr] == "." then
+      blockPtr = blockPtr - 1
     end
-    --[[ 
-      swap
-    ]]
-    diskCopy[freeIdx] = diskCopy[blockIdx]
-    diskCopy[blockIdx] = "."
+    if disk[gapPtr] == "." and disk[blockPtr] ~= "." then
+      --[[ swap ]]
+      disk[gapPtr] = disk[blockPtr]
+      disk[blockPtr] = "."
+      totalGaps = countGaps(disk, gapPtr, blockPtr)
+      -- gapPtr = gapPtr + 1
+      -- blockPtr = blockPtr - 1
+    end
   end
-  return diskCopy
+  return disk
 end
 
 local function getCompactChecksum(compactDisk)
@@ -107,7 +115,15 @@ end
 ]]
 local function day9Pt1(inputLines)
   local inputLine = inputLines[1]
+  -- local start, elapsed
+  -- local printMs = function (str, secs)
+  --   printf("%s: %.3f ms\n", str, dateTimeUtil.sToMs(secs))
+  -- end
+  -- start = os.clock()
   local diskFiles = parseInput(inputLine)
+  -- elapsed = os.clock() - start
+  -- printMs("parseInput ", elapsed)
+  -- printf("%.3f\n", dateTimeUtil.sToMs(elapsed))
   -- for _, diskFile in ipairs(diskFiles) do
   --   printf("%d: %d", diskFile.id, diskFile.blockSize)
   --   if diskFile.freeBlocks ~= nil then
@@ -115,6 +131,7 @@ local function day9Pt1(inputLines)
   --   end
   --   printf("\n")
   -- end
+  -- start = os.clock()
   local diskArr = {}
   for _, diskFile in ipairs(diskFiles) do
     for _ = 1, diskFile.blockSize do
@@ -126,10 +143,19 @@ local function day9Pt1(inputLines)
       end
     end
   end
-  -- printf("%s\n", strUtil.join(diskArr, ""))
-  local compactDisk = makeCompactDisk(diskArr)
-  -- printf("%s\n", strUtil.join(compactDisk))
+  -- elapsed = os.clock() - start
+  -- printMs("diskArr    ", elapsed)
+
+  -- start = os.clock()
+  local compactDisk = makeCompactDisk2(diskArr)
+  -- elapsed = os.clock() - start
+  -- printMs("compactDisk", elapsed)
+
+  -- start = os.clock()
   local checksum = getCompactChecksum(compactDisk)
+  -- elapsed = os.clock() - start
+  -- printMs("checksum   ", elapsed)
+
   return checksum
 end
 
