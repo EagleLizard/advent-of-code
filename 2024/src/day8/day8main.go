@@ -13,6 +13,12 @@ type Day8Input struct {
 	Freqs  map[string][]geom.Point
 }
 
+type LineCoef struct {
+	A float64
+	B float64
+	C float64
+}
+
 /*
 301 - correct
 */
@@ -30,6 +36,76 @@ func Day8Pt1(inputLines []string) int {
 		}
 	}
 	return len(antinodeMap)
+}
+
+/*
+1019 - correct
+*/
+func Day8Pt2(inputLines []string) int {
+	day8Input := parseInput(inputLines)
+	lineCoefs := []LineCoef{}
+	antinodeMap := map[geom.Point]bool{}
+	for _, freqPts := range day8Input.Freqs {
+		for i := 0; i < len(freqPts)-1; i++ {
+			currPt := freqPts[i]
+			for k := i + 1; k < len(freqPts); k++ {
+				nextPt := freqPts[k]
+				lineCoef := getLineCoef(currPt, nextPt)
+				lineCoefs = append(lineCoefs, lineCoef)
+			}
+		}
+	}
+	for _, lineCoef := range lineCoefs {
+		a := lineCoef.A
+		b := lineCoef.B
+		c := lineCoef.C
+		for y := range day8Input.Height {
+			yf := float64(y)
+			for x := range day8Input.Width {
+				xf := float64(x)
+				/*
+					Ax + By + C = 0
+				*/
+				eqRes := a*xf + b*yf + c
+				if eqRes == 0 {
+					antinodeMap[geom.Point{X: x, Y: y}] = true
+				}
+			}
+		}
+	}
+	return len(antinodeMap)
+}
+
+/*
+use standard form because it handles horiz/vert lines
+*/
+func getLineCoef(p1 geom.Point, p2 geom.Point) LineCoef {
+	x1 := float64(p1.X)
+	y1 := float64(p1.Y)
+	x2 := float64(p2.X)
+	y2 := float64(p2.Y)
+	a := y2 - y1
+	b := x1 - x2
+	/*
+		C = y1 × (x2 - x1) - (y2 - y1) × x1.
+	*/
+	c := y1*(x2-x1) - (y2-y1)*x1
+
+	/*
+		normalize coefficients so a > 0, b > 0
+		a == 0 && b < 0 means horizontal line
+	*/
+	if a < 0 || (a == 0 && b < 0) {
+		a = -a
+		b = -b
+		c = -c
+	}
+	res := LineCoef{
+		A: a,
+		B: b,
+		C: c,
+	}
+	return res
 }
 
 func getAntinodes(freqPts []geom.Point) []geom.Point {

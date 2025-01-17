@@ -67,7 +67,7 @@ var dayOptsArr = []RunDayOpts{
 	{5, day5InputFileName, day5.Day5Pt1, day5.Day5Pt2},
 	{6, day6InputFileName, day6.Day6Pt1, day6.Day6Pt2},
 	{7, day7InputFileName, day7.Day7Pt1, day7.Day7Pt2},
-	{8, day8InputFileName, day8.Day8Pt1, nil},
+	{8, day8InputFileName, day8.Day8Pt1, day8.Day8Pt2},
 }
 
 func main() {
