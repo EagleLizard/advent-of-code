@@ -22,6 +22,9 @@ local function split(s, delim)
 end
 
 local function join(strs, delim)
+  if delim == nil then
+    delim = ""
+  end
   local res = ""
   for i, s in ipairs(strs) do
     local nextStr
