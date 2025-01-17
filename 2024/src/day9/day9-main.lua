@@ -42,57 +42,25 @@ local function parseInput(inputLine)
   return diskFiles
 end
 
-local function countGaps(disk, startIdx, endIdx)
-  if startIdx == nil then
-    startIdx = 1
-  end
-  if endIdx == nil then
-    endIdx = #disk
-  end
-  local parseGap = false
-  local currGaps = 0
-  local totalGaps = 0
-  for i = startIdx, endIdx do
-    local block = disk[i]
-    if not parseGap and block == "." then
-      parseGap = true
-    end
-    if parseGap then
-      if block ~= "." then
-        parseGap = false
-        totalGaps = totalGaps + currGaps
-        currGaps = 0
-      else
-        currGaps = currGaps + 1
-      end
-    end
-  end
-  return totalGaps
-end
-
-local function makeCompactDisk2(diskArr)
+local function makeCompactDisk3(diskArr)
   local disk = arr.copy(diskArr)
-  --[[ 
-    find number of gap blocks
-  ]]
-  local totalGaps = 0
-  totalGaps = countGaps(disk)
   local gapPtr = 1
   local blockPtr = #disk
-  while totalGaps > 0 do
-    if disk[gapPtr] ~= "." then
+  while blockPtr > gapPtr do
+    --[[ find next gap ]]
+    while disk[gapPtr] ~= "." do
       gapPtr = gapPtr + 1
     end
-    if disk[blockPtr] == "." then
+    --[[ find next block ]]
+    while disk[blockPtr] == "." do
       blockPtr = blockPtr - 1
     end
-    if disk[gapPtr] == "." and disk[blockPtr] ~= "." then
+    if gapPtr < blockPtr then
       --[[ swap ]]
       disk[gapPtr] = disk[blockPtr]
       disk[blockPtr] = "."
-      totalGaps = countGaps(disk, gapPtr, blockPtr)
-      -- gapPtr = gapPtr + 1
-      -- blockPtr = blockPtr - 1
+      gapPtr = gapPtr + 1
+      blockPtr = blockPtr - 1
     end
   end
   return disk
@@ -147,7 +115,7 @@ local function day9Pt1(inputLines)
   -- printMs("diskArr    ", elapsed)
 
   -- start = os.clock()
-  local compactDisk = makeCompactDisk2(diskArr)
+  local compactDisk = makeCompactDisk3(diskArr)
   -- elapsed = os.clock() - start
   -- printMs("compactDisk", elapsed)
 
