@@ -4,6 +4,8 @@ local lfs = require("lfs")
 local files = require("./util/files")
 local cliColors = require("./util/cli-colors")
 local dateTimeUtil = require("./util/date-time-util")
+local parseArgs = require("./lib/parse-args")
+local arr = require("./util/arr-util")
 
 local colors = cliColors.colors
 
@@ -14,6 +16,7 @@ local day5 = require("./day5/day5-main")
 local day9 = require("./day9/day9-main")
 
 local printf = require("./util/printf")
+local errorf = require("./util/errorf")
 
 local c1 = colors.green_bright
 local c2 = colors.cyan
@@ -112,15 +115,37 @@ local function runDay(day, inputFileName, pt1Fn, pt2Fn)
   printf("%s\n%s\n", totalStr, divStr)
 end
 
+local dayArgsArr = {
+  {1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day2Pt2},
+  {2, DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2},
+  {3, DAY_3_FILE_NAME, day3.day3Pt1, day3.day3Pt2},
+  {5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2},
+  {9, DAY_9_FILE_NAME, day9.day9Pt1, nil},
+}
+
 local function main()
   local bannerStr = aocBanner()
   printf("\n%s\n\n", bannerStr)
+  local cmdOpts = parseArgs.parse(arg)
 
-  runDay(1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day2Pt2)
-  runDay(2, DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2)
-  runDay(3, DAY_3_FILE_NAME, day3.day3Pt1, day3.day3Pt2)
-  runDay(5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2)
-  runDay(9, DAY_9_FILE_NAME, day9.day9Pt1, nil)
+  local daysToRun = {}
+  if cmdOpts.day < 1 then
+    for _, dayArgs in ipairs(dayArgsArr) do
+      table.insert(daysToRun, dayArgs)
+    end
+  else
+    local foundIdx = arr.findIndex(dayArgsArr, function(dayArgs)
+      return dayArgs[1] == cmdOpts.day
+    end)
+    if foundIdx == nil then
+      errorf("Day not found: %d", cmdOpts.day)
+    end
+    table.insert(daysToRun, dayArgsArr[foundIdx])
+  end
+
+  for _, dayArgs in ipairs(daysToRun) do
+    runDay(dayArgs[1], dayArgs[2], dayArgs[3], dayArgs[4])
+  end
 end
 
 main()
