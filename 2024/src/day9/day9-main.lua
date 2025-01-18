@@ -77,6 +77,10 @@ local function getCompactChecksum(compactDisk)
   return checksum
 end
 
+local function day9Pt2(inputLines)
+  return -1
+end
+
 --[[ 
 6323641412437 - correct - 114311.527 ms (1.91 m)
 ]]
@@ -101,6 +105,7 @@ end
 
 local day9MainModule = {
   day9Pt1 = day9Pt1,
+  day9Pt2 = day9Pt2,
 }
 
 return day9MainModule
