@@ -77,16 +77,7 @@ local function getCompactChecksum(compactDisk)
   return checksum
 end
 
-local function day9Pt2(inputLines)
-  return -1
-end
-
---[[ 
-6323641412437 - correct - 114311.527 ms (1.91 m)
-]]
-local function day9Pt1(inputLines)
-  local inputLine = inputLines[1]
-  local diskFiles = parseInput(inputLine)
+local function getDisk(diskFiles)
   local diskArr = {}
   for _, diskFile in ipairs(diskFiles) do
     for _ = 1, diskFile.blockSize do
@@ -98,6 +89,24 @@ local function day9Pt1(inputLines)
       end
     end
   end
+  return diskArr
+end
+
+local function day9Pt2(inputLines)
+  local inputLine = inputLines[1]
+  local diskFiles = parseInput(inputLine)
+  local diskArr = getDisk(diskFiles)
+  printf("%s\n", strUtil.join(diskArr, ""))
+  return -1
+end
+
+--[[ 
+6323641412437 - correct - 114311.527 ms (1.91 m)
+]]
+local function day9Pt1(inputLines)
+  local inputLine = inputLines[1]
+  local diskFiles = parseInput(inputLine)
+  local diskArr = getDisk(diskFiles)
   local compactDisk = makeCompactDisk3(diskArr)
   local checksum = getCompactChecksum(compactDisk)
   return checksum
