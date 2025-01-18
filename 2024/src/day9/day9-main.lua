@@ -24,7 +24,6 @@ local function parseInput(inputLine)
       if blockSize == nil then
         errorf("invalid blockSize '%s', file id: %d", c, currId)
       end
-      -- printf("%d: %s - %s\n", currId, c, freeBlocks)
       local freeBlocks = nil
       if freeBlocksStr ~= nil then
         freeBlocks = tonumber(freeBlocksStr)
@@ -83,23 +82,7 @@ end
 ]]
 local function day9Pt1(inputLines)
   local inputLine = inputLines[1]
-  -- local start, elapsed
-  -- local printMs = function (str, secs)
-  --   printf("%s: %.3f ms\n", str, dateTimeUtil.sToMs(secs))
-  -- end
-  -- start = os.clock()
   local diskFiles = parseInput(inputLine)
-  -- elapsed = os.clock() - start
-  -- printMs("parseInput ", elapsed)
-  -- printf("%.3f\n", dateTimeUtil.sToMs(elapsed))
-  -- for _, diskFile in ipairs(diskFiles) do
-  --   printf("%d: %d", diskFile.id, diskFile.blockSize)
-  --   if diskFile.freeBlocks ~= nil then
-  --     printf(", free: %d", diskFile.freeBlocks)
-  --   end
-  --   printf("\n")
-  -- end
-  -- start = os.clock()
   local diskArr = {}
   for _, diskFile in ipairs(diskFiles) do
     for _ = 1, diskFile.blockSize do
@@ -111,19 +94,8 @@ local function day9Pt1(inputLines)
       end
     end
   end
-  -- elapsed = os.clock() - start
-  -- printMs("diskArr    ", elapsed)
-
-  -- start = os.clock()
   local compactDisk = makeCompactDisk3(diskArr)
-  -- elapsed = os.clock() - start
-  -- printMs("compactDisk", elapsed)
-
-  -- start = os.clock()
   local checksum = getCompactChecksum(compactDisk)
-  -- elapsed = os.clock() - start
-  -- printMs("checksum   ", elapsed)
-
   return checksum
 end
 
