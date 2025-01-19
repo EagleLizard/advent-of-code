@@ -48,7 +48,10 @@ local function checkSolvableEq(testVal, nums, ops)
     end
     for _, op in ipairs(ops) do
       local currRes = op(res, _nums[1])
-      local validEq = _checkSolvableEq(arr.slice(_nums, 2), currRes)
+      local validEq = false
+      if currRes <= testVal then
+        validEq = _checkSolvableEq(arr.slice(_nums, 2), currRes)
+      end
       if validEq then
         return true
       end
