@@ -39,6 +39,20 @@ local function copy(tab)
   return tabCopy
 end
 
+local function slice(tab, lIdx, rIdx)
+  if rIdx == nil or rIdx > #tab then
+    rIdx = #tab
+  end
+  if lIdx > rIdx then
+    return {}
+  end
+  local tabSlice = {}
+  for i = lIdx, rIdx do
+    table.insert(tabSlice, tab[i])
+  end
+  return tabSlice
+end
+
 --[[ 
   remove elem at idx and return copy
 ]]
@@ -57,6 +71,7 @@ local arrUtilModule = {
   indexOf = indexOf,
   contains = contains,
   copy = copy,
+  slice = slice,
   removeIdx = removeIdx,
 }
 
