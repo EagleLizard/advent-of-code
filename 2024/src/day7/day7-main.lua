@@ -37,20 +37,21 @@ local function mulOp(a, b)
   return a * b
 end
 local function concatOp(a, b)
-  return tonumber(a..b)
+  return (a * (10 ^ #(""..b))) + b
 end
 
 local function checkSolvableEq(testVal, nums, ops)
+  local numsLen = #nums
   --[[ helper ]]
-  local function _checkSolvableEq(_nums, res)
-    if #_nums < 1 then
+  local function _checkSolvableEq(i, res)
+    if i > numsLen then
       return res == testVal
     end
     for _, op in ipairs(ops) do
-      local currRes = op(res, _nums[1])
+      local currRes = op(res, nums[i])
       local validEq = false
       if currRes <= testVal then
-        validEq = _checkSolvableEq(arr.slice(_nums, 2), currRes)
+        validEq = _checkSolvableEq(i + 1, currRes)
       end
       if validEq then
         return true
@@ -58,8 +59,7 @@ local function checkSolvableEq(testVal, nums, ops)
     end
     return false
   end
-
-  return _checkSolvableEq(arr.slice(nums, 2), nums[1])
+  return _checkSolvableEq(2, nums[1])
 end
 
 local function day7Pt2(inputLines)
@@ -68,7 +68,11 @@ local function day7Pt2(inputLines)
   for _, currInput in ipairs(parsedInput) do
     local testVal = currInput.testVal
     local nums = currInput.nums
-    local ops = { addOp, mulOp, concatOp }
+    local ops = {
+      mulOp,
+      addOp,
+      concatOp,
+    }
     local solvableEq = checkSolvableEq(testVal, nums, ops)
     if solvableEq then
       calibrationRes = calibrationRes + testVal
