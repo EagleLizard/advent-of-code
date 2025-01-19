@@ -92,12 +92,109 @@ local function getDisk(diskFiles)
   return diskArr
 end
 
+local function getDiskGaps(disk)
+  local diskGaps = {}
+  local parseGap = false
+  local currGapLen = 0
+  local gapStartIdx = nil
+  for i = 1, #disk do
+    local block = disk[i]
+    if block == "." then
+      if not parseGap then
+        parseGap = true
+        gapStartIdx = i
+      end
+      currGapLen = currGapLen + 1
+    else
+      if parseGap then
+        --[[ add the current gap and reset ]]
+        parseGap = false
+        local nextGap = {
+          idx = gapStartIdx,
+          len = currGapLen,
+        }
+        table.insert(diskGaps, nextGap)
+        gapStartIdx = nil
+        currGapLen = 0
+      end
+    end
+  end
+  return diskGaps
+end
+
+local function defragDisk2(diskArr, diskIds)
+  table.sort(diskIds, function(a, b)
+    return a > b
+  end)
+  local disk = arr.copy(diskArr)
+  local diskGaps = getDiskGaps(disk)
+  -- printf("%s\n", strUtil.join(disk, ""))
+  -- printf("%s\n", strUtil.join(diskIds, ""))
+  local parseBlock = false
+  local currIdIdx = 1
+  local currId = diskIds[currIdIdx]
+  -- local currIdBlockLen = 0
+  local idPtr = #disk
+  while idPtr > 0 do
+    local currBlockLen = 0
+    -- printf("currId: %d\n", currId)
+    -- printf("%s\n", strUtil.join(disk, ""))
+    while disk[idPtr] ~= currId do
+      idPtr = idPtr - 1
+    end
+    while disk[idPtr] == currId do
+      currBlockLen = currBlockLen + 1
+      idPtr = idPtr - 1
+    end
+    if currBlockLen < 1 then
+      errorf("invalid state at idPtr: %d", idPtr)
+    end
+    local foundGapIdx = arr.findIndex(diskGaps, function (gap)
+      return gap.idx < idPtr and gap.len >= currBlockLen
+    end)
+    if foundGapIdx ~= nil then
+      local foundGap = diskGaps[foundGapIdx]
+      for k = 0, currBlockLen - 1 do
+        disk[foundGap.idx + k] = currId
+        disk[idPtr + 1 + k] = "."
+      end
+      -- printf("%s\n", strUtil.join(disk, ""))
+      -- printf("id: %d\nlen: %d\n", currId, currBlockLen)
+      -- printf("foundGap: (%d, %d)\n", foundGap.idx, foundGap.len)
+      if foundGap.len > currBlockLen then
+        --[[
+          If the gap is smaller than the current file block,
+            adjust it's idx and len
+        ]]
+        foundGap.idx = foundGap.idx + currBlockLen
+        foundGap.len = foundGap.len - currBlockLen
+      else
+        --[[ gap is same size as id block, remove ]]
+        table.remove(diskGaps, foundGapIdx)
+      end
+    end
+    currIdIdx = currIdIdx + 1
+    currId = diskIds[currIdIdx]
+    -- printf("%s\n", strUtil.join(disk, ""))
+  end
+  return disk
+end
+
+--[[ 
+8505770332595 - too high
+6351801932670 - correct
+]]
 local function day9Pt2(inputLines)
   local inputLine = inputLines[1]
   local diskFiles = parseInput(inputLine)
+  local diskIds = {}
+  for _, diskFile in ipairs(diskFiles) do
+    table.insert(diskIds, diskFile.id)
+  end
   local diskArr = getDisk(diskFiles)
-  printf("%s\n", strUtil.join(diskArr, ""))
-  return -1
+  local defraggedDisk = defragDisk2(diskArr, diskIds)
+  local checksum = getCompactChecksum(defraggedDisk)
+  return checksum
 end
 
 --[[ 
