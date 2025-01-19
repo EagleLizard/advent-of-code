@@ -36,6 +36,9 @@ end
 local function mulOp(a, b)
   return a * b
 end
+local function concatOp(a, b)
+  return tonumber(a..b)
+end
 
 local function checkSolvableEq(testVal, nums, ops)
   --[[ helper ]]
@@ -56,6 +59,21 @@ local function checkSolvableEq(testVal, nums, ops)
   return _checkSolvableEq(arr.slice(nums, 2), nums[1])
 end
 
+local function day7Pt2(inputLines)
+  local parsedInput = parseInput(inputLines)
+  local calibrationRes = 0
+  for _, currInput in ipairs(parsedInput) do
+    local testVal = currInput.testVal
+    local nums = currInput.nums
+    local ops = { addOp, mulOp, concatOp }
+    local solvableEq = checkSolvableEq(testVal, nums, ops)
+    if solvableEq then
+      calibrationRes = calibrationRes + testVal
+    end
+  end
+  return calibrationRes
+end
+
 local function day7Pt1(inputLines)
   local parsedInput = parseInput(inputLines)
   local calibrationRes = 0
@@ -73,6 +91,7 @@ end
 
 local day7MainNodule = {
   day7Pt1 = day7Pt1,
+  day7Pt2 = day7Pt2,
 }
 
 return day7MainNodule
