@@ -128,17 +128,11 @@ local function defragDisk2(diskArr, diskIds)
   end)
   local disk = arr.copy(diskArr)
   local diskGaps = getDiskGaps(disk)
-  -- printf("%s\n", strUtil.join(disk, ""))
-  -- printf("%s\n", strUtil.join(diskIds, ""))
-  local parseBlock = false
   local currIdIdx = 1
   local currId = diskIds[currIdIdx]
-  -- local currIdBlockLen = 0
   local idPtr = #disk
   while idPtr > 0 do
     local currBlockLen = 0
-    -- printf("currId: %d\n", currId)
-    -- printf("%s\n", strUtil.join(disk, ""))
     while disk[idPtr] ~= currId do
       idPtr = idPtr - 1
     end
@@ -158,9 +152,6 @@ local function defragDisk2(diskArr, diskIds)
         disk[foundGap.idx + k] = currId
         disk[idPtr + 1 + k] = "."
       end
-      -- printf("%s\n", strUtil.join(disk, ""))
-      -- printf("id: %d\nlen: %d\n", currId, currBlockLen)
-      -- printf("foundGap: (%d, %d)\n", foundGap.idx, foundGap.len)
       if foundGap.len > currBlockLen then
         --[[
           If the gap is smaller than the current file block,
@@ -175,7 +166,6 @@ local function defragDisk2(diskArr, diskIds)
     end
     currIdIdx = currIdIdx + 1
     currId = diskIds[currIdIdx]
-    -- printf("%s\n", strUtil.join(disk, ""))
   end
   return disk
 end
