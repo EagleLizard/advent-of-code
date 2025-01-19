@@ -13,6 +13,7 @@ local day1 = require("./day1/day1-main")
 local day2 = require("./day2/day2-main")
 local day3 = require("./day3/day3-main")
 local day5 = require("./day5/day5-main")
+local day7 = require("./day7/day7-main")
 local day9 = require("./day9/day9-main")
 
 local printf = require("./util/printf")
@@ -34,6 +35,8 @@ local DAY_2_FILE_NAME = "day2.txt"
 local DAY_3_FILE_NAME = "day3.txt"
 -- local DAY_5_FILE_NAME = "day5_test.txt"
 local DAY_5_FILE_NAME = "day5.txt"
+local DAY_7_FILE_NAME = "day7_test.txt"
+-- local DAY_7_FILE_NAME = "day7.txt"
 -- local DAY_9_FILE_NAME = "day9_test1.txt"
 -- local DAY_9_FILE_NAME = "day9_test2.txt"
 local DAY_9_FILE_NAME = "day9.txt"
@@ -120,6 +123,7 @@ local dayArgsArr = {
   {2, DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2},
   {3, DAY_3_FILE_NAME, day3.day3Pt1, day3.day3Pt2},
   {5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2},
+  {7, DAY_7_FILE_NAME, day7.day7Pt1, nil},
   {9, DAY_9_FILE_NAME, day9.day9Pt1, day9.day9Pt2},
 }
 
