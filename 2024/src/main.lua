@@ -128,7 +128,7 @@ local dayArgsArr = {
   {5, DAY_5_FILE_NAME, day5.day5pt1, day5.day5pt2},
   {7, DAY_7_FILE_NAME, day7.day7Pt1, day7.day7Pt2},
   {9, DAY_9_FILE_NAME, day9.day9Pt1, day9.day9Pt2},
-  {10, DAY_10_FILE_NAME, day10.day10Pt1, nil},
+  {10, DAY_10_FILE_NAME, day10.day10Pt1, day10.day10Pt2},
 }
 
 local function main()

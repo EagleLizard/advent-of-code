@@ -99,6 +99,21 @@ local function hike(grid, srcPt)
 end
 
 --[[ 
+  1186 - correct
+]]
+local function day10Pt2(inputLines)
+  local parsedInput = parseInput(inputLines)
+  local grid = parsedInput.grid
+  local trailHeads = parsedInput.trailHeads
+  local totalScore = 0
+  for _, hPt in ipairs(trailHeads) do
+    local paths = hike(grid, hPt)
+    totalScore = totalScore + #paths
+  end
+  return totalScore
+end
+
+--[[ 
   535 - correct
 ]]
 local function day10Pt1(inputLines)
@@ -133,6 +148,7 @@ end
 
 local day10MainModule = {
   day10Pt1 = day10Pt1,
+  day10Pt2 = day10Pt2,
 }
 
 return day10MainModule
