@@ -11,10 +11,7 @@ end
 
 local function parseInput(inputLines)
   local trailHeads = {}
-  local destPts = {}
   local grid = {}
-  local width = 0
-  local height = 0
   for y, inputLine in ipairs(inputLines) do
     table.insert(grid, {})
     for x = 1, #inputLine do
@@ -29,22 +26,12 @@ local function parseInput(inputLines)
           x = x,
           y = y,
         })
-      elseif n == 9 then
-        table.insert(destPts, {
-          x = x,
-          y = y,
-        })
       end
-      width = width + 1
     end
-    height = height + 1
   end
   local res = {
     grid = grid,
     trailHeads = trailHeads,
-    destPts = destPts,
-    width = width,
-    height = height,
   }
   return res
 end
@@ -111,51 +98,13 @@ local function hike(grid, srcPt)
   return paths
 end
 
-local function hike2(grid, srcPt)
-  local paths = {}
-  local toVisit = {
-    {
-      pt = srcPt,
-      soFar = {},
-    },
-  }
-  while #toVisit > 0 do
-    local currItem = table.remove(toVisit)
-    local currPt = currItem.pt
-    local currVal = grid[currPt.y][currPt.x]
-    -- printf("(%d, %d)\n", currPt.x, currPt.y)
-    if currVal == 9 then
-      local path = arr.copy(currItem.soFar)
-      table.insert(path, currPt)
-      table.insert(paths, path)
-    else
-      local adjPts = getAdjPts(grid, currPt)
-      for _, adjPt in ipairs(adjPts) do
-        local adjVal = grid[adjPt.y][adjPt.x]
-        if (adjVal - currVal) == 1 then
-          local nextSoFar = arr.copy(currItem.soFar)
-          table.insert(nextSoFar, currPt)
-          table.insert(toVisit, {
-            pt = adjPt,
-            soFar = nextSoFar,
-          })
-        end
-      end
-    end
-  end
-  return paths
-end
-
 --[[ 
   535 - correct
 ]]
 local function day10Pt1(inputLines)
   local parsedInput = parseInput(inputLines)
   local grid = parsedInput.grid
-  local width = parsedInput.width
-  local height = parsedInput.height
   local trailHeads = parsedInput.trailHeads
-  local destPts = parsedInput.destPts
 
   local totalScore = 0
   -- trailHeads = { trailHeads[1] }
@@ -163,23 +112,10 @@ local function day10Pt1(inputLines)
     --[[ 
       N E S W - Up, Right, Down, Left
     ]]
-    -- local adjPts = getAdjPts(grid, width, height, hPt)
-    -- for _, adjPt in pairs(adjPts) do
-    --   printf("(%s, %s) ", adjPt.x, adjPt.y)
-    -- end
-    -- printf("\n")
     local currScore = 0
     local paths = hike(grid, hPt)
-    -- printf("num paths: %d\n", #paths)
     local destSet = {}
     for _, path in ipairs(paths) do
-      -- for _, pt in ipairs(path) do
-      --   -- printf("(%d, %d) ", pt.x, pt.y)
-      --   printf("%s ", ptToStr(pt))
-      --   -- printf("%d ", grid[pt.y][pt.x])
-      -- end
-      -- printf("%s\n", getPtKey(path[#path]))
-      -- printf("\n")
       local destPt = path[#path]
       local destPtKey = getPtKey(destPt)
       if destSet[destPtKey] == nil then
