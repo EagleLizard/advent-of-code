@@ -2,6 +2,7 @@
 local Point = require("lib.geom.point")
 
 local printf = require("util.printf")
+local errorf = require("util.errorf")
 
 local Plant = (function ()
   local Plant = {}
@@ -40,29 +41,23 @@ local function getPointKey(point)
 end
 
 local function getAdjPoints(land, pt)
-  local adjPts = {}
   local width = #land[1]
   local height = #land
   local up, right, down, left
-  --[[ up, right, down, left ]]
   --[[ up ]]
   if pt.y > 1 then
-    -- table.insert(adjPts, Point:new(pt.x, pt.y - 1))
     up = Point:new(pt.x, pt.y - 1)
   end
   --[[ right ]]
   if pt.x < width then
-    -- table.insert(adjPts, Point:new(pt.x + 1, pt.y))
     right = Point:new(pt.x + 1, pt.y)
   end
   --[[ down ]]
   if pt.y < height then
-    -- table.insert(adjPts, Point:new(pt.x, pt.y + 1))
     down = Point:new(pt.x, pt.y + 1)
   end
   --[[ left ]]
   if pt.x > 1 then
-    table.insert(adjPts, Point:new(pt.x - 1, pt.y))
     left = Point:new(pt.x - 1, pt.y)
   end
   -- return adjPts
@@ -76,15 +71,37 @@ end
 
 local function getRegion(land, srcPlant, visitedMap)
   local regionPlants = {}
+
   --[[ helper ]]
   local function _getRegion(plant)
+    if plant.val ~= srcPlant.val then
+      return
+    end
     local ptKey = getPointKey(plant.point)
-    if plant.val == srcPlant.val and not visitedMap[ptKey] then
-      visitedMap[ptKey] = true
-      table.insert(regionPlants, plant)
-      local adjPts = getAdjPoints(land, plant.point)
-      for _, adjPt in pairs(adjPts) do
-        _getRegion(land[adjPt.y][adjPt.x])
+    visitedMap[ptKey] = true
+    table.insert(regionPlants, plant)
+    local adjPts = getAdjPoints(land, plant.point)
+    for k, adjPt in pairs(adjPts) do
+      local adjPlant = land[adjPt.y][adjPt.x]
+      if adjPlant.val == plant.val then
+        local adjPtKey = getPointKey(adjPlant.point)
+        --[[
+          set the current plant's relevant pointers
+        ]]
+        if k == "up" then
+          plant.up = adjPlant
+        elseif k == "right" then
+          plant.right = adjPlant
+        elseif k == "down" then
+          plant.down = adjPlant
+        elseif k == "left" then
+          plant.left = adjPlant
+        else
+          errorf("Invalid direction: %s", k)
+        end
+        if not visitedMap[adjPtKey] then
+          _getRegion(adjPlant)
+        end
       end
     end
   end
@@ -92,28 +109,54 @@ local function getRegion(land, srcPlant, visitedMap)
   return regionPlants
 end
 
+local function getPerimeter(region)
+  local perimeter = 0
+  for _, plant in ipairs(region) do
+    --[[ any non-connected edge is a perimeter ]]
+    if plant.up == nil then
+      perimeter = perimeter + 1
+    end
+    if plant.right == nil then
+      perimeter = perimeter + 1
+    end
+    if plant.down == nil then
+      perimeter = perimeter + 1
+    end
+    if plant.left == nil then
+      perimeter = perimeter + 1
+    end
+  end
+  return perimeter
+end
+
 local function getRegions(land)
   local visitedMap = {}
-  for y, row in ipairs(land) do
+  local regions = {}
+  for y in ipairs(land) do
     for x in ipairs(land[y]) do
       local plant = land[y][x]
-      -- printf("%s%s", plant.val, (x == #row and "\n") or " ")
-      -- connect adj
       if not visitedMap[getPointKey(plant.point)] then
-        printf("%s ", plant.val)
         local region = getRegion(land, plant, visitedMap)
-        for i, plant in ipairs(region) do
-          printf("(%d, %d)%s", plant.point.x, plant.point.y, (i == #region and "\n") or " ")
-        end
+        table.insert(regions, region)
       end
     end
   end
+  return regions
 end
 
+--[[ 
+  1518548 - correct
+]]
 local function day12Pt1(inputLines)
   local land = parseInput(inputLines)
   local regions = getRegions(land)
-  return -1
+  local totalPrice = 0
+  for _, region in ipairs(regions) do
+    local perimeter = getPerimeter(region)
+    local area = #region
+    totalPrice = totalPrice + (area * perimeter)
+  end
+  return totalPrice
 end
 
 local day12Module = {
