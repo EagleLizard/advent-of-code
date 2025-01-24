@@ -1,5 +1,6 @@
 
 local Point = require("lib.geom.point")
+local strUtil = require("util.str-util")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
@@ -159,8 +160,84 @@ local function day12Pt1(inputLines)
   return totalPrice
 end
 
+local function getSides(region)
+  local minX = math.huge
+  local minY = math.huge
+  local maxX = -math.huge
+  local maxY = -math.huge
+  for _, plant in ipairs(region) do
+    minX = math.min(minX, plant.point.x)
+    minY = math.min(minY, plant.point.y)
+    maxX = math.max(maxX, plant.point.x)
+    maxY = math.max(maxY, plant.point.y)
+  end
+  printf("%s - ", region[1].val)
+  for _, plant in ipairs(region) do
+    printf("(%d, %d) ", plant.point.x, plant.point.y)
+  end
+  printf("\n")
+  --[[
+    plot region on its own isolated land
+  ]]
+  local land = {}
+  for y = minY, maxY do
+    table.insert(land, {})
+    for x = minX, maxX do
+      table.insert(land[y - minY + 1], Plant:new(nil, -1, -1))
+    end
+    -- printf("\n")
+  end
+  for _, plant in ipairs(region) do
+    local plantX = plant.point.x - minX + 1
+    local plantY = plant.point.y - minY + 1
+    land[plantY][plantX] = plant
+  end
+  local upSides = 0
+  local downSides = 0
+  for y in ipairs(land) do
+    local uLine = false
+    local dLine = false
+    for x in ipairs(land[y]) do
+      local currElem = land[y][x]
+      if currElem.up ~= nil and uLine then
+        upSides = upSides + 1
+        uLine = false
+      elseif currElem.val ~= nil and currElem.up == nil then
+        uLine = true
+      end
+      if currElem.down ~= nil and dLine then
+        downSides = downSides + 1
+        dLine = false
+      elseif currElem.val ~= nil and currElem.down == nil then
+        dLine = true
+      end
+      -- printf("%s", land[y][x])
+    end
+    -- printf("uLine: %s\n", uLine)
+    if uLine then
+      upSides = upSides + 1
+    end
+    if dLine then
+      downSides = downSides + 1
+    end
+    -- printf("\n")
+  end
+  printf("up: %d\n", upSides)
+  printf("down: %d\n", downSides)
+end
+
+local function day12Pt2(inputLines)
+  local land = parseInput(inputLines)
+  local regions = getRegions(land)
+  for _, region in ipairs(regions) do
+    local sides = getSides(region)
+  end
+  return -1
+end
+
 local day12Module = {
   day12Pt1 = day12Pt1,
+  day12Pt2 = day12Pt2,
 }
 
 return day12Module
