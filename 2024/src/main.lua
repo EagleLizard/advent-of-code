@@ -15,6 +15,7 @@ local day9 = require("day9.day9-main")
 local day10 = require("day10.day10-main")
 local day11 = require("day11.day11-main")
 local day12 = require("day12.day12-main")
+local day13 = require("day13.day13-main")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
@@ -42,6 +43,8 @@ local DAY_11_FILE_NAME = "day11.txt"
 -- local DAY_12_FILE_NAME = "day12_test3.txt"
 -- local DAY_12_FILE_NAME = "day12_test4.txt"
 local DAY_12_FILE_NAME = "day12.txt"
+local DAY_13_FILE_NAME = "day13_test.txt"
+-- local DAY_13_FILE_NAME = "day13.txt"
 
 local function aocBanner(t)
   local padStr = "*"
@@ -68,6 +71,7 @@ local dayArgsArr = {
   {10, DAY_10_FILE_NAME, day10.day10Pt1, day10.day10Pt2},
   {11, DAY_11_FILE_NAME, day11.day11Pt1, day11.day11Pt2},
   {12, DAY_12_FILE_NAME, day12.day12Pt1, day12.day12Pt2},
+  {13, DAY_13_FILE_NAME, day13.day13Pt1, nil},
 }
 
 local function main()
@@ -76,7 +80,6 @@ local function main()
     c2 = colors.cyan,
     c3 = colors.pear,
     c4 = colors.white_bright,
-  
     italic = cliColors.italic,
     underline = cliColors.underline,
   }
@@ -99,7 +102,7 @@ local function main()
     end
     table.insert(daysToRun, dayArgsArr[foundIdx])
   end
-  
+
   for _, dayArgs in ipairs(daysToRun) do
     -- runDay(dayArgs[1], dayArgs[2], dayArgs[3], dayArgs[4])
     aoc.runDay(theme, dayArgs[1], dayArgs[2], dayArgs[3], dayArgs[4])
