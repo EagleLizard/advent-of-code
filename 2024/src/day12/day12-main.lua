@@ -1,5 +1,6 @@
 
 local Point = require("lib.geom.point")
+local strUtil = require("util.str-util")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
@@ -144,6 +145,96 @@ local function getRegions(land)
   return regions
 end
 
+local function getSides(region)
+  local minX = math.huge
+  local minY = math.huge
+  local maxX = -math.huge
+  local maxY = -math.huge
+  for _, plant in ipairs(region) do
+    minX = math.min(minX, plant.point.x)
+    minY = math.min(minY, plant.point.y)
+    maxX = math.max(maxX, plant.point.x)
+    maxY = math.max(maxY, plant.point.y)
+  end
+  --[[
+    plot region on its own isolated land
+  ]]
+  local land = {}
+  for y = minY, maxY do
+    table.insert(land, {})
+    for x = minX, maxX do
+      table.insert(land[y - minY + 1], Plant:new(nil, -1, -1))
+    end
+    -- printf("\n")
+  end
+  for _, plant in ipairs(region) do
+    local plantX = plant.point.x - minX + 1
+    local plantY = plant.point.y - minY + 1
+    land[plantY][plantX] = plant
+  end
+  local upSides = 0
+  local downSides = 0
+  for y in ipairs(land) do
+    local uLine = false
+    local dLine = false
+    for x in ipairs(land[y]) do
+      local currElem = land[y][x]
+      if (currElem.val == nil or currElem.up ~= nil) and uLine then
+        upSides = upSides + 1
+        uLine = false
+      elseif currElem.val ~= nil and currElem.up == nil then
+        uLine = true
+      end
+      if (currElem.val == nil or currElem.down ~= nil) and dLine then
+        downSides = downSides + 1
+        dLine = false
+      elseif currElem.val ~= nil and currElem.down == nil then
+        dLine = true
+      end
+      -- printf("%s", land[y][x])
+    end
+    -- printf("uLine: %s\n", uLine)
+    if uLine then
+      upSides = upSides + 1
+    end
+    if dLine then
+      downSides = downSides + 1
+    end
+    -- printf("\n")
+  end
+  local width = #land[1]
+  local height = #land
+  local rightSides = 0
+  local leftSides = 0
+  for x = 1, width do
+    local rLine = false
+    local lLine = false
+    for y = 1, height do
+      local currElem = land[y][x]
+      if (currElem.val == nil or currElem.left ~= nil) and lLine then
+        leftSides = leftSides + 1
+        lLine = false
+      elseif currElem.val ~= nil and currElem.left == nil then
+        lLine = true
+      end
+      if (currElem.val == nil or currElem.right ~= nil) and rLine then
+        rightSides = rightSides + 1
+        rLine = false
+      elseif currElem.val ~= nil and currElem.right == nil then
+        rLine = true
+      end
+    end
+    if lLine then
+      leftSides = leftSides + 1
+    end
+    if rLine then
+      rightSides = rightSides + 1
+    end
+  end
+  local allSides = upSides + downSides + leftSides + rightSides
+  return allSides
+end
+
 --[[ 
   1518548 - correct
 ]]
@@ -158,9 +249,25 @@ local function day12Pt1(inputLines)
   end
   return totalPrice
 end
+--[[ 
+  844704 - incorrect, too low
+  909564 - correct
+]]
+local function day12Pt2(inputLines)
+  local land = parseInput(inputLines)
+  local regions = getRegions(land)
+  local totalPrice = 0
+  for _, region in ipairs(regions) do
+    local sides = getSides(region)
+    local area = #region
+    totalPrice = totalPrice + (area * sides)
+  end
+  return totalPrice
+end
 
 local day12Module = {
   day12Pt1 = day12Pt1,
+  day12Pt2 = day12Pt2,
 }
 
 return day12Module
