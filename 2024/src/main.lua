@@ -17,6 +17,7 @@ local day7 = require("./day7/day7-main")
 local day9 = require("./day9/day9-main")
 local day10 = require("./day10/day10-main")
 local day11 = require("day11.day11-main")
+local day12 = require("day12.day12-main")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
@@ -46,6 +47,9 @@ local DAY_9_FILE_NAME = "day9.txt"
 local DAY_10_FILE_NAME = "day10.txt"
 -- local DAY_11_FILE_NAME = "day11_test.txt"
 local DAY_11_FILE_NAME = "day11.txt"
+-- local DAY_12_FILE_NAME = "day12_test.txt"
+-- local DAY_12_FILE_NAME = "day12_test2.txt"
+local DAY_12_FILE_NAME = "day12.txt"
 
 local function aocBanner()
   local padStr = "*"
@@ -133,6 +137,7 @@ local dayArgsArr = {
   {9, DAY_9_FILE_NAME, day9.day9Pt1, day9.day9Pt2},
   {10, DAY_10_FILE_NAME, day10.day10Pt1, day10.day10Pt2},
   {11, DAY_11_FILE_NAME, day11.day11Pt1, day11.day11Pt2},
+  {12, DAY_12_FILE_NAME, day12.day12Pt1, nil},
 }
 
 local function main()
