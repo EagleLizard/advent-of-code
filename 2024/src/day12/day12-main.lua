@@ -179,13 +179,13 @@ local function getSides(region)
     local dLine = false
     for x in ipairs(land[y]) do
       local currElem = land[y][x]
-      if currElem.up ~= nil and uLine then
+      if (currElem.val == nil or currElem.up ~= nil) and uLine then
         upSides = upSides + 1
         uLine = false
       elseif currElem.val ~= nil and currElem.up == nil then
         uLine = true
       end
-      if currElem.down ~= nil and dLine then
+      if (currElem.val == nil or currElem.down ~= nil) and dLine then
         downSides = downSides + 1
         dLine = false
       elseif currElem.val ~= nil and currElem.down == nil then
@@ -211,13 +211,13 @@ local function getSides(region)
     local lLine = false
     for y = 1, height do
       local currElem = land[y][x]
-      if currElem.left ~= nil and lLine then
+      if (currElem.val == nil or currElem.left ~= nil) and lLine then
         leftSides = leftSides + 1
         lLine = false
       elseif currElem.val ~= nil and currElem.left == nil then
         lLine = true
       end
-      if currElem.right ~= nil and rLine then
+      if (currElem.val == nil or currElem.right ~= nil) and rLine then
         rightSides = rightSides + 1
         rLine = false
       elseif currElem.val ~= nil and currElem.right == nil then
@@ -231,23 +231,8 @@ local function getSides(region)
       rightSides = rightSides + 1
     end
   end
-  printf("%s\n", region[1].val)
-  for _, plant in ipairs(region) do
-    printf("(%d, %d) ", plant.point.x, plant.point.y)
-  end
-  printf("\n")
-  for y in ipairs(land) do
-    for x in ipairs(land[y]) do
-      local currEl = land[y][x]
-      printf("%s", ((currEl.val == nil) and " ") or currEl.val)
-    end
-    printf("\n")
-  end
-  printf("up: %d\n", upSides)
-  printf("down: %d\n", downSides)
-  printf("left: %d\n", leftSides)
-  printf("right: %d\n", rightSides)
-  return upSides + downSides + leftSides + rightSides
+  local allSides = upSides + downSides + leftSides + rightSides
+  return allSides
 end
 
 --[[ 
@@ -266,6 +251,7 @@ local function day12Pt1(inputLines)
 end
 --[[ 
   844704 - incorrect, too low
+  909564 - correct
 ]]
 local function day12Pt2(inputLines)
   local land = parseInput(inputLines)
