@@ -1,33 +1,23 @@
 
-local lfs = require("lfs")
-
-local files = require("./util/files")
-local cliColors = require("./util/cli-colors")
-local dateTimeUtil = require("./util/date-time-util")
-local parseArgs = require("./lib/parse-args")
-local arr = require("./util/arr-util")
+local aoc = require("lib.run-aoc")
+local cliColors = require("util.cli-colors")
+local parseArgs = require("lib.parse-args")
+local arr = require("util.arr-util")
 
 local colors = cliColors.colors
 
-local day1 = require("./day1/day1-main")
-local day2 = require("./day2/day2-main")
-local day3 = require("./day3/day3-main")
-local day5 = require("./day5/day5-main")
-local day7 = require("./day7/day7-main")
-local day9 = require("./day9/day9-main")
-local day10 = require("./day10/day10-main")
+local day1 = require("day1.day1-main")
+local day2 = require("day2.day2-main")
+local day3 = require("day3.day3-main")
+local day5 = require("day5.day5-main")
+local day7 = require("day7.day7-main")
+local day9 = require("day9.day9-main")
+local day10 = require("day10.day10-main")
 local day11 = require("day11.day11-main")
 local day12 = require("day12.day12-main")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
-
-local c1 = colors.green_bright
-local c2 = colors.cyan
--- local c3 = colors.pear_light
-local c3 = colors.pear
-local c4 = colors.white_bright
--- local c4 = colors.pear_light
 
 -- local DAY_1_FILE_NAME = "day1_test1.txt"
 local DAY_1_FILE_NAME = "day1.txt"
@@ -53,81 +43,19 @@ local DAY_11_FILE_NAME = "day11.txt"
 -- local DAY_12_FILE_NAME = "day12_test4.txt"
 local DAY_12_FILE_NAME = "day12.txt"
 
-local function aocBanner()
+local function aocBanner(t)
   local padStr = "*"
-  local left = c1(padStr)
-  local right = c1(padStr)
+  local left = t.c1(padStr)
+  local right = t.c1(padStr)
   local bannerTxt = " Advent of Code 2024 [lua] "
-  local bannerTxtStr = c4(bannerTxt)
+  local bannerTxtStr = t.c4(bannerTxt)
   local bannerTxtLine = string.format("%s%s%s", left, bannerTxtStr, right)
   local topTxt = string.rep(padStr, bannerTxt:len() + (padStr:len() * 2))
   local bottomTxt = topTxt
-  local top = c1(topTxt)
-  local bottom = cliColors.underline(c1(bottomTxt))
+  local top = t.c1(topTxt)
+  local bottom = t.underline(t.c1(bottomTxt))
   local bannerStr = string.format("%s\n%s\n%s", top, bannerTxtLine, bottom)
   return bannerStr
-end
-
-local function getInputLines(inputFileName)
-  local inputFilePath = lfs.currentdir()..files.sep.."input"..files.sep..inputFileName
-  if not files.check(inputFilePath) then
-    error("File does't exist: "..inputFilePath)
-  end
-  local lines = {}
-  for line in io.lines(inputFilePath) do
-    lines[#lines + 1] = line
-  end
-  return lines
-end
-
-local function runPart(ptNum, inputLines, ptFn)
-  local startTime = os.clock()
-  local ptSolution = ptFn(inputLines)
-  local endTime = os.clock()
-  local elapsed = endTime - startTime
-  local partRes = {
-    partNum = ptNum,
-    fnTime = elapsed,
-    solution = ptSolution,
-  }
-  return partRes
-end
-
-local function printPart(ptRes)
-  local fnTimeMs = dateTimeUtil.sToMs(ptRes.fnTime)
-  local solution = c3(string.format("%d", ptRes.solution))
-  local fnTimeStr = c2(string.format("%.3f ms", fnTimeMs))
-
-  local partStr = c1(string.format("Part %d", ptRes.partNum))
-  printf("%s: %s | %s\n", partStr, solution, fnTimeStr)
-end
-
-local function runDay(day, inputFileName, pt1Fn, pt2Fn)
-  local pt1Res
-  local pt2Res
-  local inputLines
-  local dayBanner = string.format("~ Day %s ~", day)
-  printf("%s\n", c1(dayBanner))
-  inputLines = getInputLines(inputFileName)
-
-  local totalStart = os.clock()
-  if pt1Fn ~= nil then
-    pt1Res = runPart(1, inputLines, pt1Fn)
-    printPart(pt1Res)
-  end
-  if pt2Fn ~= nil then
-    pt2Res = runPart(2, inputLines, pt2Fn)
-    printPart(pt2Res)
-  end
-  local totalElapsedTime = os.clock() - totalStart
-  local totalElapsedTimeMs = dateTimeUtil.sToMs(totalElapsedTime)
-  local totalTimeStr = c2(string.format("%.3f ms", totalElapsedTimeMs))
-
-  local divWidth = 6
-  local divStr = string.rep("-", divWidth)
-  local totalTxt = c1("total")
-  local totalStr = cliColors.italic(string.format("%s: %s", totalTxt, totalTimeStr))
-  printf("%s\n%s\n", totalStr, divStr)
 end
 
 local dayArgsArr = {
@@ -143,7 +71,17 @@ local dayArgsArr = {
 }
 
 local function main()
-  local bannerStr = aocBanner()
+  local theme = {
+    c1 = colors.green_bright,
+    c2 = colors.cyan,
+    c3 = colors.pear,
+    c4 = colors.white_bright,
+  
+    italic = cliColors.italic,
+    underline = cliColors.underline,
+  }
+
+  local bannerStr = aocBanner(theme)
   printf("\n%s\n\n", bannerStr)
   local cmdOpts = parseArgs.parse(arg)
 
@@ -161,9 +99,10 @@ local function main()
     end
     table.insert(daysToRun, dayArgsArr[foundIdx])
   end
-
+  
   for _, dayArgs in ipairs(daysToRun) do
-    runDay(dayArgs[1], dayArgs[2], dayArgs[3], dayArgs[4])
+    -- runDay(dayArgs[1], dayArgs[2], dayArgs[3], dayArgs[4])
+    aoc.runDay(theme, dayArgs[1], dayArgs[2], dayArgs[3], dayArgs[4])
   end
 end
 
