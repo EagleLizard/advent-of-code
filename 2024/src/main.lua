@@ -47,8 +47,9 @@ local DAY_9_FILE_NAME = "day9.txt"
 local DAY_10_FILE_NAME = "day10.txt"
 -- local DAY_11_FILE_NAME = "day11_test.txt"
 local DAY_11_FILE_NAME = "day11.txt"
-local DAY_12_FILE_NAME = "day12_test.txt"
--- local DAY_12_FILE_NAME = "day12_test2.txt"
+-- local DAY_12_FILE_NAME = "day12_test.txt"
+local DAY_12_FILE_NAME = "day12_test2.txt"
+-- local DAY_12_FILE_NAME = "day12_test3.txt"
 -- local DAY_12_FILE_NAME = "day12.txt"
 
 local function aocBanner()

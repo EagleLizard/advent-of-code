@@ -145,21 +145,6 @@ local function getRegions(land)
   return regions
 end
 
---[[ 
-  1518548 - correct
-]]
-local function day12Pt1(inputLines)
-  local land = parseInput(inputLines)
-  local regions = getRegions(land)
-  local totalPrice = 0
-  for _, region in ipairs(regions) do
-    local perimeter = getPerimeter(region)
-    local area = #region
-    totalPrice = totalPrice + (area * perimeter)
-  end
-  return totalPrice
-end
-
 local function getSides(region)
   local minX = math.huge
   local minY = math.huge
@@ -171,11 +156,6 @@ local function getSides(region)
     maxX = math.max(maxX, plant.point.x)
     maxY = math.max(maxY, plant.point.y)
   end
-  printf("%s - ", region[1].val)
-  for _, plant in ipairs(region) do
-    printf("(%d, %d) ", plant.point.x, plant.point.y)
-  end
-  printf("\n")
   --[[
     plot region on its own isolated land
   ]]
@@ -222,17 +202,81 @@ local function getSides(region)
     end
     -- printf("\n")
   end
+  local width = #land[1]
+  local height = #land
+  local rightSides = 0
+  local leftSides = 0
+  for x = 1, width do
+    local rLine = false
+    local lLine = false
+    for y = 1, height do
+      local currElem = land[y][x]
+      if currElem.left ~= nil and lLine then
+        leftSides = leftSides + 1
+        lLine = false
+      elseif currElem.val ~= nil and currElem.left == nil then
+        lLine = true
+      end
+      if currElem.right ~= nil and rLine then
+        rightSides = rightSides + 1
+        rLine = false
+      elseif currElem.val ~= nil and currElem.right == nil then
+        rLine = true
+      end
+    end
+    if lLine then
+      leftSides = leftSides + 1
+    end
+    if rLine then
+      rightSides = rightSides + 1
+    end
+  end
+  printf("%s\n", region[1].val)
+  for _, plant in ipairs(region) do
+    printf("(%d, %d) ", plant.point.x, plant.point.y)
+  end
+  printf("\n")
+  for y in ipairs(land) do
+    for x in ipairs(land[y]) do
+      local currEl = land[y][x]
+      printf("%s", ((currEl.val == nil) and " ") or currEl.val)
+    end
+    printf("\n")
+  end
   printf("up: %d\n", upSides)
   printf("down: %d\n", downSides)
+  printf("left: %d\n", leftSides)
+  printf("right: %d\n", rightSides)
+  return upSides + downSides + leftSides + rightSides
 end
 
+--[[ 
+  1518548 - correct
+]]
+local function day12Pt1(inputLines)
+  local land = parseInput(inputLines)
+  local regions = getRegions(land)
+  local totalPrice = 0
+  for _, region in ipairs(regions) do
+    local perimeter = getPerimeter(region)
+    local area = #region
+    totalPrice = totalPrice + (area * perimeter)
+  end
+  return totalPrice
+end
+--[[ 
+  844704 - incorrect, too low
+]]
 local function day12Pt2(inputLines)
   local land = parseInput(inputLines)
   local regions = getRegions(land)
+  local totalPrice = 0
   for _, region in ipairs(regions) do
     local sides = getSides(region)
+    local area = #region
+    totalPrice = totalPrice + (area * sides)
   end
-  return -1
+  return totalPrice
 end
 
 local day12Module = {
