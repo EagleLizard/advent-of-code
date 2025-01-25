@@ -58,8 +58,23 @@ local function day13Pt1(inputLines)
   return totalTokens
 end
 
+--[[ 
+  90798500745591 - correct
+]]
+local function day13Pt2(inputLines)
+  local claws = parseInput(inputLines)
+  local totalTokens = 0
+  local mod = 1e13
+  for _, claw in ipairs(claws) do
+    local tokens = getClawTokens(claw.a.x, claw.a.y, claw.b.x, claw.b.y, claw.prize.x + mod, claw.prize.y + mod)
+    totalTokens = totalTokens + tokens
+  end
+  return totalTokens
+end
+
 local day13Module = {
   day13Pt1 = day13Pt1,
+  day13Pt2 = day13Pt2,
 }
 
 return day13Module
