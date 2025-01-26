@@ -12,7 +12,7 @@ local Plant = (function ()
   function Plant:new(val, x, y)
     local self = setmetatable({}, Plant)
     self.val = val
-    self.point = Point:new(x, y)
+    self.point = Point.new(x, y)
 
     self.up = nil
     self.right = nil
@@ -47,19 +47,19 @@ local function getAdjPoints(land, pt)
   local up, right, down, left
   --[[ up ]]
   if pt.y > 1 then
-    up = Point:new(pt.x, pt.y - 1)
+    up = Point.new(pt.x, pt.y - 1)
   end
   --[[ right ]]
   if pt.x < width then
-    right = Point:new(pt.x + 1, pt.y)
+    right = Point.new(pt.x + 1, pt.y)
   end
   --[[ down ]]
   if pt.y < height then
-    down = Point:new(pt.x, pt.y + 1)
+    down = Point.new(pt.x, pt.y + 1)
   end
   --[[ left ]]
   if pt.x > 1 then
-    left = Point:new(pt.x - 1, pt.y)
+    left = Point.new(pt.x - 1, pt.y)
   end
   -- return adjPts
   return {
