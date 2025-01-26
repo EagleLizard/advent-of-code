@@ -12,12 +12,12 @@ local function parseInput(inputLines)
       local xStr, yStr = string.match(inputLine, "^Button A: X%+(%d+), Y%+(%d+)")
       local x = tonumber(xStr) or errorf("Invalid button X: %s", xStr)
       local y = tonumber(yStr) or errorf("Invalid button Y: %s", yStr)
-      a = Point:new(x, y)
+      a = Point.new(x, y)
     elseif string.match(inputLine, "^Button B:") then
       local xStr, yStr = string.match(inputLine, "^Button B: X%+(%d+), Y%+(%d+)")
       local x = tonumber(xStr) or errorf("Invalid button X: %s", xStr)
       local y = tonumber(yStr) or errorf("Invalid button Y: %s", yStr)
-      b = Point:new(x, y)
+      b = Point.new(x, y)
     elseif string.match(inputLine, "^Prize: ") then
       local xStr, yStr = string.match(inputLine, "^Prize: X=(%d+), Y=(%d+)")
       local x = tonumber(xStr) or errorf("Invalid button X: %s", xStr)
@@ -25,7 +25,7 @@ local function parseInput(inputLines)
       table.insert(claws, {
         a = a,
         b = b,
-        prize = Point:new(x, y),
+        prize = Point.new(x, y),
       })
     end
   end
