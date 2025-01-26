@@ -5,10 +5,10 @@ local arr = require("util.arr-util")
 local printf = require("util.printf")
 local errorf = require("util.errorf")
 
-local bWidth = 11
-local bHeight = 7
--- local bWidth = 101
--- local bHeight = 103
+-- local bWidth = 11
+-- local bHeight = 7
+local bWidth = 101
+local bHeight = 103
 
 local Bot = (function ()
   local Bot = {}
@@ -82,11 +82,22 @@ local function parseInput(inputLines)
   return bots
 end
 
-local function printGrid(grid, bots)
-  for y in ipairs(grid) do
-    for x in ipairs(grid[y]) do
+local function printGrid(grid, withQuads)
+  local width = #grid[1]
+  local height = #grid
+  local midX = math.ceil(width / 2)
+  local midY = math.ceil(height / 2)
+  withQuads = withQuads or false
+  if withQuads then
+    printf("midX: %d\n", midX)
+    printf("midY: %d\n", midY)
+  end
+  for y = 1, height do
+    for x = 1, width do
       local val = grid[y][x]
-      if val < 1 then
+      if withQuads and (y == midY or x == midX) then
+        printf(" ")
+      elseif val < 1 then
         printf(".")
       else
         printf("%d", val)
@@ -96,36 +107,39 @@ local function printGrid(grid, bots)
       end
     end
   end
+  printf("\n")
 end
 
+local function getBathroomGrid(bots, width, height)
+  local grid = {}
+  for y = 1, height do
+    table.insert(grid, {})
+    for x = 1, width do
+      table.insert(grid[y], 0)
+    end
+  end
+  for _, bot in ipairs(bots) do
+    grid[bot.y][bot.x] = grid[bot.y][bot.x] + 1
+  end
+  return grid
+end
+
+--[[
+  230686500 - correct
+]]
 local function day14Pt1(inputLines)
   local bots = parseInput(inputLines)
-  local testBotIdx = arr.findIndex(bots, function (bot)
-    return bot.x == 3 and bot.y == 5
-  end)
+  -- local testBotIdx = arr.findIndex(bots, function (bot)
+  --   return bot.x == 3 and bot.y == 5
+  -- end)
   -- bots = { bots[testBotIdx] }
   local secs = 100
-  for sec = 1, secs do
-    -- local grid = {}
-    -- for y = 1, bHeight do
-    --   table.insert(grid, {})
-    --   for x = 1, bWidth do
-    --     table.insert(grid[y], 0)
-    --   end
-    -- end
+  for _ = 1, secs do
     for _, bot in ipairs(bots) do
-      -- if bot.x == 2 and bot.y == 4 then
-        -- printf("%d, %d -> ", bot.x, bot.y)
-        bot:move()
-        -- printf("%d, %d", bot.x, bot.y)
-        -- print("\n")
-        -- grid[bot.y][bot.x] = grid[bot.y][bot.x] + 1
-      -- end
+      bot:move()
     end
-
-    -- printGrid(grid)
-    -- print("\n")
   end
+
   --[[
     Count bots in quadrants.
       For the sake of correctness, I'll use proper quadrants:
@@ -134,9 +148,32 @@ local function day14Pt1(inputLines)
   ]]
   local midX = math.ceil(bWidth / 2)
   local midY = math.ceil(bHeight / 2)
-  printf("midX: %d\n", midX)
-  printf("midY: %d\n", midY)
-  return -1
+  -- local grid = getBathroomGrid(bots, bWidth, bHeight)
+  -- printGrid(grid)
+  -- printf("midX: %d\n", midX)
+  -- printf("midY: %d\n", midY)
+  -- printGrid(grid, true)
+  local quads = { 0, 0, 0, 0 }
+  for _, bot in ipairs(bots) do
+    if bot.y < midY then
+      if bot.x > midX then
+        quads[1] = quads[1] + 1
+      elseif bot.x < midX then
+        quads[2] = quads[2] + 1
+      end
+    elseif bot.y > midY then
+      if bot.x < midX then
+        quads[3] = quads[3] + 1
+      elseif bot.x > midX then
+        quads[4] = quads[4] + 1
+      end
+    end
+  end
+  local quadProduct = quads[1]
+  for i = 2, #quads do
+    quadProduct = quadProduct * quads[i]
+  end
+  return quadProduct
 end
 
 local day14Module = {
