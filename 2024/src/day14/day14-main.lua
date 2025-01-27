@@ -19,6 +19,7 @@ local Bot = (function ()
   ---@field x integer
   ---@field y integer
   ---@field v Point
+  ---@field move fun(self: Bot)  -- Add this line to annotate the move method
   function Bot.new(x, y, vx, vy)
     local self = setmetatable({}, Bot)
     self.origin = Point.new(x, y)
@@ -57,6 +58,9 @@ local Bot = (function ()
   return Bot
 end)()
 
+---comment
+---@param inputLines string[]
+---@return Bot[]
 local function parseInput(inputLines)
   local bots = {}
   for _, inputLine in ipairs(inputLines) do
@@ -124,6 +128,115 @@ local function getBathroomGrid(bots, width, height)
   return grid
 end
 
+local function printGrid2(bots)
+  local grid = {}
+  local width = bWidth
+  local height = bHeight
+  for y = 1, height do
+    table.insert(grid, {})
+    for _ = 1, width do
+      table.insert(grid[y], 0)
+    end
+  end
+  for _, bot in ipairs(bots) do
+    grid[bot.y][bot.x] = grid[bot.y][bot.x] + 1
+  end
+  for y in ipairs(grid) do
+    for x in ipairs(grid[y]) do
+      local val = grid[y][x]
+      if val < 1 then
+        printf(".")
+      else
+        printf("o")
+      end
+      if x == width then
+        printf("\n")
+      end
+    end
+  end
+end
+
+local function hasXmasTree(bots)
+  local width = bWidth
+  local height = bHeight
+  local topHalfCount = 0
+  local bottomHalfCount = 0
+  local midY = math.ceil(height / 2)
+  local grid = getBathroomGrid(bots, width, height)
+  local tipFlag = true
+  local treeFlag = false
+  local prevLeft, prevRight
+
+  local invalidTree = false
+  for y = 1, height do
+    local pts = {}
+    local currLeft = nil
+    local currRight = nil
+    for x = 1, width do
+      local val = grid[y][x]
+      if val > 0 then
+        local pt = Point.new(x, y)
+        table.insert(pts, pt)
+        if treeFlag then
+          if currLeft == nil then
+            currLeft = pt
+          else
+            currRight = pt
+          end
+        end
+      end
+    end
+    if tipFlag then
+      --[[
+        when looking for the tip, lines should:
+          - be empty
+          - have a single point
+      ]]
+      if #pts == 1 then
+        tipFlag = false
+        treeFlag = true
+        prevLeft = pts[1]
+        prevRight = pts[1]
+      elseif #pts > 1 then
+        invalidTree = true
+      end
+    elseif treeFlag then
+      if currLeft == nil or currRight == nil then
+        -- invalidTree = true
+      else
+        if currLeft.x >= prevLeft.x or currRight.x <= prevRight.x then
+          -- invalidTree = true
+        else
+          prevLeft = currLeft
+          prevRight = currRight
+        end
+      end
+    end
+    if invalidTree then
+      break
+    end
+  end
+  return not invalidTree
+end
+
+local function day14Pt2(inputLines)
+  local bots = parseInput(inputLines)
+  local hasTree = false
+  local sec = 0
+  local maxSecs = 1e4
+  while not hasTree and sec <= maxSecs do
+    for _, bot in ipairs(bots) do
+      bot:move()
+    end
+    sec = sec + 1
+    if hasXmasTree(bots) then
+      printf("sec: %d\n", sec)
+      printGrid2(bots)
+    end
+  end
+  return -1
+end
+
 --[[
   230686500 - correct
 ]]
@@ -174,10 +287,6 @@ local function day14Pt1(inputLines)
     quadProduct = quadProduct * quads[i]
   end
   return quadProduct
-end
-
-local function day14Pt2(inputLines)
-  return -1
 end
 
 local day14Module = {

@@ -9,6 +9,15 @@ I could optimize this part by advancing all of the seconds per bot at one time, 
 
 ## Part 2
 
+`[01/26/2025][lua]`
+
+After applying some heuristics, I realize all of my assumptions below are likely wrong.
+
+My next approach will be instead to look for when a bunch of points are clustered together.
+
+---
+`01/26/2025`
+
 I was initially frustrated by the prompt. Now I can appreciate the humor of the ambiguity.
 
 My first inclination was to print the entire grid, second-by-second, and visually observe when the christmas tree appears.
