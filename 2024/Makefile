@@ -20,5 +20,9 @@ watch-go:
 	air --build.cmd "make build-go" --build.bin "make run-go"
 run-lua:
 	lua init.lua -d $(day)
+out-lua:
+	lua init.lua -d $(day) > d$(day)-out.txt
 watch-lua:
 	fswatch -ro ./src | xargs -n1 -I{} make run-lua
+watch-out-lua:
+	fswatch -ro ./src | xargs -n1 -I{} make out-lua

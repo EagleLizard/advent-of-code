@@ -19,6 +19,7 @@ local Bot = (function ()
   ---@field x integer
   ---@field y integer
   ---@field v Point
+  ---@field move fun(self: Bot)  -- Add this line to annotate the move method
   function Bot.new(x, y, vx, vy)
     local self = setmetatable({}, Bot)
     self.origin = Point.new(x, y)
@@ -57,6 +58,9 @@ local Bot = (function ()
   return Bot
 end)()
 
+---comment
+---@param inputLines string[]
+---@return Bot[]
 local function parseInput(inputLines)
   local bots = {}
   for _, inputLine in ipairs(inputLines) do
@@ -124,6 +128,114 @@ local function getBathroomGrid(bots, width, height)
   return grid
 end
 
+local function printGrid2(bots)
+  local grid = {}
+  local width = bWidth
+  local height = bHeight
+  for y = 1, height do
+    table.insert(grid, {})
+    for _ = 1, width do
+      table.insert(grid[y], 0)
+    end
+  end
+  for _, bot in ipairs(bots) do
+    grid[bot.y][bot.x] = grid[bot.y][bot.x] + 1
+  end
+  for y in ipairs(grid) do
+    for x in ipairs(grid[y]) do
+      local val = grid[y][x]
+      if val < 1 then
+        printf(".")
+      else
+        printf("o")
+      end
+      if x == width then
+        printf("\n")
+      end
+    end
+  end
+end
+
+local function checkXmasTree(bots)
+  local width = bWidth
+  local height = bHeight
+  local hasTree = false
+  local nBoxes = 6
+  local boxWidth = math.floor(width / nBoxes)
+  local boxHeight = math.floor(height / nBoxes)
+  local numBots = #bots
+  local grid = getBathroomGrid(bots, width, height)
+
+  --[[
+    search regions of the grid
+  ]]
+  for by = 1, nBoxes do
+    for bx = 1, nBoxes do
+      local subGrid = {}
+      local yStart
+      if by == 1 then
+        yStart = 1
+      else
+        yStart = (by - 1) * boxHeight
+      end
+      local xStart
+      if bx == 1 then
+        xStart = 1
+      else
+        xStart = (bx - 1) * boxWidth
+      end
+      -- printf("%d, %d\n", xStart, yStart)
+      -- printf("bw: %d\n", boxWidth)
+      -- printf("xStart+bw-1: %d\n", xStart + boxWidth-1)
+      local currBotCount = 0
+      local cellCount = 0
+      for y = yStart, yStart + boxHeight do
+        for x = xStart, xStart + boxWidth do
+          cellCount = cellCount + 1
+          local val = grid[y][x]
+          if val > 0 then
+            currBotCount = currBotCount + 1
+            -- printf("o")
+          end
+        end
+        -- printf("\n")
+      end
+      local currBotPct = currBotCount / cellCount
+      if currBotPct > 0.2 then
+        return true
+      end
+    end
+    -- printf("\n")
+  end
+  -- hasTree = true
+  return hasTree
+end
+
+--[[ 
+7672 - correct
+]]
+
+local function day14Pt2(inputLines)
+  local bots = parseInput(inputLines)
+  local hasTree = false
+  local sec = 0
+  -- local maxSecs = 500
+  local maxSecs = 1e4
+  while not hasTree and sec <= maxSecs do
+    for _, bot in ipairs(bots) do
+      bot:move()
+    end
+    sec = sec + 1
+    -- printGrid2(bots)
+    if checkXmasTree(bots) then
+      hasTree = true
+      -- printf("sec: %d\n", sec)
+      -- printGrid2(bots)
+    end
+  end
+  return sec
+end
+
 --[[
   230686500 - correct
 ]]
@@ -178,6 +290,7 @@ end
 
 local day14Module = {
   day14Pt1 = day14Pt1,
+  day14Pt2 = day14Pt2,
 }
 
 return day14Module

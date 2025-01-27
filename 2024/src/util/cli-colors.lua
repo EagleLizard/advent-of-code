@@ -1,8 +1,19 @@
 
-local function rgb(r, g, b)
-  return function(val)
-    return string.format("\x1B[38;2;%d;%d;%dm%s\x1B[39m", r, g, b, val)
+local tty = io.type(io.stdout) == "terminal"
+
+local function fmtFn(srcFn)
+  if not tty then
+    return function(val)
+      return ""..val
+    end
   end
+  return srcFn
+end
+
+local function rgb(r, g, b)
+  return fmtFn(function(val)
+    return string.format("\x1B[38;2;%d;%d;%dm%s\x1B[39m", r, g, b, val)
+  end)
 end
 
 local function italic(val)
