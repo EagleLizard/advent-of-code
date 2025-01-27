@@ -67,8 +67,20 @@ The smaller box doesn't correctly cover the entire grid - there is some remainde
 
 It's pretty slow. 6.1s.
 
+### `[01/27/2025][lua]`
+
+*<u>*update2:</u>*
+
+I was able to optimize in various spots to get the running time of part 2 down.
+
+There is probably more I could do to  optimize the current algorithm; however, I think a different heuristic would be necessary to realize significant performance improvements.
+
+From ~6.1s to ~3.1s
 
 ---
+
+---
+
 `01/26/2025`
 
 I was initially frustrated by the prompt. Now I can appreciate the humor of the ambiguity.
