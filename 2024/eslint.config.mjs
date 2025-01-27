@@ -1,0 +1,24 @@
+import globals from "globals";
+import pluginJs from "@eslint/js";
+
+/** @type {import('eslint').Linter.Config[]} */
+const config = [
+  {files: ["**/*.js"], languageOptions: {sourceType: "commonjs"}},
+  {languageOptions: { globals: globals.node }},
+  pluginJs.configs.recommended,
+  {
+    rules: {
+      indent: [
+        'error',
+        2,
+        {
+          'MemberExpression': 1,
+          'SwitchCase': 1
+        }
+      ],
+      semi: "error"
+    },
+  },
+];
+
+export default config;
