@@ -176,8 +176,13 @@ local function day14Pt1(inputLines)
   return quadProduct
 end
 
+local function day14Pt2(inputLines)
+  return -1
+end
+
 local day14Module = {
   day14Pt1 = day14Pt1,
+  day14Pt2 = day14Pt2,
 }
 
 return day14Module
