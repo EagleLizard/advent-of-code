@@ -156,85 +156,84 @@ local function printGrid2(bots)
   end
 end
 
-local function hasXmasTree(bots)
+local function checkXmasTree(bots)
   local width = bWidth
   local height = bHeight
-  local topHalfCount = 0
-  local bottomHalfCount = 0
-  local midY = math.ceil(height / 2)
+  local hasTree = false
+  local nBoxes = 6
+  local boxWidth = math.floor(width / nBoxes)
+  local boxHeight = math.floor(height / nBoxes)
+  local numBots = #bots
   local grid = getBathroomGrid(bots, width, height)
-  local tipFlag = true
-  local treeFlag = false
-  local prevLeft, prevRight
 
-  local invalidTree = false
-  for y = 1, height do
-    local pts = {}
-    local currLeft = nil
-    local currRight = nil
-    for x = 1, width do
-      local val = grid[y][x]
-      if val > 0 then
-        local pt = Point.new(x, y)
-        table.insert(pts, pt)
-        if treeFlag then
-          if currLeft == nil then
-            currLeft = pt
-          else
-            currRight = pt
+  --[[
+    search regions of the grid
+  ]]
+  for by = 1, nBoxes do
+    for bx = 1, nBoxes do
+      local subGrid = {}
+      local yStart
+      if by == 1 then
+        yStart = 1
+      else
+        yStart = (by - 1) * boxHeight
+      end
+      local xStart
+      if bx == 1 then
+        xStart = 1
+      else
+        xStart = (bx - 1) * boxWidth
+      end
+      -- printf("%d, %d\n", xStart, yStart)
+      -- printf("bw: %d\n", boxWidth)
+      -- printf("xStart+bw-1: %d\n", xStart + boxWidth-1)
+      local currBotCount = 0
+      local cellCount = 0
+      for y = yStart, yStart + boxHeight do
+        for x = xStart, xStart + boxWidth do
+          cellCount = cellCount + 1
+          local val = grid[y][x]
+          if val > 0 then
+            currBotCount = currBotCount + 1
+            -- printf("o")
           end
         end
+        -- printf("\n")
+      end
+      local currBotPct = currBotCount / cellCount
+      if currBotPct > 0.2 then
+        return true
       end
     end
-    if tipFlag then
-      --[[
-        when looking for the tip, lines should:
-          - be empty
-          - have a single point
-      ]]
-      if #pts == 1 then
-        tipFlag = false
-        treeFlag = true
-        prevLeft = pts[1]
-        prevRight = pts[1]
-      elseif #pts > 1 then
-        invalidTree = true
-      end
-    elseif treeFlag then
-      if currLeft == nil or currRight == nil then
-        -- invalidTree = true
-      else
-        if currLeft.x >= prevLeft.x or currRight.x <= prevRight.x then
-          -- invalidTree = true
-        else
-          prevLeft = currLeft
-          prevRight = currRight
-        end
-      end
-    end
-    if invalidTree then
-      break
-    end
+    -- printf("\n")
   end
-  return not invalidTree
+  -- hasTree = true
+  return hasTree
 end
+
+--[[ 
+7672 - correct
+]]
 
 local function day14Pt2(inputLines)
   local bots = parseInput(inputLines)
   local hasTree = false
   local sec = 0
+  -- local maxSecs = 500
   local maxSecs = 1e4
   while not hasTree and sec <= maxSecs do
     for _, bot in ipairs(bots) do
       bot:move()
     end
     sec = sec + 1
-    if hasXmasTree(bots) then
-      printf("sec: %d\n", sec)
-      printGrid2(bots)
+    -- printGrid2(bots)
+    if checkXmasTree(bots) then
+      hasTree = true
+      -- printf("sec: %d\n", sec)
+      -- printGrid2(bots)
     end
   end
-  return -1
+  return sec
 end
 
 --[[
