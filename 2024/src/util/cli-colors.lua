@@ -1,5 +1,9 @@
 
-local tty = io.type(io.stdout) == "terminal"
+local system = require("system")
+
+local tty = system.isatty(io.stdout)
+
+print(tty)
 
 local function fmtFn(srcFn)
   if not tty then

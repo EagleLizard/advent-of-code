@@ -19,5 +19,6 @@ build = {
    }
 }
 dependencies = {
-   "luafilesystem"
+   "luafilesystem",
+   "luasystem"
 }
