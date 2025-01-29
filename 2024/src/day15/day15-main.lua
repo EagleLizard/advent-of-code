@@ -1,5 +1,6 @@
 
 local Point = require("geom.point")
+local arr = require("util.arr-util")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
@@ -46,6 +47,26 @@ local Robot = (function ()
   return Robot
 end)()
 
+local MoveCmd = (function ()
+  ---@class MoveCmd
+  ---@field str string
+  ---@field dx integer
+  ---@field dy integer
+  local MoveCmd = {}
+  MoveCmd.__index = MoveCmd
+
+  ---@param str string
+  function MoveCmd.new(str)
+    local self = setmetatable({}, MoveCmd)
+    self.str = str
+    self.dx = ((str == ">" and 1) or (str == "<" and -1)) or 0
+    self.dy = ((str == "^" and -1) or (str == "v" and 1)) or 0
+    return self
+  end
+
+  return MoveCmd
+end)()
+
 local Warehouse = (function ()
   ---@class Warehouse
   ---@field grid string[][]
@@ -79,7 +100,7 @@ local Warehouse = (function ()
       grid[box.y][box.x] = "O"
     end
     --[[ place the robot ]]
-    grid[self.robot.y][self.robot.y] = "@"
+    grid[self.robot.y][self.robot.x] = "@"
 
     for y in ipairs(grid) do
       for x in ipairs(grid[y]) do
@@ -95,7 +116,7 @@ local Warehouse = (function ()
 end)()
 
 ---@param inputLines string[]
----@return { grid: string[][], boxes: Box[], robot: Robot, moves: string[] }
+---@return { grid: string[][], boxes: Box[], robot: Robot, moveCmds: MoveCmd[] }
 local function parseInput(inputLines)
   local parseWarehouse = true
   local rawGrid = {}
@@ -121,6 +142,7 @@ local function parseInput(inputLines)
 
   local grid = {}
   local boxes = {}
+  local moveCmds = {}
   local robot = nil
   for y in ipairs(rawGrid) do
     table.insert(grid, {})
@@ -154,6 +176,7 @@ local function parseInput(inputLines)
 
   for _, move in ipairs(rawMoves) do
     printf("%s", move)
+    table.insert(moveCmds, MoveCmd.new(move))
   end
   printf("\n")
 
@@ -161,7 +184,7 @@ local function parseInput(inputLines)
     grid = grid,
     boxes = boxes,
     robot = robot,
-    moves = rawMoves,
+    moveCmds = moveCmds,
   }
   return res
 end
@@ -171,21 +194,35 @@ local function day15Pt1(inputLines)
   local grid = day15Input.grid
   local boxes = day15Input.boxes
   local robot = day15Input.robot
-  local moves = day15Input.moves
   local wh = Warehouse.new(grid, boxes, robot)
-
-  for _, move in ipairs(moves) do
-    local dx = ((move == "<" and -1) or (move == ">" and 1)) or 0
-    local dy = ((move == "^" and -1) or (move == "v" and 1)) or 0
+  local moveCmds = day15Input.moveCmds
+  for _, moveCmd in ipairs(moveCmds) do
+    local dx = moveCmd.dx
+    local dy = moveCmd.dy
     local destX = wh.robot.x + dx
     local destY = wh.robot.y + dy
     local destVal = wh.grid[destY][destX]
-    printf("%s\n", move)
-    -- if destVal ~= "#" then
-    --   robot.x = destX
-    --   robot.y = destY
-    -- end
+    printf("\n")
+    printf("dest: (%d, %d)\n", destX, destY)
+    printf("%s (%d, %d), dest: %s\n", moveCmd.str, moveCmd.dx, moveCmd.dy, destVal)
+    ---@type Box|nil
+    local foundBox = nil
+    if destVal == "." then
+      --[[ see if the destination has a box ]]
+      foundBox = arr.find(wh.boxes, function (box)
+        return box.x == destX and box.y == destY
+      end)
+      if foundBox == nil then
+        wh.robot.x = destX
+        wh.robot.y = destY
+      end
+      printf("robot: (%d, %d)\n", wh.robot.x, wh.robot.y)
+    end
     wh:print()
+    if foundBox ~= nil then
+      printf("FOUND BOX\n")
+      break
+    end
     -- printWarehouse(grid, boxes, robot)
   end
   return -1
