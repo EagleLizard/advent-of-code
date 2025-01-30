@@ -62,20 +62,20 @@ local function parseInput(inputLines)
     end
   end
 
-  for y in ipairs(grid) do
-    for x in ipairs(grid[y]) do
-      printf("%s", grid[y][x])
-      if x == #grid[y] then
-        printf("\n")
-      end
-    end
-  end
+  -- for y in ipairs(grid) do
+  --   for x in ipairs(grid[y]) do
+  --     printf("%s", grid[y][x])
+  --     if x == #grid[y] then
+  --       printf("\n")
+  --     end
+  --   end
+  -- end
 
   for _, move in ipairs(rawMoves) do
-    printf("%s", move)
+    -- printf("%s", move)
     table.insert(moveCmds, MoveCmd.new(move))
   end
-  printf("\n")
+  -- printf("\n")
 
   local res = {
     grid = grid,
@@ -86,6 +86,9 @@ local function parseInput(inputLines)
   return res
 end
 
+--[[ 
+1430439 - correct
+]]
 local function day15Pt1(inputLines)
   local day15Input = parseInput(inputLines)
   local grid = day15Input.grid
@@ -93,25 +96,36 @@ local function day15Pt1(inputLines)
   local robot = day15Input.robot
   local wh = Warehouse.new(grid, boxes, robot)
   local moveCmds = day15Input.moveCmds
+
+  local boxMoveCount = 0
+
   for _, moveCmd in ipairs(moveCmds) do
     local dx = moveCmd.dx
     local dy = moveCmd.dy
     local destX = wh.robot.x + dx
     local destY = wh.robot.y + dy
     local destVal = wh.grid[destY][destX]
-    printf("\n")
-    printf("dest: (%d, %d)\n", destX, destY)
-    printf("%s (%d, %d), dest: %s\n", moveCmd.str, moveCmd.dx, moveCmd.dy, destVal)
+    -- printf("\n")
+    -- printf("dest: (%d, %d)\n", destX, destY)
+    -- printf("%s (%d, %d), dest: %s\n", moveCmd.str, moveCmd.dx, moveCmd.dy, destVal)
     ---@type Box|nil
     local foundBox = wh:moveRobot(moveCmd)
-    wh:print()
+    -- wh:print()
     if foundBox ~= nil then
-      printf("FOUND BOX\n")
-      break
+      -- printf("FOUND BOX\n")
+      boxMoveCount = boxMoveCount + 1
+      -- if boxMoveCount > 5 then
+      --   break
+      -- end
     end
     -- printWarehouse(grid, boxes, robot)
   end
-  return -1
+  local gpsSum = 0
+  for _, box in ipairs(wh.boxes) do
+    local currGps = (box.x - 1) + (100 * (box.y - 1))
+    gpsSum = gpsSum + currGps
+  end
+  return gpsSum
 end
 
 local day15MainModule = {

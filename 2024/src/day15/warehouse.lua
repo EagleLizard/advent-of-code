@@ -121,14 +121,44 @@ local Warehouse = (function ()
     local foundBox = arr.find(self.boxes, function (box)
       return box.x == destX and box.y == destY
     end)
+    local canMove = false
     if foundBox ~= nil then
       --[[ handle collision ]]
-      
-    elseif destVal == "." then
+      canMove = self:moveBox(moveCmd, foundBox)
+    else
+      canMove = destVal == "."
+    end
+    if canMove then
       self.robot.x = destX
       self.robot.y = destY
     end
     return foundBox
+  end
+
+  ---@param moveCmd MoveCmd
+  ---@param srcBox Box
+  ---@return boolean
+  function Warehouse:moveBox(moveCmd, srcBox)
+    -- printf("box (%d,%d)\n", srcBox.x, srcBox.y)
+
+    --[[ see if there's another box in the way ]]
+    local canMove = false
+    local destX = srcBox.x + moveCmd.dx
+    local destY = srcBox.y + moveCmd.dy
+    local foundBox = arr.find(self.boxes, function (box)
+      return box.x == destX and box.y == destY
+    end)
+    if foundBox == nil then
+      --[[ can move if grid val not a wall ]]
+      canMove = self.grid[destY][destX] == "."
+    else
+      canMove = self:moveBox(moveCmd, foundBox)
+    end
+    if canMove then
+      srcBox.x = destX
+      srcBox.y = destY
+    end
+    return canMove
   end
 
   return Warehouse
