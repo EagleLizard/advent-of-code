@@ -145,8 +145,22 @@ local function day15Pt2(inputLines)
   local grid = day15Pt2Input.grid
   local boxes = day15Pt2Input.boxes
   local robot = day15Pt2Input.robot
+  local moveCmds = day15Pt2Input.moveCmds
   local wh = Warehouse2.new(grid, boxes, robot)
+  local boxMoveCount = 0
   wh:print()
+  for _, moveCmd in ipairs(moveCmds) do
+    printf("%s\n", moveCmd.str)
+    local movedBox = wh:moveRobot(moveCmd)
+    if movedBox ~= nil then
+      boxMoveCount = boxMoveCount + 1
+    end
+    boxMoveCount = boxMoveCount + 1
+    wh:print()
+    if boxMoveCount > 1 then
+      break
+    end
+  end
   return -1
 end
 
