@@ -7,6 +7,9 @@ local Warehouse = _warehouseModule.Warehouse
 local Box = _warehouseModule.Box
 local Robot = _warehouseModule.Robot
 local MoveCmd = _warehouseModule.MoveCmd
+local _warehouse2Module = require("day15.warehouse2")
+local Warehouse2 = _warehouse2Module.Warehouse2
+local Box2 = _warehouse2Module.Box2
 
 
 ---@param inputLines string[]
@@ -72,39 +75,78 @@ local function parseInput(inputLines)
   return res
 end
 
+---@param inputLines string[]
+---@return { grid: string[][], boxes: Box2[], robot: Robot, moveCmds: MoveCmd[] }
 local function parseInput2(inputLines)
-  local grid = {}
+  local rawGrid = {}
+  local moveCmds = {}
+  local parseMoves = false
   --[[ transform initial grid  ]]
   for y, inputLine in ipairs(inputLines) do
-    table.insert(grid, {})
-    for c in string.gmatch(inputLine, ".") do
-      if c == "#" then
-        table.insert(grid[y], "#")
-        table.insert(grid[y], "#")
-      elseif c == "O" then
-        table.insert(grid[y], "[")
-        table.insert(grid[y], "]")
-      elseif c == "@" then
-        table.insert(grid[y], "@")
-        table.insert(grid[y], ".")
+    if parseMoves then
+      for c in string.gmatch(inputLine, ".") do
+        table.insert(moveCmds, MoveCmd.new(c))
+      end
+    else
+      if #inputLine < 1 then
+        parseMoves = true
       else
-        table.insert(grid[y], ".")
-        table.insert(grid[y], ".")
+        table.insert(rawGrid, {})
+        for c in string.gmatch(inputLine, ".") do
+          if c == "#" then
+            table.insert(rawGrid[y], "#")
+            table.insert(rawGrid[y], "#")
+          elseif c == "O" then
+            table.insert(rawGrid[y], "[")
+            table.insert(rawGrid[y], "]")
+          elseif c == "@" then
+            table.insert(rawGrid[y], "@")
+            table.insert(rawGrid[y], ".")
+          else
+            table.insert(rawGrid[y], ".")
+            table.insert(rawGrid[y], ".")
+          end
+        end
       end
     end
   end
-  for y in ipairs(grid) do
-    for x in ipairs(grid[y]) do
-      printf(grid[y][x])
-      if x == #grid[y] then
-        printf("\n")
+  local grid = {}
+  local boxes = {}
+  local robot = nil
+  for y in ipairs(rawGrid) do
+    table.insert(grid, {})
+    for x, val in ipairs(rawGrid[y]) do
+      if val == "[" then
+        table.insert(boxes, Box2.new(x, y))
+      elseif val == "@" then
+        if robot ~= nil then
+          errorf("Unexpected Robot at (%d, %d), robot already exists", x, y)
+        end
+        robot = Robot.new(x, y)
+      end
+      if val == "#" then
+        grid[y][x] = "#"
+      else
+        grid[y][x] = "."
       end
     end
   end
+  local res = {
+    grid = grid,
+    boxes = boxes,
+    robot = robot,
+    moveCmds = moveCmds
+  }
+  return res
 end
 
 local function day15Pt2(inputLines)
   local day15Pt2Input = parseInput2(inputLines)
+  local grid = day15Pt2Input.grid
+  local boxes = day15Pt2Input.boxes
+  local robot = day15Pt2Input.robot
+  local wh = Warehouse2.new(grid, boxes, robot)
+  wh:print()
   return -1
 end
 
