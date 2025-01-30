@@ -1,4 +1,8 @@
 
+--- @generic T
+--- @param arr T[]
+--- @param compFn fun(v: T, i: integer, arr: T[]): boolean 
+--- @return integer | nil
 local function findIndex(arr, compFn)
   local foundIdx = nil
   for i, v in ipairs(arr) do
@@ -8,6 +12,21 @@ local function findIndex(arr, compFn)
     end
   end
   return foundIdx
+end
+
+--- @generic T
+--- @param arr T[]
+--- @param compFn fun(v: T, i: integer, arr: T[]): boolean 
+--- @return T | nil
+local function find(arr, compFn)
+  local found = nil
+  for i, v in ipairs(arr) do
+    if compFn(v, i, arr) then
+      found = v
+      break
+    end
+  end
+  return found
 end
 
 local function indexOf(arr, searchVal)
@@ -68,6 +87,7 @@ end
 
 local arrUtilModule = {
   findIndex = findIndex,
+  find = find,
   indexOf = indexOf,
   contains = contains,
   copy = copy,
