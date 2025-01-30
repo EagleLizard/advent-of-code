@@ -103,18 +103,7 @@ local function day15Pt1(inputLines)
     printf("dest: (%d, %d)\n", destX, destY)
     printf("%s (%d, %d), dest: %s\n", moveCmd.str, moveCmd.dx, moveCmd.dy, destVal)
     ---@type Box|nil
-    local foundBox = nil
-    if destVal == "." then
-      --[[ see if the destination has a box ]]
-      foundBox = arr.find(wh.boxes, function (box)
-        return box.x == destX and box.y == destY
-      end)
-      if foundBox == nil then
-        wh.robot.x = destX
-        wh.robot.y = destY
-      end
-      printf("robot: (%d, %d)\n", wh.robot.x, wh.robot.y)
-    end
+    local foundBox = wh:moveRobot(moveCmd)
     wh:print()
     if foundBox ~= nil then
       printf("FOUND BOX\n")
