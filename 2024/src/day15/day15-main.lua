@@ -72,6 +72,42 @@ local function parseInput(inputLines)
   return res
 end
 
+local function parseInput2(inputLines)
+  local grid = {}
+  --[[ transform initial grid  ]]
+  for y, inputLine in ipairs(inputLines) do
+    table.insert(grid, {})
+    for c in string.gmatch(inputLine, ".") do
+      if c == "#" then
+        table.insert(grid[y], "#")
+        table.insert(grid[y], "#")
+      elseif c == "O" then
+        table.insert(grid[y], "[")
+        table.insert(grid[y], "]")
+      elseif c == "@" then
+        table.insert(grid[y], "@")
+        table.insert(grid[y], ".")
+      else
+        table.insert(grid[y], ".")
+        table.insert(grid[y], ".")
+      end
+    end
+  end
+  for y in ipairs(grid) do
+    for x in ipairs(grid[y]) do
+      printf(grid[y][x])
+      if x == #grid[y] then
+        printf("\n")
+      end
+    end
+  end
+end
+
+local function day15Pt2(inputLines)
+  local day15Pt2Input = parseInput2(inputLines)
+  return -1
+end
+
 --[[ 
 1430439 - correct
 ]]
@@ -90,6 +126,9 @@ local function day15Pt1(inputLines)
     if foundBox ~= nil then
       boxMoveCount = boxMoveCount + 1
     end
+    -- printf("%s\n", moveCmd.str)
+    -- wh:print()
+    -- printf("\n")
   end
   local gpsSum = 0
   for _, box in ipairs(wh.boxes) do
@@ -101,6 +140,7 @@ end
 
 local day15MainModule = {
   day15Pt1 = day15Pt1,
+  day15Pt2 = day15Pt2,
 }
 
 return day15MainModule

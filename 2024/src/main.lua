@@ -51,7 +51,8 @@ local DAY_13_FILE_NAME = "day13.txt"
 local DAY_14_FILE_NAME = "day14.txt"
 -- local DAY_15_FILE_NAME = "day15_test.txt"
 -- local DAY_15_FILE_NAME = "day15_test1.txt"
-local DAY_15_FILE_NAME = "day15.txt"
+local DAY_15_FILE_NAME = "day15_test2.txt"
+-- local DAY_15_FILE_NAME = "day15.txt"
 
 local function aocBanner(t)
   local padStr = "*"
@@ -80,7 +81,7 @@ local dayArgsArr = {
   {12, DAY_12_FILE_NAME, day12.day12Pt1, day12.day12Pt2},
   {13, DAY_13_FILE_NAME, day13.day13Pt1, day13.day13Pt2},
   {14, DAY_14_FILE_NAME, day14.day14Pt1, day14.day14Pt2},
-  {15, DAY_15_FILE_NAME, day15.day15Pt1, nil}
+  {15, DAY_15_FILE_NAME, day15.day15Pt1, day15.day15Pt2},
 }
 
 local function main()
