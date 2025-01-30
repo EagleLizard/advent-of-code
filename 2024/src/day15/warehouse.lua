@@ -139,8 +139,6 @@ local Warehouse = (function ()
   ---@param srcBox Box
   ---@return boolean
   function Warehouse:moveBox(moveCmd, srcBox)
-    -- printf("box (%d,%d)\n", srcBox.x, srcBox.y)
-
     --[[ see if there's another box in the way ]]
     local canMove = false
     local destX = srcBox.x + moveCmd.dx

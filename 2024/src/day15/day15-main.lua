@@ -1,7 +1,4 @@
 
-local Point = require("geom.point")
-local arr = require("util.arr-util")
-
 local printf = require("util.printf")
 local errorf = require("util.errorf")
 
@@ -62,20 +59,9 @@ local function parseInput(inputLines)
     end
   end
 
-  -- for y in ipairs(grid) do
-  --   for x in ipairs(grid[y]) do
-  --     printf("%s", grid[y][x])
-  --     if x == #grid[y] then
-  --       printf("\n")
-  --     end
-  --   end
-  -- end
-
   for _, move in ipairs(rawMoves) do
-    -- printf("%s", move)
     table.insert(moveCmds, MoveCmd.new(move))
   end
-  -- printf("\n")
 
   local res = {
     grid = grid,
@@ -100,25 +86,10 @@ local function day15Pt1(inputLines)
   local boxMoveCount = 0
 
   for _, moveCmd in ipairs(moveCmds) do
-    local dx = moveCmd.dx
-    local dy = moveCmd.dy
-    local destX = wh.robot.x + dx
-    local destY = wh.robot.y + dy
-    local destVal = wh.grid[destY][destX]
-    -- printf("\n")
-    -- printf("dest: (%d, %d)\n", destX, destY)
-    -- printf("%s (%d, %d), dest: %s\n", moveCmd.str, moveCmd.dx, moveCmd.dy, destVal)
-    ---@type Box|nil
     local foundBox = wh:moveRobot(moveCmd)
-    -- wh:print()
     if foundBox ~= nil then
-      -- printf("FOUND BOX\n")
       boxMoveCount = boxMoveCount + 1
-      -- if boxMoveCount > 5 then
-      --   break
-      -- end
     end
-    -- printWarehouse(grid, boxes, robot)
   end
   local gpsSum = 0
   for _, box in ipairs(wh.boxes) do
