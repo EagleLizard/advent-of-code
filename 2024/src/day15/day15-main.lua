@@ -154,11 +154,19 @@ local function day15Pt2(inputLines)
   local robot = day15Pt2Input.robot
   local moveCmds = day15Pt2Input.moveCmds
   local wh = Warehouse2.new(grid, boxes, robot)
+  local moveCount = 0
   wh:print()
   for i, moveCmd in ipairs(moveCmds) do
+    printf("\n")
     wh:moveRobot(moveCmd)
+    printf("%s   %d\n", moveCmd.str, moveCount)
+    wh:print()
+    moveCount = moveCount + 1
+    if moveCount > 0 then
+      break
+    end
   end
-  wh:print()
+  -- wh:print()
   local gpsSum = 0
   for _, box in ipairs(wh.boxes) do
     local currGps = (box.x - 1) + (100 * (box.y - 1))
