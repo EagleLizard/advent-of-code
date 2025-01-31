@@ -7,22 +7,27 @@ local printf = require("util.printf")
 -- local _Warehouse = require("day15.warehouse")
 -- local Robot = _Warehouse.Robot
 
--- local DEBUG = false
-local DEBUG = true
+local DEBUG = false
+-- local DEBUG = true
 
 local Box2 = (function ()
   ---@class Box2
   ---@field origin Point
   ---@field x integer
   ---@field y integer
+  ---@field id integer
   local Box2 = {}
   Box2.__index = Box2
+
+  local idCounter = 1
 
   function Box2.new(x, y)
     local self = setmetatable({}, Box2)
     self.origin = Point.new(x, y)
     self.x = x
     self.y = y
+    self.id = idCounter
+    idCounter = idCounter + 1
     return self
   end
 
@@ -145,7 +150,12 @@ local Warehouse2 = (function ()
       end
       -- end
       if _canMove then
-        table.insert(boxesToMove, _srcBox)
+        local foundIdx = arr.find(boxesToMove, function(box)
+          return box.id == _srcBox.id
+        end)
+        if foundIdx == nil then
+          table.insert(boxesToMove, _srcBox)
+        end
       end
       return _canMove
     end

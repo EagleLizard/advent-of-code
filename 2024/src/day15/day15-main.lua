@@ -149,6 +149,7 @@ end
 1461801 - too high
 1478627 - wrong
 1459031 - wrong
+1458740 - correct
 ]]
 local function day15Pt2(inputLines)
   local day15Pt2Input = parseInput2(inputLines)
@@ -162,13 +163,13 @@ local function day15Pt2(inputLines)
   for i, moveCmd in ipairs(moveCmds) do
     -- printf("\n")
     wh:moveRobot(moveCmd, moveCount)
-    printf("\n%s   %d\n", moveCmd.str, moveCount)
-    wh:print()
+    -- printf("\n%s   %d\n", moveCmd.str, moveCount)
+    -- wh:print()
     moveCount = moveCount + 1
     -- if moveCount > 1054 then
-    if moveCount > 1248 then
-      break
-    end
+    -- if moveCount > 1248 then
+    --   break
+    -- end
   end
   -- wh:print()
   local gpsSum = 0
