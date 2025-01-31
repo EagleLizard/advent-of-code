@@ -96,7 +96,7 @@ local Warehouse2 = (function ()
           if box.y ~= destY then
             return false
           end
-          return (box.x == destX) or (box.x == destX - 1)
+          return (box.x == destX - 1)
         end)
         -- if foundBox ~= nil then
         --   printf("(%s, %s)\n", foundBox.x, foundBox.y)
@@ -187,7 +187,8 @@ local Warehouse2 = (function ()
     grid[self.robot.y][self.robot.x] = "@"
     for y in ipairs(grid) do
       for x in ipairs(grid[y]) do
-        printf("%s%s", grid[y][x], (x == #grid[y] and "\n") or "")
+        local val = grid[y][x]
+        printf("%s%s", val, (x == #grid[y] and "\n") or "")
       end
     end
   end

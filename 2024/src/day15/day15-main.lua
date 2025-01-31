@@ -145,6 +145,7 @@ end
 
 --[[ 
 1479128 - too high
+1448847 - too low
 ]]
 local function day15Pt2(inputLines)
   local day15Pt2Input = parseInput2(inputLines)
@@ -153,30 +154,11 @@ local function day15Pt2(inputLines)
   local robot = day15Pt2Input.robot
   local moveCmds = day15Pt2Input.moveCmds
   local wh = Warehouse2.new(grid, boxes, robot)
-  local boxMoveCount = 0
   wh:print()
-  local mvIdx = 1
-  for _, moveCmd in ipairs(moveCmds) do
-    -- printf("%s   %d", moveCmd.str, boxMoveCount)
-    -- printf("\n")
-    local movedBox = wh:moveRobot(moveCmd)
-    if movedBox ~= nil then
-      -- boxMoveCount = boxMoveCount + 1
-    end
-    -- boxMoveCount = boxMoveCount + 1
-    -- wh:print()
-    mvIdx = mvIdx + 1
-    -- if boxMoveCount > 225 then
-    --   break
-    -- end
+  for i, moveCmd in ipairs(moveCmds) do
+    wh:moveRobot(moveCmd)
   end
   wh:print()
-  -- for i = 0, 3 do
-  --   printf("%s", moveCmds[mvIdx + i].str)
-  -- end
-  -- printf("\n")
-  -- printf("%s\n", moveCmds[mvIdx].str)
-  -- printf("mvIdx: %d\n", mvIdx)
   local gpsSum = 0
   for _, box in ipairs(wh.boxes) do
     local currGps = (box.x - 1) + (100 * (box.y - 1))
