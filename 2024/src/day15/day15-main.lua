@@ -1,4 +1,7 @@
 
+local arr = require("util.arr-util")
+local strUtil = require("util.str-util")
+
 local printf = require("util.printf")
 local errorf = require("util.errorf")
 
@@ -140,6 +143,9 @@ local function parseInput2(inputLines)
   return res
 end
 
+--[[ 
+1479128 - too high
+]]
 local function day15Pt2(inputLines)
   local day15Pt2Input = parseInput2(inputLines)
   local grid = day15Pt2Input.grid
@@ -149,19 +155,34 @@ local function day15Pt2(inputLines)
   local wh = Warehouse2.new(grid, boxes, robot)
   local boxMoveCount = 0
   wh:print()
+  local mvIdx = 1
   for _, moveCmd in ipairs(moveCmds) do
-    printf("%s\n", moveCmd.str)
+    -- printf("%s   %d", moveCmd.str, boxMoveCount)
+    -- printf("\n")
     local movedBox = wh:moveRobot(moveCmd)
     if movedBox ~= nil then
-      boxMoveCount = boxMoveCount + 1
+      -- boxMoveCount = boxMoveCount + 1
     end
-    boxMoveCount = boxMoveCount + 1
-    wh:print()
-    if boxMoveCount > 1 then
-      break
-    end
+    -- boxMoveCount = boxMoveCount + 1
+    -- wh:print()
+    mvIdx = mvIdx + 1
+    -- if boxMoveCount > 225 then
+    --   break
+    -- end
   end
-  return -1
+  wh:print()
+  -- for i = 0, 3 do
+  --   printf("%s", moveCmds[mvIdx + i].str)
+  -- end
+  -- printf("\n")
+  -- printf("%s\n", moveCmds[mvIdx].str)
+  -- printf("mvIdx: %d\n", mvIdx)
+  local gpsSum = 0
+  for _, box in ipairs(wh.boxes) do
+    local currGps = (box.x - 1) + (100 * (box.y - 1))
+    gpsSum = gpsSum + currGps
+  end
+  return gpsSum
 end
 
 --[[ 

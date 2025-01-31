@@ -106,14 +106,14 @@ local Warehouse2 = (function ()
           if box.y ~= destY then
             return false
           end
-          return (box.x == destX + 1) or (box.x == destX + 2) 
+          return (box.x == destX) or (box.x == destX + 1)
         end)
       end
       if foundBox == nil then
         local destVal
         if moveCmd.dx < 0 then
           destVal = self.grid[destY][destX]
-        elseif moveCmd.dy > 0 then
+        elseif moveCmd.dx > 0 then
           destVal = self.grid[destY][destX + 1]
         end
         canMove = destVal == "."
@@ -141,7 +141,24 @@ local Warehouse2 = (function ()
           end
           canMove = moveAcc
         end
-        -- printf("%d\n", #foundBoxes)
+      elseif moveCmd.dy > 0 then
+        --[[ down ]]
+        foundBoxes = arr.filter(self.boxes, function(box)
+          if box.y ~= destY then
+            return false
+          end
+          return box.x == destX or box.x == destX + 1 or box.x == destX - 1
+        end)
+        if #foundBoxes < 1 then
+          canMove = self.grid[destY][destX] == "." and self.grid[destY][destX + 1] == "."
+        else
+          local moveAcc = true
+          for _, foundBox in ipairs(foundBoxes) do
+            moveAcc = moveAcc and self:checkMoveBox(moveCmd, foundBox, commit)
+          end
+          canMove = moveAcc
+        end
+        -- printf("foundBoxes: %d\n", #foundBoxes)
       end
     end
     if canMove and commit then
