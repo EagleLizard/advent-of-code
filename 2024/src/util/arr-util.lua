@@ -40,6 +40,33 @@ local function indexOf(arr, searchVal)
   return foundIdx
 end
 
+---@generic T
+---@param arr T[]
+---@param compFn fun(v: T): boolean
+---@return T[]
+local function filter(arr, compFn)
+  local fArr = {}
+  for _, v in ipairs(arr) do
+    if compFn(v) then
+      table.insert(fArr, v)
+    end
+  end
+  return fArr
+end
+
+---@generic T
+---@param arr T[]
+---@param compFn fun(v: T): boolean
+---@return boolean
+local function every(arr, compFn)
+  for _, val in ipairs(arr) do
+    if not compFn(val) then
+      return false
+    end
+  end
+  return true
+end
+
 local function contains(tab, searchEl)
   for _, val in pairs(tab) do
     if searchEl == val then
@@ -89,6 +116,8 @@ local arrUtilModule = {
   findIndex = findIndex,
   find = find,
   indexOf = indexOf,
+  filter = filter,
+  every = every,
   contains = contains,
   copy = copy,
   slice = slice,
