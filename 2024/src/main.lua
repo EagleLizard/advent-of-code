@@ -52,7 +52,8 @@ local DAY_14_FILE_NAME = "day14.txt"
 -- local DAY_15_FILE_NAME = "day15_test.txt"
 -- local DAY_15_FILE_NAME = "day15_test2.txt"
 -- local DAY_15_FILE_NAME = "day15_test3.txt"
-local DAY_15_FILE_NAME = "day15_test1.txt"
+local DAY_15_FILE_NAME = "day15_test-e2.txt"
+-- local DAY_15_FILE_NAME = "day15_test1.txt"
 -- local DAY_15_FILE_NAME = "day15.txt"
 
 local function aocBanner(t)

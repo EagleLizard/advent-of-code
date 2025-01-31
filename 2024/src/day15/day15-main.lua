@@ -146,6 +146,9 @@ end
 --[[ 
 1479128 - too high
 1448847 - too low
+1461801 - too high
+1478627 - wrong
+1459031 - wrong
 ]]
 local function day15Pt2(inputLines)
   local day15Pt2Input = parseInput2(inputLines)
@@ -155,14 +158,15 @@ local function day15Pt2(inputLines)
   local moveCmds = day15Pt2Input.moveCmds
   local wh = Warehouse2.new(grid, boxes, robot)
   local moveCount = 0
-  wh:print()
+  -- wh:print()
   for i, moveCmd in ipairs(moveCmds) do
-    printf("\n")
-    wh:moveRobot(moveCmd)
-    printf("%s   %d\n", moveCmd.str, moveCount)
+    -- printf("\n")
+    wh:moveRobot(moveCmd, moveCount)
+    printf("\n%s   %d\n", moveCmd.str, moveCount)
     wh:print()
     moveCount = moveCount + 1
-    if moveCount > 0 then
+    -- if moveCount > 1054 then
+    if moveCount > 1248 then
       break
     end
   end
