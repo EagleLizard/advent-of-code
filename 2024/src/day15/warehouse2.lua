@@ -69,7 +69,7 @@ local Warehouse2 = (function ()
   ---@param moveCmd MoveCmd
   ---@param srcBox Box2
   function Warehouse2:moveBox(moveCmd, srcBox)
-
+    
   end
 
   function Warehouse2:print()
