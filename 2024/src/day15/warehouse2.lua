@@ -4,12 +4,6 @@ local arr = require("util.arr-util")
 
 local printf = require("util.printf")
 
--- local _Warehouse = require("day15.warehouse")
--- local Robot = _Warehouse.Robot
-
-local DEBUG = false
--- local DEBUG = true
-
 local Box2 = (function ()
   ---@class Box2
   ---@field origin Point
@@ -56,9 +50,16 @@ local Warehouse2 = (function ()
     local destX = self.robot.x + moveCmd.dx
     local destY = self.robot.y + moveCmd.dy
     local destVal = self.grid[destY][destX]
-    local foundBox = arr.find(self.boxes, function(box)
-      return box.y == destY and (box.x == destX or (box.x + 1) == destX)
-    end)
+    local foundBox = nil
+    for _, box in ipairs(self.boxes) do
+      if box.y == destY and (box.x == destX or (box.x + 1) == destX) then
+        foundBox = box
+        break
+      end
+    end
+    -- local foundBox = arr.find(self.boxes, function(box)
+    --   return box.y == destY and (box.x == destX or (box.x + 1) == destX)
+    -- end)
     local movedBox = nil
     local canMove = false
     if foundBox == nil then
@@ -80,18 +81,9 @@ local Warehouse2 = (function ()
     local boxesToMove = self:checkMove(moveCmd, srcBox)
     if boxesToMove ~= nil then
       --[[ move ]]
-      if DEBUG then
-        printf("\n%s   %d\n", moveCmd.str, moveCount or -1)
-      end
-      for i, box in ipairs(boxesToMove) do
-        if DEBUG then
-          printf("(%d, %d)%s", box.x, box.y, (i == #boxesToMove and "\n") or ", ")
-        end
+      for _, box in ipairs(boxesToMove) do
         box.x = box.x + moveCmd.dx
         box.y = box.y + moveCmd.dy
-      end
-      if DEBUG then
-        self:print()
       end
     end
     return boxesToMove ~= nil
@@ -108,40 +100,43 @@ local Warehouse2 = (function ()
     --[[ helper ]]
     ---@param _srcBox Box2
     local function _checkMove(_srcBox)
-      local foundBoxes = arr.filter(self.boxes, function(box)
+      local foundBoxes = {}
+      for _, box in ipairs(self.boxes) do
         if up then
-          return box.y == (_srcBox.y - 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1))
+          if box.y == (_srcBox.y - 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1)) then
+            table.insert(foundBoxes, box)
+          end
         elseif right then
-          return (box.y == _srcBox.y) and (box.x == (_srcBox.x + 2))
+          if (box.y == _srcBox.y) and (box.x == (_srcBox.x + 2)) then
+            table.insert(foundBoxes, box)
+          end
         elseif down then
-          return box.y == (_srcBox.y + 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1))
+          if box.y == (_srcBox.y + 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1)) then
+            table.insert(foundBoxes, box)
+          end
         elseif left then
-          return (box.y == _srcBox.y) and (
-            -- (box.x == (_srcBox.x - 1))
-            (box.x == (_srcBox.x - 2))
-          )
+          if (box.y == _srcBox.y) and (box.x == (_srcBox.x - 2)) then
+            table.insert(foundBoxes, box)
+          end
         end
-        return false
-      end)
+      end
       local _canMove = false
-      -- if #foundBoxes < 1 then
-        --[[ check if a wall is in the way ]]
-        if up then
-          _canMove = (
-            (self.grid[_srcBox.y - 1][_srcBox.x] ~= "#")
-            and (self.grid[_srcBox.y - 1][_srcBox.x + 1] ~= "#")
-          )
-        elseif right then
-          _canMove = self.grid[_srcBox.y][_srcBox.x + 2] ~= "#"
-        elseif down then
-          _canMove = (
-            (self.grid[_srcBox.y + 1][_srcBox.x] ~= "#")
-            and (self.grid[_srcBox.y + 1][_srcBox.x + 1] ~= "#")
-          )
-        elseif left then
-          _canMove = self.grid[_srcBox.y][_srcBox.x - 1] ~= "#"
-        end
-      -- else
+      --[[ check if a wall is in the way ]]
+      if up then
+        _canMove = (
+          (self.grid[_srcBox.y - 1][_srcBox.x] ~= "#")
+          and (self.grid[_srcBox.y - 1][_srcBox.x + 1] ~= "#")
+        )
+      elseif right then
+        _canMove = self.grid[_srcBox.y][_srcBox.x + 2] ~= "#"
+      elseif down then
+        _canMove = (
+          (self.grid[_srcBox.y + 1][_srcBox.x] ~= "#")
+          and (self.grid[_srcBox.y + 1][_srcBox.x + 1] ~= "#")
+        )
+      elseif left then
+        _canMove = self.grid[_srcBox.y][_srcBox.x - 1] ~= "#"
+      end
       if _canMove then
         --[[ recursively check found boxes ]]
         _canMove = arr.every(foundBoxes, function (currBox)
@@ -160,11 +155,6 @@ local Warehouse2 = (function ()
       return _canMove
     end
     local canMove = _checkMove(srcBox)
-    -- if canMove then
-    --   for i, box in ipairs(boxesToMove) do
-    --     -- printf("(%d, %d), %s", box.x, box.y, (i == #boxesToMove and "\n") or "")
-    --   end
-    -- end
     if canMove then
       return boxesToMove
     end

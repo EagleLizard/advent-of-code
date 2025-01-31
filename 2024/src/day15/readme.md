@@ -41,3 +41,9 @@ The *expected* outcome is that the whole triangle moves down. What's happening i
 *<u>*Update</u>*
 
 This was correct, the issues was counting boxes that should move transitively twice in the branching logic. Solved with some naive duplication prevention.
+
+*<u>*Update2</u>*
+
+Currently runs in ~615ms.
+
+Replaced `filter` with a loop, ~615ms to ~355ms.
