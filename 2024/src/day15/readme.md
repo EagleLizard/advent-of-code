@@ -3,6 +3,10 @@
 
 ## Part 1
 
+### `[01/31/2025][lua]`
+
+Currently runs in ~571ms. There is some low hanging fruit.
+
 ## Part 2
 
 ### `[01/31/2025][lua]`
