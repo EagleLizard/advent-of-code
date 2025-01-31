@@ -146,6 +146,10 @@ end
 --[[ 
 1479128 - too high
 1448847 - too low
+1461801 - too high
+1478627 - wrong
+1459031 - wrong
+1458740 - correct
 ]]
 local function day15Pt2(inputLines)
   local day15Pt2Input = parseInput2(inputLines)
@@ -154,11 +158,20 @@ local function day15Pt2(inputLines)
   local robot = day15Pt2Input.robot
   local moveCmds = day15Pt2Input.moveCmds
   local wh = Warehouse2.new(grid, boxes, robot)
-  wh:print()
+  local moveCount = 0
+  -- wh:print()
   for i, moveCmd in ipairs(moveCmds) do
-    wh:moveRobot(moveCmd)
+    -- printf("\n")
+    wh:moveRobot(moveCmd, moveCount)
+    -- printf("\n%s   %d\n", moveCmd.str, moveCount)
+    -- wh:print()
+    moveCount = moveCount + 1
+    -- if moveCount > 1054 then
+    -- if moveCount > 1248 then
+    --   break
+    -- end
   end
-  wh:print()
+  -- wh:print()
   local gpsSum = 0
   for _, box in ipairs(wh.boxes) do
     local currGps = (box.x - 1) + (100 * (box.y - 1))
