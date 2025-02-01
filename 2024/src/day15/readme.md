@@ -53,3 +53,9 @@ Replaced `filter` with a loop, ~615ms to ~355ms.
 Return early in recursive box move if it's going to hit a wall.
 
 ~355ms to ~340ms
+
+*<u>*Update4</u>*
+
+Calculate bounds checks outside of the loop for `self.boxes`.
+
+~340ms to ~314ms.

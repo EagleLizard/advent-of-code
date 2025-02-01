@@ -126,23 +126,27 @@ local Warehouse2 = (function ()
       --[[ 
         find any boxes in the way
       ]]
+      local yBound = _srcBox.y
+      local lBound = _srcBox.x
+      local rBound = _srcBox.x
+      if up then
+        yBound = yBound - 1
+      elseif down then
+        yBound = yBound + 1
+      end
+      if up or down then
+        lBound = _srcBox.x - 1
+        rBound = _srcBox.x + 1
+      elseif right then
+        lBound = _srcBox.x + 2
+        rBound = lBound
+      elseif left then
+        lBound = _srcBox.x - 2
+        rBound = lBound
+      end
       for _, box in ipairs(self.boxes) do
-        if up then
-          if box.y == (_srcBox.y - 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1)) then
-            table.insert(foundBoxes, box)
-          end
-        elseif right then
-          if (box.y == _srcBox.y) and (box.x == (_srcBox.x + 2)) then
-            table.insert(foundBoxes, box)
-          end
-        elseif down then
-          if box.y == (_srcBox.y + 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1)) then
-            table.insert(foundBoxes, box)
-          end
-        elseif left then
-          if (box.y == _srcBox.y) and (box.x == (_srcBox.x - 2)) then
-            table.insert(foundBoxes, box)
-          end
+        if box.y == yBound and (box.x >= lBound and box.x <= rBound) then
+          table.insert(foundBoxes, box)
         end
       end
       --[[
