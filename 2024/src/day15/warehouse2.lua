@@ -1,6 +1,5 @@
 
 local Point = require("geom.point")
-local arr = require("util.arr-util")
 
 local printf = require("util.printf")
 
@@ -81,7 +80,7 @@ local Warehouse2 = (function ()
     local boxesToMove = self:checkMove(moveCmd, srcBox)
     if boxesToMove ~= nil then
       --[[ move ]]
-      for _, box in ipairs(boxesToMove) do
+      for _, box in pairs(boxesToMove) do
         box.x = box.x + moveCmd.dx
         box.y = box.y + moveCmd.dy
       end
@@ -149,22 +148,22 @@ local Warehouse2 = (function ()
       --[[
         recursively check if any boxes in the way can be moved
       ]]
-      local _canMove = arr.every(foundBoxes, function (currBox)
-        return _checkMove(currBox)
-      end)
-      if _canMove then
-        --[[
-          add to the list of boxes to moved only if the box
-            isn't already in the list of boxes to move
-        ]]
-        local foundIdx = arr.find(boxesToMove, function(box)
-          return box.id == _srcBox.id
-        end)
-        if foundIdx == nil then
-          table.insert(boxesToMove, _srcBox)
+      local _canMove = true
+      for _, foundBoxes in ipairs(foundBoxes) do
+        _canMove = _checkMove(foundBoxes)
+        if not _canMove then
+          break
         end
       end
-      return _canMove
+      if not _canMove then
+        return false
+      end
+      --[[
+        add to the list of boxes to moved only if the box
+          isn't already in the list of boxes to move
+      ]]
+      boxesToMove[_srcBox.id] = _srcBox 
+      return true
     end
     local canMove = _checkMove(srcBox)
     if canMove then
