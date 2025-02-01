@@ -1,6 +1,5 @@
 
 local Point = require("geom.point")
-local arr = require("util.arr-util")
 
 local printf = require("util.printf")
 
@@ -113,14 +112,16 @@ local Warehouse = (function ()
 
   ---@param moveCmd MoveCmd
   function Warehouse:moveRobot(moveCmd)
-    local dx = moveCmd.dx
-    local dy = moveCmd.dy
-    local destX = self.robot.x + dx
-    local destY = self.robot.y + dy
+    local destX = self.robot.x + moveCmd.dx
+    local destY = self.robot.y + moveCmd.dy
     local destVal = self.grid[destY][destX]
-    local foundBox = arr.find(self.boxes, function (box)
-      return box.x == destX and box.y == destY
-    end)
+    local foundBox = nil
+    for _, box in ipairs(self.boxes) do
+      if box.x == destX and box.y == destY then
+        foundBox = box
+        break
+      end
+    end
     local canMove = false
     if foundBox ~= nil then
       --[[ handle collision ]]
@@ -143,9 +144,13 @@ local Warehouse = (function ()
     local canMove = false
     local destX = srcBox.x + moveCmd.dx
     local destY = srcBox.y + moveCmd.dy
-    local foundBox = arr.find(self.boxes, function (box)
-      return box.x == destX and box.y == destY
-    end)
+    local foundBox = nil
+    for _, box in ipairs(self.boxes) do
+      if box.x == destX and box.y == destY then
+        foundBox = box
+        break
+      end
+    end
     if foundBox == nil then
       --[[ can move if grid val not a wall ]]
       canMove = self.grid[destY][destX] == "."
