@@ -47,3 +47,9 @@ This was correct, the issues was counting boxes that should move transitively tw
 Currently runs in ~615ms.
 
 Replaced `filter` with a loop, ~615ms to ~355ms.
+
+*<u>*Update3</u>*
+
+Return early in recursive box move if it's going to hit a wall.
+
+~355ms to ~340ms

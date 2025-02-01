@@ -100,7 +100,33 @@ local Warehouse2 = (function ()
     --[[ helper ]]
     ---@param _srcBox Box2
     local function _checkMove(_srcBox)
+      local wallHit = false
+      --[[ check if a wall is in the way ]]
+      if up then
+        wallHit = (
+          (self.grid[_srcBox.y - 1][_srcBox.x] ~= "#")
+          and (self.grid[_srcBox.y - 1][_srcBox.x + 1] ~= "#")
+        )
+      elseif right then
+        wallHit = self.grid[_srcBox.y][_srcBox.x + 2] ~= "#"
+      elseif down then
+        wallHit = (
+          (self.grid[_srcBox.y + 1][_srcBox.x] ~= "#")
+          and (self.grid[_srcBox.y + 1][_srcBox.x + 1] ~= "#")
+        )
+      elseif left then
+        wallHit = self.grid[_srcBox.y][_srcBox.x - 1] ~= "#"
+      end
+      --[[
+        if the box is going to move into a wall we can return early
+      ]]
+      if not wallHit then
+        return false
+      end
       local foundBoxes = {}
+      --[[ 
+        find any boxes in the way
+      ]]
       for _, box in ipairs(self.boxes) do
         if up then
           if box.y == (_srcBox.y - 1) and (box.x >= (_srcBox.x - 1) and box.x <= (_srcBox.x + 1)) then
@@ -120,31 +146,17 @@ local Warehouse2 = (function ()
           end
         end
       end
-      local _canMove = false
-      --[[ check if a wall is in the way ]]
-      if up then
-        _canMove = (
-          (self.grid[_srcBox.y - 1][_srcBox.x] ~= "#")
-          and (self.grid[_srcBox.y - 1][_srcBox.x + 1] ~= "#")
-        )
-      elseif right then
-        _canMove = self.grid[_srcBox.y][_srcBox.x + 2] ~= "#"
-      elseif down then
-        _canMove = (
-          (self.grid[_srcBox.y + 1][_srcBox.x] ~= "#")
-          and (self.grid[_srcBox.y + 1][_srcBox.x + 1] ~= "#")
-        )
-      elseif left then
-        _canMove = self.grid[_srcBox.y][_srcBox.x - 1] ~= "#"
-      end
+      --[[
+        recursively check if any boxes in the way can be moved
+      ]]
+      local _canMove = arr.every(foundBoxes, function (currBox)
+        return _checkMove(currBox)
+      end)
       if _canMove then
-        --[[ recursively check found boxes ]]
-        _canMove = arr.every(foundBoxes, function (currBox)
-          return _checkMove(currBox)
-        end)
-      end
-      -- end
-      if _canMove then
+        --[[
+          add to the list of boxes to moved only if the box
+            isn't already in the list of boxes to move
+        ]]
         local foundIdx = arr.find(boxesToMove, function(box)
           return box.id == _srcBox.id
         end)
