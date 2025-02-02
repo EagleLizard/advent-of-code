@@ -1,15 +1,21 @@
 const std = @import("std");
 
+// 2196996 - correct
 pub fn day1Part1(inputLines: [][]const u8) i32 {
-    // std.debug.print("{s}\n", .{inputLines[0]});
     const allocator = std.heap.page_allocator;
-    // defer gpa.deinit();
     const day1Input = parseInput(allocator, inputLines) catch |err| {
         std.debug.print("Error: {}\n", .{err});
         return -1;
     };
-    std.debug.print("left: {d}\n", .{day1Input.left_nums.len});
-    return -1;
+    std.mem.sort(i32, day1Input.left_nums, {}, std.sort.asc(i32));
+    std.mem.sort(i32, day1Input.right_nums, {}, std.sort.asc(i32));
+    var diff_sum: i32 = 0;
+    for (day1Input.left_nums, 0..) |l_num, i| {
+        const r_num = day1Input.right_nums[i];
+        const diff = @abs(r_num - l_num);
+        diff_sum += @intCast(diff);
+    }
+    return diff_sum;
 }
 
 const Day1Input = struct {
@@ -19,7 +25,11 @@ const Day1Input = struct {
 
 fn parseInput(allocator: std.mem.Allocator, input_lines: [][]const u8) !Day1Input {
     var left_nums = std.ArrayList(i32).init(allocator);
+    defer left_nums.deinit();
+
     var right_nums = std.ArrayList(i32).init(allocator);
+    defer right_nums.deinit();
+
     for (input_lines) |input_line| {
         var digit_stack = std.ArrayList(u8).init(allocator);
         defer digit_stack.deinit();

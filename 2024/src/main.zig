@@ -9,8 +9,8 @@ const RunDayOpts = struct {
     part2Fn: ?*const fn ([][]const u8) i32,
 };
 
-const DAY_1_FILE_PATH = "day1_test1.txt";
-// const DAY_1_FILE_PATH = "day1.txt";
+// const DAY_1_FILE_PATH = "day1_test1.txt";
+const DAY_1_FILE_PATH = "day1.txt";
 
 const dayOptsArr = [_]RunDayOpts{
     .{
@@ -32,8 +32,13 @@ pub fn main() !void {
         defer allocator.free(input_lines);
 
         if (dayOpts.part1Fn) |part1Fn| {
+            var timer = try std.time.Timer.start();
             const part1Res = part1Fn(input_lines);
-            std.debug.print("Part 1: {d}\n", .{part1Res});
+            const elapsed: f64 = @floatFromInt(timer.read());
+            std.debug.print("Part 1: {d} | {d:.3}ms\n", .{
+                part1Res,
+                elapsed / std.time.ns_per_ms,
+            });
         }
         if (dayOpts.part2Fn) |part2Fn| {
             const part2Res = part2Fn(input_lines);
