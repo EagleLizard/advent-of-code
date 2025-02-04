@@ -57,11 +57,11 @@ local Maze = (function ()
 
   ---@param visited? boolean[][]
   function Maze:gridStr(visited)
+    visited = visited or {}
     local mazeStr = ""
     for y = 1, self.width do
       for x = 1, self.height do
-        local val = self.grid[y][x]
-        local c = mazeCharMap[val]
+        local c = (visited[y] and visited[y][x] and "o") or mazeCharMap[self.grid[y][x]]
         mazeStr = mazeStr..c
       end
       mazeStr = mazeStr.."\n"
@@ -75,5 +75,6 @@ end)()
 local mazeModule = {
   Maze = Maze,
   mazeEnum = mazeEnum,
+  mazeCharMap = mazeCharMap,
 }
 return mazeModule

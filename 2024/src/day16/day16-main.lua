@@ -2,6 +2,7 @@
 local mazeModule = require("day16.maze")
 local Maze = mazeModule.Maze
 local mazeEnum = mazeModule.mazeEnum
+local mazeCharMap = mazeModule.mazeCharMap
 local Point = require("geom.point")
 
 local printf = require("util.printf")
@@ -34,26 +35,32 @@ local function parseInput(inputLines)
   return res
 end
 
+local function gridPathStr(maze, path)
+  local grid = maze:gridCopy()
+  for _, pathPt in ipairs(path) do
+    grid[pathPt.y][pathPt.x] = 3
+  end
+  local gridStr = ""
+  for y in ipairs(grid) do
+    for x in ipairs(grid[y]) do
+      local val = grid[y][x]
+      if mazeCharMap[val] ~= nil then
+        gridStr = gridStr..mazeCharMap[val]
+      else
+        gridStr = gridStr.."o"
+      end
+    end
+    gridStr = gridStr.."\n"
+  end
+  return gridStr
+end
+
 local directionPoints = {
   Point.new(0, -1), --[[ up ]]
   Point.new(1, 0), --[[ right ]]
   Point.new(0, 1), --[[ down ]]
   Point.new(-1, 0), --[[ left ]]
 }
----@param x integer
----@param y integer
----@return { x: integer, y: integer, direction: integer }[]
-local function getMoves(x, y)
-  local moves = {}
-  for i, dPt in ipairs(directionPoints) do
-    moves[i] = {
-      x = x + dPt.x,
-      y = y + dPt.y,
-      direction = i,
-    }
-  end
-  return moves
-end
 
 ---@param maze Maze
 ---@param sPos Point
@@ -64,26 +71,39 @@ local function findPath(maze, sPos, ePos)
     visited[y] = {}
   end
   local grid = maze:gridCopy()
-  
+  local foundPaths = {}
   local function helper(x, y, direction, soFar)
+    if visited[y][x] or (grid[y][x] ~= mazeEnum.tile) then
+      return
+    end
+    visited[y][x] = true
     if x == ePos.x and y == ePos.y then
       --[[ valid path found ]]
+      local foundPath = {}
+      for i, v in ipairs(soFar) do
+        foundPath[i] = v
+      end
+      table.insert(foundPaths, foundPath)
+      return
     end
-    printf("(%d, %d) - %s\n", x, y, direction)
-    local dpt = directionPoints[direction]
-    local nextX = x + dpt.x
-    local nextY = y + dpt.y
-    local canMove = not visited[y][x] and (grid[y][x] == mazeEnum.tile)
-    if canMove then
-      --[[ try to move in the direction already facing ]]
-      helper(nextX, nextY, direction, soFar)
-    else
-      --[[ check if we can rotate ]]
+    for i, dpt in ipairs(directionPoints) do
+      local nx = x + dpt.x
+      local ny = y + dpt.y
+      local nd = i
+      table.insert(soFar, {
+        x = nx,
+        y = ny,
+        direction = nd,
+      })
+      helper(nx, ny, nd, soFar)
+      table.remove(soFar)
     end
   end
   local pathSoFar = {}
   helper(sPos.x, sPos.y, 2, pathSoFar)
-
+  for _, foundPath in ipairs(foundPaths) do
+    printf(gridPathStr(maze, foundPath))
+  end
 end
 
 local function day16Pt1(inputLines)
