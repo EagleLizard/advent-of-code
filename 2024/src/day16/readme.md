@@ -16,3 +16,9 @@ To generate all paths, I either need to either:
 * Keep track of visited during traversal only, instead of a shared visited map in the closure
 
 I think the former will work and perform better. It seems easy to do as well.
+
+`[02/04/2025][lua]`
+
+*<u>*Update:</u>*
+
+The naive algorithm takes too long.
