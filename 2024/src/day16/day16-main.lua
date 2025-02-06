@@ -1,4 +1,6 @@
 
+local arr = require("util.arr-util")
+
 local mazeModule = require("day16.maze")
 local Maze = mazeModule.Maze
 local mazeEnum = mazeModule.mazeEnum
@@ -8,7 +10,7 @@ local Point = require("geom.point")
 local printf = require("util.printf")
 
 local DEBUG = false
--- DEBUG = true
+DEBUG = true
 
 ---@param inputLines string[]
 ---@return { maze: Maze, sPos: Point, ePos: Point }
@@ -101,9 +103,9 @@ local function findPaths(maze, sPos, ePos)
       local ny = y + dpt.y
       local nd = i
       table.insert(soFar, {
-        x = nx,
-        y = ny,
-        direction = nd,
+        x = x,
+        y = y,
+        direction = i,
       })
       helper(nx, ny, nd, soFar)
       table.remove(soFar)
@@ -111,7 +113,7 @@ local function findPaths(maze, sPos, ePos)
     visited[y][x] = nil
   end
   local pathSoFar = {}
-  helper(sPos.x, sPos.y, 2, pathSoFar, 0)
+  helper(sPos.x, sPos.y, 2, pathSoFar)
   return foundPaths
 end
 
@@ -140,7 +142,6 @@ local function day16Pt1(inputLines)
     printf("start: (%d, %d)\n", sPos.x, sPos.y)
     printf("end: (%d, %d)\n", ePos.x, ePos.y)
   end
-
   local foundPaths = findPaths(maze, sPos, ePos)
   local scores = {}
   local minScore = math.huge
@@ -159,7 +160,9 @@ local function day16Pt1(inputLines)
       end
     end
   end
+  -- printf("num paths: %d\n", #foundPaths or 0)
   return minScore
+  -- return -1
 end
 
 local day16MainModule = {

@@ -59,8 +59,8 @@ local Maze = (function ()
   function Maze:gridStr(visited)
     visited = visited or {}
     local mazeStr = ""
-    for y = 1, self.width do
-      for x = 1, self.height do
+    for y = 1, self.height do
+      for x = 1, self.width do
         local c = (visited[y] and visited[y][x] and "o") or mazeCharMap[self.grid[y][x]]
         mazeStr = mazeStr..c
       end
