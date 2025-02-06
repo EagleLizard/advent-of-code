@@ -179,9 +179,35 @@ end
 ---@param sPos Point
 ---@param ePos Point
 local function findPaths2(maze, sPos, ePos)
-  local function helper()
-    
+  local foundPaths = {}
+  local visited = {}
+  local sNode = maze.nodeGrid[sPos.y][sPos.x]
+  local eNode = maze.nodeGrid[ePos.y][ePos.x]
+
+  ---@param node MazeNode|nil
+  ---@param direction integer
+  ---@param soFar any
+  local function helper(node, direction, soFar)
+    if node == nil or visited[node.id] then
+      return
+    end
+    visited[node.id] = true
+    if node.x == eNode.x and node.y == eNode.y then
+      --[[ validPath found ]]
+      local foundPath = {}
+      for i, v in ipairs(soFar) do
+        foundPath[i] = v
+      end
+      table.insert(foundPaths, foundPath)
+    end
+    table.insert(soFar, {
+      node = node,
+      direction = direction,
+    })
+    -- helper(node.up, 1, soFar)
   end
+  local pathSoFar = {}
+  helper(sNode, 2, pathSoFar)
 end
 
 local function day16Pt1(inputLines)
