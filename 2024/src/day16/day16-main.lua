@@ -5,6 +5,8 @@ local mazeModule = require("day16.maze")
 local Maze = mazeModule.Maze
 local mazeEnum = mazeModule.mazeEnum
 local mazeCharMap = mazeModule.mazeCharMap
+local mazeGraphModule = require("day16.maze-graph")
+local MazeGraph = mazeGraphModule.MazeGraph
 local Point = require("geom.point")
 
 local printf = require("util.printf")
@@ -132,6 +134,18 @@ local function getPathScore(path)
 end
 
 local function day16Pt1(inputLines)
+  local day16Input = parseInput(inputLines)
+  local maze = day16Input.maze
+  local sPos = day16Input.sPos
+  local ePos = day16Input.ePos
+
+  local grid = maze:gridCopy()
+  local mazeGraph = MazeGraph.new(grid, sPos)
+
+  return -1
+end
+
+local function day16Pt1_2(inputLines)
   local day16Input = parseInput(inputLines)
   local maze = day16Input.maze
   local sPos = day16Input.sPos
