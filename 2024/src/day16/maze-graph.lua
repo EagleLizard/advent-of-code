@@ -32,41 +32,52 @@ local MazeNode = (function ()
   return MazeNode
 end)()
 
+local function getNodeGrid(grid)
+  local nodeGrid = {}
+  for y in ipairs(grid) do
+    local row = {}
+    for x in ipairs(grid[y]) do
+      local val = grid[y][x]
+      if val == mazeEnum.tile then
+        row[x] = MazeNode.new(x, y)
+      end
+      -- printf("%d%s", grid[y][x], (x == #grid[y] and "\n") or "")
+    end
+    nodeGrid[y] = row
+  end
+  --[[ connect nodes ]]
+  for y in ipairs(grid) do
+    for x in ipairs(grid[y]) do
+      local node = nodeGrid[y][x]
+      if node ~= nil then
+        --[[ connect to adjacent nodes ]]
+        if grid[y - 1][x] == mazeEnum.tile then
+          node.up = nodeGrid[y - 1][x]
+        elseif grid[y][x + 1] == mazeEnum.tile then
+          node.right = nodeGrid[y][x + 1]
+        elseif grid[y + 1][x] == mazeEnum.tile then
+          node.down = nodeGrid[y + 1][x]
+        elseif grid[y][x - 1] == mazeEnum.tile then
+          node.left = nodeGrid[y][x - 1]
+        end
+      end
+    end
+  end
+  return nodeGrid
+end
+
 local MazeGraph = (function ()
   ---@class MazeGraph
   ---@field grid integer[][]
-  ---@field sPos Point
+  ---@field nodeGrid MazeNode[][]
   local MazeGraph = {}
   MazeGraph.__index = MazeGraph
 
-  function MazeGraph.new(grid, sPos)
+  function MazeGraph.new(grid, sPos, ePos)
     local self = setmetatable({}, MazeGraph)
     self.grid = grid
-    self.sPos = sPos
-    self:connect()
+    self.nodeGrid = getNodeGrid(self.grid)
     return self
-  end
-
-  function MazeGraph:connect()
-    printf("sPos: (%d, %d)\n", self.sPos.x, self.sPos.y)
-    --[[ initialize a grid of nodes ]]
-    local nodeGrid = {}
-    for y in ipairs(self.grid) do
-      local row = {}
-      for x in ipairs(self.grid[y]) do
-        local val = self.grid[y][x]
-        -- printf("%d%s", val, (x == #self.grid[y] and "\n") or "")
-        if val == mazeEnum.tile then
-          row[x] = MazeNode.new(x, y)
-        end
-      end
-      table.insert(nodeGrid, row)
-    end
-    for y in ipairs(nodeGrid) do
-      for x in pairs(nodeGrid[y]) do
-        printf("%d%s", nodeGrid[y][x].id, (x == #nodeGrid[y] and "\n") or " ")
-      end
-    end
   end
 
   return MazeGraph
@@ -74,6 +85,7 @@ end)()
 
 local mazeGraphModule = {
   MazeGraph = MazeGraph,
+  MazeNode = MazeNode,
 }
 
 return mazeGraphModule

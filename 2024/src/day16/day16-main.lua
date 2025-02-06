@@ -7,9 +7,11 @@ local mazeEnum = mazeModule.mazeEnum
 local mazeCharMap = mazeModule.mazeCharMap
 local mazeGraphModule = require("day16.maze-graph")
 local MazeGraph = mazeGraphModule.MazeGraph
+local MazeNode = mazeGraphModule.MazeNode
 local Point = require("geom.point")
 
 local printf = require("util.printf")
+local errorf = require("util.errorf")
 
 local DEBUG = false
 DEBUG = true
@@ -133,15 +135,61 @@ local function getPathScore(path)
   return score
 end
 
+---@param inputLines string[]
+---@return { maze: MazeGraph, sPos: Point, ePos: Point }
+local function parseInput2(inputLines)
+  local grid = {}
+  local sPos = nil
+  local ePos = nil
+  for y in ipairs(inputLines) do
+    local x = 1
+    local row = {}
+    for c in string.gmatch(inputLines[y], ".") do
+      if c == "#" then
+        row[x] = mazeEnum.wall
+      else
+        row[x] = mazeEnum.tile
+      end
+      if c == "S" then
+        sPos = Point.new(x, y)
+      elseif c == "E" then
+        ePos = Point.new(x, y)
+      end
+      x = x + 1
+    end
+    table.insert(grid, row)
+  end
+  if sPos == nil then
+    return errorf("Missing start pos")
+  end
+  if ePos == nil then
+    return errorf("Missing end pos")
+  end
+  local mazeGraph = MazeGraph.new(grid, sPos, ePos)
+  local nodeGrid = mazeGraph.nodeGrid
+  local res = {
+    maze = mazeGraph,
+    sPos = sPos,
+    ePos = ePos,
+  }
+  return res
+end
+
+---@param maze MazeGraph
+---@param sPos Point
+---@param ePos Point
+local function findPaths2(maze, sPos, ePos)
+  local function helper()
+    
+  end
+end
+
 local function day16Pt1(inputLines)
-  local day16Input = parseInput(inputLines)
+  local day16Input = parseInput2(inputLines)
   local maze = day16Input.maze
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
-
-  local grid = maze:gridCopy()
-  local mazeGraph = MazeGraph.new(grid, sPos)
-
+  local paths = findPaths2(maze, sPos, ePos)
   return -1
 end
 
