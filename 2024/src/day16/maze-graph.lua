@@ -131,6 +131,33 @@ local MazeGraph = (function ()
     end
     return mazeStr
   end
+
+  ---@param path { node: MazeNode, direction: integer, cost: integer }[]
+  ---@return string
+  function MazeGraph:pathStr(path)
+    local grid = self:gridCopy()
+    local charGrid = {}
+    for y in ipairs(grid) do
+      local row = {}
+      for x in ipairs(grid) do
+        local c = mazeCharMap[grid[y][x]]
+        row[x] = c
+      end
+      charGrid[y] = row
+    end
+    local arrows = { "^", ">", "v", "<", }
+    for _, pathPart in ipairs(path) do
+      charGrid[pathPart.node.y][pathPart.node.x] = arrows[pathPart.direction]
+    end
+    local gridStr = ""
+    for y in ipairs(charGrid) do
+      for _, c in ipairs(charGrid[y]) do
+        gridStr = gridStr..c
+      end
+      gridStr = gridStr.."\n"
+    end
+    return gridStr
+  end
   
   return MazeGraph
 end)()

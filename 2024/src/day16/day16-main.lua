@@ -222,20 +222,99 @@ local function findPaths2(maze, sPos, ePos)
   return foundPaths
 end
 
+--[[ bfs ]]
+---@param maze MazeGraph
+---@param sPos Point
+---@param ePos Point
+---@return { node: MazeNode, direction: integer, cost: integer }[]
+local function findPath(maze, sPos, ePos)
+  local queue = {}
+  local visited = {}
+  local sNode = maze.nodeGrid[sPos.y][sPos.x]
+  local eNode = maze.nodeGrid[ePos.y][ePos.x]
+  table.insert(queue, {
+    node = sNode,
+    direction = 2,
+    pathSoFar = {},
+    cost = 0,
+  })
+  local foundPath = {}
+  while #queue > 0 do
+    --[[ find the smallest node to visit next ]]
+    local minCost = math.huge
+    local minCostIdx = nil
+    for i, qNode in ipairs(queue) do
+      if qNode.cost < minCost then
+        minCost = qNode.cost
+        minCostIdx = i
+      end
+    end
+    local curr = table.remove(queue, minCostIdx)
+    -- local curr = table.remove(queue)
+    local node = curr.node
+    local pathSoFar = curr.pathSoFar
+    local direction = curr.direction
+    local cost = curr.cost
+    if node.x == eNode.x and node.y == eNode.y then
+      foundPath = pathSoFar
+      table.insert(foundPath, {
+        node = node,
+        direction = direction,
+        cost = cost,
+      })
+      break
+    end
+    -- for i, sf in ipairs(pathSoFar) do
+    --   printf("(%d, %d)%s", sf.node.x, sf.node.y, (i == #pathSoFar and "\n") or " ")
+    -- end
+    visited[node.id] = true
+    for _, d in ipairs(directions) do
+      local nextNode = node:next(d)
+      if nextNode ~= nil and not visited[nextNode.id] then
+        -- printf("(%d, %d)\n", nextNode.x, nextNode.y)
+        local nextSoFar = arr.copy(pathSoFar)
+        local nextCost = 1 + ((d == direction and 0) or 1000)
+        table.insert(nextSoFar, {
+          node = node,
+          direction = direction,
+          cost = cost,
+        })
+        table.insert(queue, {
+          node = nextNode,
+          direction = d,
+          pathSoFar = nextSoFar,
+          cost = nextCost,
+        })
+      end
+    end
+  end
+  -- printf(maze:gridStr(visited))
+  return foundPath
+end
+--[[ 
+88472 - incorrect, too high
+]]
 local function day16Pt1(inputLines)
   local day16Input = parseInput2(inputLines)
   local maze = day16Input.maze
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
-  local paths = findPaths2(maze, sPos, ePos)
-  local minScore = math.huge
-  for i, foundPath in ipairs(paths) do
-    -- printf("%d: %d\n", i, foundPath.score)
-    if foundPath.score < minScore then
-      minScore = foundPath.score
-    end
+  local minPath = findPath(maze, sPos, ePos)
+  local minScore = 0
+  for _, pathPt in ipairs(minPath) do
+    minScore = minScore + pathPt.cost
   end
-  printf("numPaths: %d\n", #paths)
+  -- printf("minPath: %d\n", minScore)
+  -- printf(maze:pathStr(minPath))
+  -- local paths = findPaths2(maze, sPos, ePos)
+  -- local minScore = math.huge
+  -- for i, foundPath in ipairs(paths) do
+  --   -- printf("%d: %d\n", i, foundPath.score)
+  --   if foundPath.score < minScore then
+  --     minScore = foundPath.score
+  --   end
+  -- end
+  -- printf("numPaths: %d\n", #paths)
   return minScore
 end
 
