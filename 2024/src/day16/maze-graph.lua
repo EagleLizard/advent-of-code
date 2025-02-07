@@ -1,6 +1,7 @@
 
 local mazeModule = require("day16.maze")
 local mazeEnum = mazeModule.mazeEnum
+local mazeCharMap = mazeModule.mazeCharMap
 
 local printf = require("util.printf")
 
@@ -29,6 +30,22 @@ local MazeNode = (function ()
     return self
   end
 
+  ---@param direction integer
+  ---@return MazeNode|nil
+  function MazeNode:next(direction)
+    local nextNode
+    if direction == 1 then
+      nextNode = self.up
+    elseif direction == 2 then
+      nextNode = self.right
+    elseif direction == 3 then
+      nextNode = self.down
+    elseif direction == 4 then
+      nextNode = self.left
+    end
+    return nextNode
+  end
+
   return MazeNode
 end)()
 
@@ -53,11 +70,14 @@ local function getNodeGrid(grid)
         --[[ connect to adjacent nodes ]]
         if grid[y - 1][x] == mazeEnum.tile then
           node.up = nodeGrid[y - 1][x]
-        elseif grid[y][x + 1] == mazeEnum.tile then
+        end
+        if grid[y][x + 1] == mazeEnum.tile then
           node.right = nodeGrid[y][x + 1]
-        elseif grid[y + 1][x] == mazeEnum.tile then
+        end
+        if grid[y + 1][x] == mazeEnum.tile then
           node.down = nodeGrid[y + 1][x]
-        elseif grid[y][x - 1] == mazeEnum.tile then
+        end
+        if grid[y][x - 1] == mazeEnum.tile then
           node.left = nodeGrid[y][x - 1]
         end
       end
@@ -69,6 +89,8 @@ end
 local MazeGraph = (function ()
   ---@class MazeGraph
   ---@field grid integer[][]
+  ---@field width integer
+  ---@field height integer
   ---@field nodeGrid MazeNode[][]
   local MazeGraph = {}
   MazeGraph.__index = MazeGraph
@@ -76,10 +98,40 @@ local MazeGraph = (function ()
   function MazeGraph.new(grid, sPos, ePos)
     local self = setmetatable({}, MazeGraph)
     self.grid = grid
+    self.width = #self.grid[1]
+    self.height = #self.grid
     self.nodeGrid = getNodeGrid(self.grid)
     return self
   end
 
+  function MazeGraph:gridCopy()
+    local cpy = {}
+    for y in ipairs(self.grid) do
+      local row = {}
+      for x in ipairs(self.grid[y]) do
+        row[x] = self.grid[y][x]
+      end
+      cpy[y] = row
+    end
+    return cpy
+  end
+
+  ---@param visited? boolean[]
+  function MazeGraph:gridStr(visited)
+    visited = visited or {}
+    local mazeStr = ""
+    for y = 1, self.height do
+      for x = 1, self.width do
+        local node = self.nodeGrid[y][x]
+        local nodeId = node and node.id
+        local c = (visited[nodeId] and "o") or mazeCharMap[self.grid[y][x]]
+        mazeStr = mazeStr..c
+      end
+      mazeStr = mazeStr.."\n"
+    end
+    return mazeStr
+  end
+  
   return MazeGraph
 end)()
 

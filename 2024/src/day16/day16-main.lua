@@ -175,6 +175,8 @@ local function parseInput2(inputLines)
   return res
 end
 
+local directions = { 1, 2, 3, 4, }
+
 ---@param maze MazeGraph
 ---@param sPos Point
 ---@param ePos Point
@@ -200,14 +202,20 @@ local function findPaths2(maze, sPos, ePos)
       end
       table.insert(foundPaths, foundPath)
     end
-    table.insert(soFar, {
-      node = node,
-      direction = direction,
-    })
-    -- helper(node.up, 1, soFar)
+    for _, d in ipairs(directions) do
+      local nextNode = node:next(d)
+      table.insert(soFar, {
+        node = node,
+        direction = direction,
+      })
+      helper(nextNode, d, soFar)
+      table.remove(soFar)
+    end
+    visited[node.id] = nil
   end
   local pathSoFar = {}
   helper(sNode, 2, pathSoFar)
+  return foundPaths
 end
 
 local function day16Pt1(inputLines)
@@ -216,6 +224,7 @@ local function day16Pt1(inputLines)
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
   local paths = findPaths2(maze, sPos, ePos)
+  printf("numPaths: %d\n", #paths)
   return -1
 end
 
