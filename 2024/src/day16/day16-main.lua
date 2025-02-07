@@ -166,7 +166,6 @@ local function parseInput2(inputLines)
     return errorf("Missing end pos")
   end
   local mazeGraph = MazeGraph.new(grid, sPos, ePos)
-  local nodeGrid = mazeGraph.nodeGrid
   local res = {
     maze = mazeGraph,
     sPos = sPos,
@@ -189,7 +188,7 @@ local function findPaths2(maze, sPos, ePos)
   ---@param node MazeNode|nil
   ---@param direction integer
   ---@param soFar any
-  local function helper(node, direction, soFar)
+  local function helper(node, direction, soFar, score)
     if node == nil or visited[node.id] then
       return
     end
@@ -200,21 +199,26 @@ local function findPaths2(maze, sPos, ePos)
       for i, v in ipairs(soFar) do
         foundPath[i] = v
       end
-      table.insert(foundPaths, foundPath)
+      table.insert(foundPaths, {
+        path = foundPath,
+        score = score,
+      })
     end
     for _, d in ipairs(directions) do
       local nextNode = node:next(d)
+      local cost = 1 + ((d ~= direction and 1000) or 0)
+      local nextScore = score + cost
       table.insert(soFar, {
         node = node,
         direction = direction,
       })
-      helper(nextNode, d, soFar)
+      helper(nextNode, d, soFar, nextScore)
       table.remove(soFar)
     end
     visited[node.id] = nil
   end
   local pathSoFar = {}
-  helper(sNode, 2, pathSoFar)
+  helper(sNode, 2, pathSoFar, 0)
   return foundPaths
 end
 
@@ -224,8 +228,15 @@ local function day16Pt1(inputLines)
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
   local paths = findPaths2(maze, sPos, ePos)
+  local minScore = math.huge
+  for i, foundPath in ipairs(paths) do
+    -- printf("%d: %d\n", i, foundPath.score)
+    if foundPath.score < minScore then
+      minScore = foundPath.score
+    end
+  end
   printf("numPaths: %d\n", #paths)
-  return -1
+  return minScore
 end
 
 local function day16Pt1_2(inputLines)
