@@ -351,8 +351,14 @@ local function findPath2(maze, sPos, ePos)
           dx = adj.x - pNode.x
           dy = adj.y - pNode.y
         end
-        -- printf("%d, %d\n", dx, dy)
-        local turn = dx ~= 0 and dy ~= 0
+        --[[ 
+          if it's the first node, a turn occurs if the direction
+            differs from the initial direction
+        ]]
+        local turn = (
+          ((uNode.id == sNode.id) and (d ~= direction))
+          or (dx ~= 0 and dy ~= 0)
+        )
         if turn then
           printf("turn\n")
         end
