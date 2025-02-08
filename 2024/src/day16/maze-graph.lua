@@ -91,6 +91,7 @@ local MazeGraph = (function ()
   ---@field grid integer[][]
   ---@field width integer
   ---@field height integer
+  ---@field nodes MazeNode[]
   ---@field nodeGrid MazeNode[][]
   local MazeGraph = {}
   MazeGraph.__index = MazeGraph
@@ -100,8 +101,23 @@ local MazeGraph = (function ()
     self.grid = grid
     self.width = #self.grid[1]
     self.height = #self.grid
+    self.nodes = {}
     self.nodeGrid = getNodeGrid(self.grid)
+    for _, row in pairs(self.nodeGrid) do
+      for _, node in pairs(row) do
+        table.insert(self.nodes, node)
+      end
+    end
     return self
+  end
+
+  function MazeGraph:getNodeById(id)
+    for _, node in pairs(self.nodes) do
+      if id == node.id then
+        return node
+      end
+    end
+    return nil
   end
 
   function MazeGraph:gridCopy()
@@ -139,7 +155,7 @@ local MazeGraph = (function ()
     local charGrid = {}
     for y in ipairs(grid) do
       local row = {}
-      for x in ipairs(grid) do
+      for x in ipairs(grid[y]) do
         local c = mazeCharMap[grid[y][x]]
         row[x] = c
       end
