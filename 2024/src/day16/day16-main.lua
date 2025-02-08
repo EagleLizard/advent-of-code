@@ -310,7 +310,6 @@ end
 ---@param ePos Point
 local function findPath2(maze, sPos, ePos)
   local dist = {}
-  local last = {}
   local spt = {}
   local prev = {}
   local sNode = maze.nodeGrid[sPos.y][sPos.x]
@@ -322,29 +321,17 @@ local function findPath2(maze, sPos, ePos)
   end
   dist[sNode.id] = 0
   local direction = 2
-  local iterCount = 0
   while #q do
-    iterCount = iterCount + 1
     local u = getMinDistIdx(q, dist, spt)
     if u == -1 then
       break
     end
     local uNode = table.remove(q, u)
     spt[uNode.id] = true
-    printf("uNode: (%d, %d)\n", uNode.x, uNode.y)
-    -- local pNode = prev[uNode.id]
-    -- if pNode ~= nil then
-    --   printf("pNode: (%d, %d)\n", pNode.x, pNode.y)
-    -- end
     for _, d in ipairs(directions) do
       local adj = uNode:next(d)
       if adj ~= nil and not spt[adj.id] then
         local pNode = prev[uNode.id]
-        if pNode ~= nil then
-          printf("p:(%d, %d) -> ", pNode.x, pNode.y)
-        end
-        printf("u:(%d, %d) -> ", uNode.x, uNode.y)
-        printf("a:(%d, %d)\n", adj.x, adj.y)
         local dx = adj.x - uNode.x
         local dy = adj.y - uNode.y
         if pNode ~= nil then
@@ -359,32 +346,11 @@ local function findPath2(maze, sPos, ePos)
           ((uNode.id == sNode.id) and (d ~= direction))
           or (dx ~= 0 and dy ~= 0)
         )
-        if turn then
-          printf("turn\n")
-        end
         local alt = dist[uNode.id] + (1 + ((turn and 1000) or 0))
-        -- local alt = dist[u] + 1
         if alt < dist[adj.id] then
           dist[adj.id] = alt
           prev[adj.id] = uNode
         end
-        printf("\n")
-        -- printf("%s (%s, %s)\n", d, adj.x, adj.y)
-      end
-    end
-    -- printf("%s\n", u)
-    if iterCount > 5 then
-      -- break
-    end
-  end
-  for k, v in pairs(dist) do
-    if v ~= math.huge then
-      local pNode = maze:getNodeById(k)
-      if pNode == nil then
-        errorf("couldn't find node with id: %s", k)
-      else
-        -- printf("%s %s\n", k, v)
-        printf("(%d, %d) %s\n", pNode.x, pNode.y, v)
       end
     end
   end
@@ -392,13 +358,14 @@ local function findPath2(maze, sPos, ePos)
   local node = maze.nodeGrid[ePos.y][ePos.x]
   if prev[node.id] ~= nil then
     while node ~= nil do
-      table.insert(foundPath, node)
+      table.insert(foundPath, 1, node)
       node = prev[node.id]
     end
   end
   for i, pathPt in ipairs(foundPath) do
     printf("(%d, %d)%s", pathPt.x, pathPt.y, (i == #foundPath and "\n") or " ")
   end
+  printf("cost: %d\n", dist[maze.nodeGrid[ePos.y][ePos.x].id])
 end
 
 --[[ 
