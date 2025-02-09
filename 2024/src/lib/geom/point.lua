@@ -14,4 +14,9 @@ function Point.new(x, y)
   return self
 end
 
+---@return string
+function Point:str()
+  return string.format("(%d, %d)", self.x, self.y)
+end
+
 return Point
