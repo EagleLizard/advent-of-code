@@ -21,4 +21,12 @@ I think the former will work and perform better. It seems easy to do as well.
 
 *<u>*Update:</u>*
 
-The naive algorithm takes too long.
+The naive algorithm takes too long. The obvious solution is BFS via Dijkstra's.
+
+~~`[02/05/2025[lua]`~~
+
+`[02/09/2025][lua]`
+
+I overcomplicated the obvious solution, which was not correct.
+
+The working solution is Dijkstra's with a priority queue.
