@@ -7,6 +7,9 @@ local PriorityQueue = priorityQueueModule.PriorityQueue
 
 local printf = require("util.printf")
 
+local DEBUG = false
+-- DEBUG = true
+
 ---@param inputLines string[]
 ---@return { grid: string[][], sPos: Point, ePos: Point }
 local function parseInput(inputLines)
@@ -54,6 +57,7 @@ local directionPoints = {
 ---@param grid string[][]
 ---@param sPos Point
 ---@param ePos Point
+---@return nil|{ path: {x: integer, y: integer, d: integer}[], cost: integer }
 local function findPath(grid, sPos, ePos)
   local pq = PriorityQueue.new()
   pq:insert(0, {
@@ -69,6 +73,7 @@ local function findPath(grid, sPos, ePos)
     }
   })
   local visited = {}
+  local res = nil
   while not pq:empty() do
     local curr = pq:pullMin()
     local cost = curr.p
@@ -82,8 +87,12 @@ local function findPath(grid, sPos, ePos)
       -- for i, sfPt in ipairs(soFar) do
       --   printf("(%d, %d) %d%s", sfPt.x, sfPt.y, sfPt.d, (i == #soFar and "\n") or ", ")
       -- end
-      return soFar
-      -- break
+      -- return soFar
+      res = {
+        path = soFar,
+        cost = cost,
+      }
+      break
     end
     if visited[currVKey] == nil or (visited[currVKey] and visited[currVKey] > cost) then
       -- printf("%d (%d, %d), d: %d\n", cost, x, y, d)
@@ -113,6 +122,7 @@ local function findPath(grid, sPos, ePos)
       end
     end
   end
+  return res
 end
 
 local function gridStr(srcGrid, path)
@@ -125,9 +135,10 @@ local function gridStr(srcGrid, path)
     end
     grid[y] = row
   end
+  local arrows = { "^", ">", "v", "<" }
   if path ~= nil then
     for _, pathPt in ipairs(path) do
-      grid[pathPt.y][pathPt.x] = "o"
+      grid[pathPt.y][pathPt.x] = arrows[pathPt.d]
     end
   end
   local gridStr = ""
@@ -142,22 +153,29 @@ local function gridStr(srcGrid, path)
   return gridStr
 end
 
+--[[
+88472 - incorrect, too high
+88471 - too high
+88468 - correct
+]]
 local function day16Pt1(inputLines)
   local day16Input = parseInput(inputLines)
   local grid = day16Input.grid
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
-  for y in ipairs(grid) do
-    for x in ipairs(grid[y]) do
-      printf("%s%s", grid[y][x], (x == #grid[y] and "\n") or "")
-    end
+  if DEBUG then
+    printf("\n")
+    printf(gridStr(grid))
   end
-  printf("\n")
-  printf(gridStr(grid))
-  local path = findPath(grid, sPos, ePos)
-  printf("\n")
-  printf(gridStr(grid, path))
-  return -1
+  local foundPath = findPath(grid, sPos, ePos)
+  local cost = (foundPath and foundPath.cost) or -1
+  if DEBUG then
+    local path = foundPath and foundPath.path
+    printf("\n")
+    printf(gridStr(grid, path))
+  end
+  -- printf("cost: %d\n", path[#path].cost)
+  return cost
 end
 
 local day16Main2Module = {
