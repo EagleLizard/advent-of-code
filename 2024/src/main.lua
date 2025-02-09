@@ -18,7 +18,8 @@ local day12 = require("day12.day12-main")
 local day13 = require("day13.day13-main")
 local day14 = require("day14.day14-main")
 local day15 = require("day15.day15-main")
-local day16 = require("day16.day16-main")
+-- local day16 = require("day16.day16-main")
+local day16 = require("day16.day16-main2")
 
 local printf = require("util.printf")
 local errorf = require("util.errorf")
@@ -57,10 +58,11 @@ local DAY_14_FILE_NAME = "day14.txt"
 -- local DAY_15_FILE_NAME = "day15_test1.txt"
 local DAY_15_FILE_NAME = "day15.txt"
 -- local DAY_16_FILE_NAME = "day16_test1.txt"
-local DAY_16_FILE_NAME = "day16_test2.txt"
+-- local DAY_16_FILE_NAME = "day16_test2.txt"
 -- local DAY_16_FILE_NAME = "day16_test-e1.txt"
 -- local DAY_16_FILE_NAME = "day16_test-e2.txt"
 -- local DAY_16_FILE_NAME = "day16_test-e3.txt"
+local DAY_16_FILE_NAME = "day16_test-e4.txt"
 -- local DAY_16_FILE_NAME = "day16.txt"
 
 local function aocBanner(t)
