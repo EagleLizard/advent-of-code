@@ -25,7 +25,7 @@ local PriorityQueue = (function ()
         smallest = pItem
       end
     end
-    return smallest and smallest.val
+    return smallest
   end
 
   function PriorityQueue:pullMin()
@@ -40,7 +40,11 @@ local PriorityQueue = (function ()
     if smallestIdx ~= nil then
       smallest = table.remove(self.plist, smallestIdx)
     end
-    return smallest and smallest.val
+    return smallest
+  end
+
+  function PriorityQueue:empty()
+    return #self.plist == 0
   end
 
   return PriorityQueue
