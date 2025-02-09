@@ -1,72 +1,52 @@
 
 local arr = require("util.arr-util")
 
-local mazeModule = require("day16.maze")
-local Maze = mazeModule.Maze
-local mazeEnum = mazeModule.mazeEnum
-local mazeCharMap = mazeModule.mazeCharMap
 local Point = require("geom.point")
+local priorityQueueModule = require("util.priority-queue")
+local PriorityQueue = priorityQueueModule.PriorityQueue
 
 local printf = require("util.printf")
 
 local DEBUG = false
-DEBUG = true
+-- DEBUG = true
 
 ---@param inputLines string[]
----@return { maze: Maze, sPos: Point, ePos: Point }
+---@return { grid: string[][], sPos: Point, ePos: Point }
 local function parseInput(inputLines)
-  local maze = Maze.new(#inputLines[1], #inputLines)
+  local grid = {}
   local sPos = nil
   local ePos = nil
   for y, inputLine in ipairs(inputLines) do
     local x = 1
+    local row = {}
     for c in string.gmatch(inputLine, ".") do
       if c == "#" then
-        maze:setWall(x, y)
-      elseif c == "S" then
+        row[x] = "#"
+      else
+        row[x] = "."
+      end
+      if c == "S" then
         sPos = Point.new(x, y)
       elseif c == "E" then
         ePos = Point.new(x, y)
       end
       x = x + 1
     end
+    grid[y] = row
   end
-  -- printf(maze:gridStr())
   local res = {
-    maze = maze,
+    grid = grid,
     sPos = sPos,
     ePos = ePos,
   }
   return res
 end
 
-local function gridPathStr(maze, path)
-  local rawGrid = maze:gridCopy()
-  -- for _, pathPt in ipairs(path) do
-  --   rawGrid[pathPt.y][pathPt.x] = 3
-  -- end
-  local charGrid = {}
-  for y in ipairs(rawGrid) do
-    local row = {}
-    for x in ipairs(rawGrid[y]) do
-      table.insert(row, mazeCharMap[rawGrid[y][x]])
-    end
-    table.insert(charGrid, row)
-  end
-  local arrows = { "^", ">", "v", "<", }
-  for _, pathStep in ipairs(path) do
-    charGrid[pathStep.y][pathStep.x] = arrows[pathStep.direction]
-  end
-  local gridStr = ""
-  for y in ipairs(charGrid) do
-    for _, c in ipairs(charGrid[y]) do
-      gridStr = gridStr..c
-    end
-    gridStr = gridStr.."\n"
-  end
-  return gridStr
+local function getVisitedKey(x, y, d)
+  return string.format("%s,%s,%s", x, y, d)
 end
 
+local directions = {1, 2, 3, 4,}
 local directionPoints = {
   Point.new(0, -1), --[[ up ]]
   Point.new(1, 0), --[[ right ]]
@@ -74,95 +54,128 @@ local directionPoints = {
   Point.new(-1, 0), --[[ left ]]
 }
 
----@param maze Maze
+---@param grid string[][]
 ---@param sPos Point
 ---@param ePos Point
----@return { x: integer, y: integer, direction: integer }[]
-local function findPaths(maze, sPos, ePos)
+---@return nil|{ path: {x: integer, y: integer, d: integer}[], cost: integer }
+local function findPath(grid, sPos, ePos)
+  local pq = PriorityQueue.new()
+  pq:insert(0, {
+    x = sPos.x,
+    y = sPos.y,
+    d = 2,
+    soFar = {
+      {
+        x = sPos.x,
+        y = sPos.y,
+        d = 2,
+      }
+    }
+  })
   local visited = {}
-  for y = 1, maze.height do
-    visited[y] = {}
-  end
-  local grid = maze:gridCopy()
-  local foundPaths = {}
-  local function helper(x, y, direction, soFar)
-    if visited[y][x] or (grid[y][x] ~= mazeEnum.tile) then
-      return
-    end
-    visited[y][x] = true
+  local res = nil
+  while not pq:empty() do
+    local curr = pq:pullMin()
+    local cost = curr.p
+    local x = curr.val.x
+    local y = curr.val.y
+    local d = curr.val.d
+    local soFar = curr.val.soFar
+    local currVKey = getVisitedKey(x, y, d)
     if x == ePos.x and y == ePos.y then
-      --[[ valid path found ]]
-      local foundPath = {}
-      for i, v in ipairs(soFar) do
-        foundPath[i] = v
+      --[[ found end ]]
+      -- for i, sfPt in ipairs(soFar) do
+      --   printf("(%d, %d) %d%s", sfPt.x, sfPt.y, sfPt.d, (i == #soFar and "\n") or ", ")
+      -- end
+      -- return soFar
+      res = {
+        path = soFar,
+        cost = cost,
+      }
+      break
+    end
+    if visited[currVKey] == nil or (visited[currVKey] and visited[currVKey] > cost) then
+      -- printf("%d (%d, %d), d: %d\n", cost, x, y, d)
+      visited[currVKey] = cost
+      for nd, ndp in ipairs(directionPoints) do
+        local nx = x + ndp.x
+        local ny = y + ndp.y
+        if grid[ny][nx] == "." then
+          local nCost = cost + 1
+          local nSoFar = arr.copy(soFar)
+          -- table.insert(nSoFar, Point.new(nx, ny))
+          table.insert(nSoFar, {
+            x = nx,
+            y = ny,
+            d = nd,
+          })
+          if d ~= nd then
+            nCost = nCost + 1000
+          end
+          pq:insert(nCost, {
+            x = nx,
+            y = ny,
+            d = nd,
+            soFar = nSoFar,
+          })
+        end
       end
-      table.insert(foundPaths, foundPath)
-    end
-    for i, dpt in ipairs(directionPoints) do
-      local nx = x + dpt.x
-      local ny = y + dpt.y
-      local nd = i
-      table.insert(soFar, {
-        x = x,
-        y = y,
-        direction = i,
-      })
-      helper(nx, ny, nd, soFar)
-      table.remove(soFar)
-    end
-    visited[y][x] = nil
-  end
-  local pathSoFar = {}
-  helper(sPos.x, sPos.y, 2, pathSoFar)
-  return foundPaths
-end
-
-local function getPathScore(path)
-  local currDirection = 2
-  local score = 0
-  for _, pathStep in ipairs(path) do
-    score = score + 1
-    if pathStep.direction ~= currDirection then
-      --[[ rotation happened ]]
-      score = score + 1000
-      currDirection = pathStep.direction
     end
   end
-  return score
+  return res
 end
 
+local function gridStr(srcGrid, path)
+  --[[ copy grid ]]
+  local grid = {}
+  for y in ipairs(srcGrid) do
+    local row = {}
+    for x in ipairs(srcGrid[y]) do
+      row[x] = srcGrid[y][x]
+    end
+    grid[y] = row
+  end
+  local arrows = { "^", ">", "v", "<" }
+  if path ~= nil then
+    for _, pathPt in ipairs(path) do
+      grid[pathPt.y][pathPt.x] = arrows[pathPt.d]
+    end
+  end
+  local gridStr = ""
+  for y in ipairs(grid) do
+    for x, c in ipairs(grid[y]) do
+      gridStr = gridStr..c
+      if x == #grid[y] then
+        gridStr = gridStr.."\n"
+      end
+    end
+  end
+  return gridStr
+end
+
+--[[
+88472 - incorrect, too high
+88471 - too high
+88468 - correct
+]]
 local function day16Pt1(inputLines)
   local day16Input = parseInput(inputLines)
-  local maze = day16Input.maze
+  local grid = day16Input.grid
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
-
   if DEBUG then
-    printf("%s\n", maze:gridStr())
-    printf("start: (%d, %d)\n", sPos.x, sPos.y)
-    printf("end: (%d, %d)\n", ePos.x, ePos.y)
+    printf("\n")
+    printf(gridStr(grid))
   end
-  local foundPaths = findPaths(maze, sPos, ePos)
-  local scores = {}
-  local minScore = math.huge
-  for _, foundPath in ipairs(foundPaths) do
-    local score = getPathScore(foundPath)
-    if score < minScore then
-      minScore = score
-    end
-    table.insert(scores, score)
-  end
+  local foundPath = findPath(grid, sPos, ePos)
+  local cost = (foundPath and foundPath.cost) or -1
   if DEBUG then
-    for i, score in ipairs(scores) do
-      if score == minScore then
-        printf(gridPathStr(maze, foundPaths[i]))
-        printf("score: %d\n", score)
-      end
-    end
+    local path = foundPath and foundPath.path
+    printf("\n")
+    printf(gridStr(grid, path))
   end
-  -- printf("num paths: %d\n", #foundPaths or 0)
-  return minScore
-  -- return -1
+  -- printf("cost: %d\n", path[#path].cost)
+  return cost
 end
 
 local day16MainModule = {
