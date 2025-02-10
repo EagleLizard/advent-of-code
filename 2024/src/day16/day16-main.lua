@@ -42,10 +42,6 @@ local function parseInput(inputLines)
   return res
 end
 
-local function getVisitedKey(x, y, d)
-  return string.format("%s,%s,%s", x, y, d)
-end
-
 local directions = {1, 2, 3, 4,}
 local directionPoints = {
   Point.new(0, -1), --[[ up ]]
@@ -54,75 +50,30 @@ local directionPoints = {
   Point.new(-1, 0), --[[ left ]]
 }
 
----@param grid string[][]
----@param sPos Point
----@param ePos Point
----@return nil|{ path: {x: integer, y: integer, d: integer}[], cost: integer }
-local function findPath(grid, sPos, ePos)
-  local pq = PriorityQueue.new()
-  pq:insert(0, {
-    x = sPos.x,
-    y = sPos.y,
-    d = 2,
-    soFar = {
-      {
-        x = sPos.x,
-        y = sPos.y,
-        d = 2,
-      }
-    }
-  })
-  local visited = {}
-  local res = nil
-  while not pq:empty() do
-    local curr = pq:pullMin()
-    local cost = curr.p
-    local x = curr.val.x
-    local y = curr.val.y
-    local d = curr.val.d
-    local soFar = curr.val.soFar
-    local currVKey = getVisitedKey(x, y, d)
-    if x == ePos.x and y == ePos.y then
-      --[[ found end ]]
-      -- for i, sfPt in ipairs(soFar) do
-      --   printf("(%d, %d) %d%s", sfPt.x, sfPt.y, sfPt.d, (i == #soFar and "\n") or ", ")
-      -- end
-      -- return soFar
-      res = {
-        path = soFar,
-        cost = cost,
-      }
-      break
+local function gridVisitedStr(srcGrid, visited)
+  local grid = {}
+  for y in ipairs(srcGrid) do
+    local row = {}
+    for x, v in ipairs(srcGrid[y]) do
+      row[x] = v
     end
-    if visited[currVKey] == nil or (visited[currVKey] and visited[currVKey] > cost) then
-      -- printf("%d (%d, %d), d: %d\n", cost, x, y, d)
-      visited[currVKey] = cost
-      for nd, ndp in ipairs(directionPoints) do
-        local nx = x + ndp.x
-        local ny = y + ndp.y
-        if grid[ny][nx] == "." then
-          local nCost = cost + 1
-          local nSoFar = arr.copy(soFar)
-          -- table.insert(nSoFar, Point.new(nx, ny))
-          table.insert(nSoFar, {
-            x = nx,
-            y = ny,
-            d = nd,
-          })
-          if d ~= nd then
-            nCost = nCost + 1000
-          end
-          pq:insert(nCost, {
-            x = nx,
-            y = ny,
-            d = nd,
-            soFar = nSoFar,
-          })
-        end
-      end
+    grid[y] = row
+  end
+
+  for y in pairs(visited) do
+    for x in pairs(visited[y]) do
+      grid[y][x] = "o"
     end
   end
-  return res
+
+  local gridStr = ""
+  for y in ipairs(grid) do
+    for _, c in ipairs(grid[y]) do
+      gridStr = gridStr..c
+    end
+    gridStr = gridStr.."\n"
+  end
+  return gridStr
 end
 
 local function gridStr(srcGrid, path)
@@ -153,93 +104,91 @@ local function gridStr(srcGrid, path)
   return gridStr
 end
 
----@param x integer
----@param y integer
----@return string
-local function getPtKey(x, y)
-  return string.format("%d,%d", x, y)
-end
-
----@param srcGrid string[][]
----@param seatPts {[string]: Point}
--- ---@param seatPts {[integer]: {[integer]: boolean}}
-local function gridSeatStr(srcGrid, seatPts)
-  local gridStr = ""
-  for y in ipairs(srcGrid) do
-    -- local row = {}
-    for x in ipairs(srcGrid[y]) do
-      local ptKey = getPtKey(x, y)
-      local c = (seatPts[ptKey] and "o") or srcGrid[y][x]
-      gridStr = gridStr..c
-    end
-    gridStr = gridStr.."\n"
-  end
-  return gridStr
-end
-
---[[ dfs ]]
 ---@param grid string[][]
 ---@param sPos Point
 ---@param ePos Point
----@param costLimit integer
-local function findPaths(grid, sPos, ePos, costLimit)
-  ---@type {x: integer, y: integer, d: integer}[]
-  local foundPaths = {}
-  local visited = {}
-  for y = 1, #grid do
-    visited[y] = {}
-  end
-  ---@param x integer
-  ---@param y integer
-  ---@param d integer
-  ---@param cost integer
-  ---@param soFar {x: integer, y: integer, d: integer, cost: integer}[]
-  local function helper(x, y, d, cost, soFar)
-    if x == ePos.x and y == ePos.y then
-      --[[ valid path found ]]
-      local foundPath = {}
-      for i, v in ipairs(soFar) do
-        foundPath[i] = v
-      end
-      table.insert(foundPaths, foundPath)
-    end
-    visited[y][x] = true
-    for i, dpt in ipairs(directionPoints) do
-      local nx = x + dpt.x
-      local ny = y + dpt.y
-      local nd = i
-      local nc = cost + (1 + ((nd == d and 0) or 1000))
-      if (
-        (not visited[ny][nx])
-        and (grid[ny][nx] == ".")
-        and (nc <= costLimit)
-      ) then
-        table.insert(soFar, {
-          x = nx,
-          y = ny,
-          d = nd,
-          cost = nc,
-        })
-        --[[ recurse ]]
-        helper(nx, ny, nd, nc, soFar)
-        table.remove(soFar)
-      end
-    end
-    visited[y][x] = nil
-  end
-  local pathSoFar = {
-    {
-      x = sPos.x,
-      y = sPos.y,
-      d = 2,
-      cost = 0,
+---@return nil|{ path: {x: integer, y: integer, d: integer}[], cost: integer, seats: {[integer]: boolean}[] }
+local function findPath(grid, sPos, ePos)
+  local pq = PriorityQueue.new()
+  pq:insert(0, {
+    x = sPos.x,
+    y = sPos.y,
+    d = 2,
+    soFar = {
+      {
+        x = sPos.x,
+        y = sPos.y,
+        d = 2,
+      }
     }
+  })
+  local visited = {}
+  local minCost = math.huge
+  local minPath = {}
+  local seats = {}
+  while not pq:empty() do
+    local curr = pq:pullMin()
+    local cost = curr.p
+    local x = curr.val.x
+    local y = curr.val.y
+    local d = curr.val.d
+    local soFar = curr.val.soFar
+    if (x == ePos.x) and (y == ePos.y) and cost <= minCost then
+      --[[ found end ]]
+      minCost = cost
+      minPath = soFar
+      for _, sfPt in ipairs(soFar) do
+        if seats[sfPt.y] == nil then
+          seats[sfPt.y] = {}
+        end
+        seats[sfPt.y][sfPt.x] = true
+      end
+    end
+    local visitedCost = visited[y] and visited[y][x] and visited[y][x][d]
+    --[[ If not already visited with a lower cost ]]
+    if visitedCost == nil or (visitedCost >= cost) then
+      if visited[y] == nil then
+        visited[y] = {}
+      end
+      if visited[y][x] == nil then
+        visited[y][x] = {}
+      end
+      visited[y][x][d] = cost
+      for nd, ndp in ipairs(directionPoints) do
+        local nx = x + ndp.x
+        local ny = y + ndp.y
+        if grid[ny][nx] == "." then
+          local nCost = cost + 1
+          local nSoFar = arr.copy(soFar)
+          table.insert(nSoFar, {
+            x = nx,
+            y = ny,
+            d = nd,
+          })
+          if d ~= nd then
+            nCost = nCost + 1000
+          end
+          pq:insert(nCost, {
+            x = nx,
+            y = ny,
+            d = nd,
+            soFar = nSoFar,
+          })
+        end
+      end
+    end
+  end
+  local res = {
+    path = minPath,
+    cost = minCost,
+    seats = seats,
   }
-  visited[sPos.y][sPos.x] = true
-  helper(sPos.x, sPos.y, 2, 0, pathSoFar)
-  return foundPaths
+  return res
 end
 
+--[[ 
+616 - correct
+]]
 local function day16Pt2(inputLines)
   local day16Input = parseInput(inputLines)
   local grid = day16Input.grid
@@ -253,32 +202,14 @@ local function day16Pt2(inputLines)
   if DEBUG then
     printf("min cost: %d\n", minCost)
   end
-  local minPaths = findPaths(grid, sPos, ePos, minCost)
-  local minPathPtSet = {}
-  -- for y = 1, #grid do
-  --   minPathPtSet[y] = {}
-  -- end
-  for i, path in ipairs(minPaths) do
-    -- printf(gridStr(grid, path))
-    -- printf("%d - cost: %d\n", i, path[#path].cost)
-    for _, pathPt in ipairs(path) do
-      local ptKey = getPtKey(pathPt.x, pathPt.y)
-      if not minPathPtSet[ptKey] then
-        minPathPtSet[ptKey] = Point.new(pathPt.x, pathPt.y)
-      end
-      -- if minPathPtSet[pathPt.y][pathPt.x] == nil then
-      --   minPathPtSet[pathPt.y][pathPt.x] = true
-      -- end
+  local seatCount = 0
+  for y in pairs(bestPath.seats) do
+    for _ in pairs(bestPath.seats[y]) do
+      seatCount = seatCount + 1
     end
   end
-  local seatCount = 0
-  for _ in pairs(minPathPtSet) do
-    seatCount = seatCount + 1
-  end
   if DEBUG then
-    printf(gridSeatStr(grid, minPathPtSet))
-    printf("num paths: %d\n", #minPaths)
-    printf("num seats: %d\n", seatCount)
+    printf(gridVisitedStr(grid, bestPath.seats))
   end
   return seatCount
   -- return -1

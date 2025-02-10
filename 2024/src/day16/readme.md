@@ -46,3 +46,11 @@ My initial inclination is to use the function from part 1 to find the cost of th
 The naive DFS solution is slow. This is moire or less expected, but it might be too slow.
 
 It does appear to be too slow.
+
+### `[02/10/2025][lua]`
+
+Correct solution after some googling.
+
+The gist is to keep track of the minimum cost to the target, and to keep exploring instead of returning on the first found minimum path.
+
+While traversing all of the best paths, I keep track of all of the seats along a given best path in a set.
