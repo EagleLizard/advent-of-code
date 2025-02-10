@@ -31,6 +31,8 @@ I overcomplicated the obvious solution, which was not correct.
 
 The working solution is Dijkstra's with a priority queue.
 
+Runs in ~800ms.
+
 ## Part 2
 
 ### `[02/09/2025][lua]`
