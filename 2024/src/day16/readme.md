@@ -54,3 +54,14 @@ Correct solution after some googling.
 The gist is to keep track of the minimum cost to the target, and to keep exploring instead of returning on the first found minimum path.
 
 While traversing all of the best paths, I keep track of all of the seats along a given best path in a set.
+
+~2200ms (~22.0s)
+
+
+## Optimization
+
+###  `[02/10/2025][lua]`
+
+| t | test case | pt1 ms | pt2 ms | notes |
+|-|-|-|-|-|
+| 02/10/2025 3:28 PM | `day16_test-e6.txt` | 743 | 737.285 | baseline

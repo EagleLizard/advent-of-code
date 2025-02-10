@@ -8,7 +8,7 @@ local PriorityQueue = priorityQueueModule.PriorityQueue
 local printf = require("util.printf")
 
 local DEBUG = false
--- DEBUG = true
+DEBUG = true
 
 ---@param inputLines string[]
 ---@return { grid: string[][], sPos: Point, ePos: Point }
@@ -107,8 +107,9 @@ end
 ---@param grid string[][]
 ---@param sPos Point
 ---@param ePos Point
+---@param findSeats? boolean
 ---@return nil|{ path: {x: integer, y: integer, d: integer}[], cost: integer, seats: {[integer]: boolean}[] }
-local function findPath(grid, sPos, ePos)
+local function findPath(grid, sPos, ePos, findSeats)
   local pq = PriorityQueue.new()
   pq:insert(0, {
     x = sPos.x,
@@ -226,8 +227,8 @@ local function day16Pt1(inputLines)
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
   if DEBUG then
-    printf("\n")
-    printf(gridStr(grid))
+    -- printf("\n")
+    -- printf(gridStr(grid))
   end
   local foundPath = findPath(grid, sPos, ePos)
   local cost = (foundPath and foundPath.cost) or -1
