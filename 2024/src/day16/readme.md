@@ -40,3 +40,9 @@ Runs in ~800ms.
 The task is to find all tiles that are along a "best path". A best path is a shortest path, of which there can be many.
 
 My initial inclination is to use the function from part 1 to find the cost of the best path, and then implement DFS with a cost limit to short-circuit if it is ever traversing a path longer than the best path.
+
+*<u>*Update:</u>*
+
+The naive DFS solution is slow. This is moire or less expected, but it might be too slow.
+
+It does appear to be too slow.
