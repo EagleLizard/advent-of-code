@@ -144,6 +144,10 @@ local function findPath(grid, sPos, ePos, findSeats)
         end
         seats[sfPt.y][sfPt.x] = true
       end
+      if not findSeats then
+        --[[ exit after first shortest path found ]]
+        break
+      end
     end
     local visitedCost = visited[y] and visited[y][x] and visited[y][x][d]
     --[[ If not already visited with a lower cost ]]
@@ -195,7 +199,7 @@ local function day16Pt2(inputLines)
   local grid = day16Input.grid
   local sPos = day16Input.sPos
   local ePos = day16Input.ePos
-  local bestPath = findPath(grid, sPos, ePos)
+  local bestPath = findPath(grid, sPos, ePos, true)
   if bestPath == nil then
     return -1
   end
