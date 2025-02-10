@@ -30,3 +30,11 @@ The naive algorithm takes too long. The obvious solution is BFS via Dijkstra's.
 I overcomplicated the obvious solution, which was not correct.
 
 The working solution is Dijkstra's with a priority queue.
+
+## Part 2
+
+### `[02/09/2025][lua]`
+
+The task is to find all tiles that are along a "best path". A best path is a shortest path, of which there can be many.
+
+My initial inclination is to use the function from part 1 to find the cost of the best path, and then implement DFS with a cost limit to short-circuit if it is ever traversing a path longer than the best path.
