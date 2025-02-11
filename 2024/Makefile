@@ -40,3 +40,7 @@ br-zig:
 	zig build run
 run-zig:
 	./$(ZIG_BIN_DIR)/$(ZIG_BIN)
+run-js:
+	node src/main.js
+watch-js:
+	node --watch src/main.js
