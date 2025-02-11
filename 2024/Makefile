@@ -43,4 +43,5 @@ run-zig:
 run-js:
 	node src/main.js
 watch-js:
-	node --watch src/main.js
+	fswatch -ro ./src ./input | xargs -n1 -I{} make run-js
+#	node --watch src/main.js

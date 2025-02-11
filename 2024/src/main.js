@@ -37,24 +37,48 @@ async function main() {
   console.log('aoc 2024');
   for(let i = 0; i < dayArgsArr.length; ++i) {
     let currDayArgs = dayArgsArr[i];
-    let lines = files.getInputLines(currDayArgs.inputFileName);
-    let start;
-    let end;
-    let partMs;
-    console.log(`Day ${currDayArgs.day}`);
-    if(currDayArgs.part1Fn !== undefined) {
-      start = process.hrtime.bigint();
-      let pt1Res = currDayArgs.part1Fn(lines);
-      end = process.hrtime.bigint();
-      partMs = Number(end - start) / NS_IN_MS;
-      console.log(`Part 1: ${pt1Res} | ${partMs} ms`);
-    }
-    if(currDayArgs.part2Fn !== undefined) {
-      start = process.hrtime.bigint();
-      let pt2Res = currDayArgs.part2Fn(lines);
-      end = process.hrtime.bigint();
-      partMs = Number(end - start) / NS_IN_MS;
-      console.log(`Part 2: ${pt2Res} | ${partMs} ms`);
-    }
+    runDay(currDayArgs.day, currDayArgs.inputFileName, currDayArgs.part1Fn, currDayArgs.part2Fn);
   }
+}
+
+function runDay(day, inputFileName, part1Fn, part2Fn) {
+  let dayBanner = `~ Day ${day} ~`;
+  let inputLines = files.getInputLines(inputFileName);
+  let ptRes;
+  process.stdout.write(`${dayBanner}\n`);
+  let totalStart = process.hrtime.bigint();
+  if(part1Fn !== undefined) {
+    ptRes = runPart(1, inputLines, part1Fn);
+    printPart(ptRes);
+  }
+  if(part2Fn !== undefined) {
+    ptRes = runPart(2, inputLines, part2Fn);
+    printPart(ptRes);
+  }
+  let totalEnd = process.hrtime.bigint();
+  let totalMs = Number(totalEnd - totalStart) / NS_IN_MS;
+  let divWidth = 6;
+  let divStr = '-'.repeat(divWidth);
+  let totalTxt = 'total';
+  let totalStr = `${totalTxt}: ${totalMs} ms`;
+  process.stdout.write(`${totalStr}\n${divStr}\n`);
+}
+
+function printPart(partRes) {
+  let partMs = partRes.elapsedNs / NS_IN_MS;
+  let partStr = `Part ${partRes.partNum}: ${partRes.solution} | ${partMs} ms`;
+  process.stdout.write(`${partStr}\n`);
+}
+
+function runPart(partNum, inputLines, partFn) {
+  let startTime = process.hrtime.bigint();
+  let solution = partFn(inputLines);
+  let endTime = process.hrtime.bigint();
+  let elapsedNs = Number(endTime - startTime);
+  let partRes = {
+    partNum,
+    elapsedNs,
+    solution, 
+  };
+  return partRes;
 }
