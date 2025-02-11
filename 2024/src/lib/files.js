@@ -15,5 +15,9 @@ function getInputLines(inputFileName) {
   ].join(path.sep);
   let fileData = fs.readFileSync(inputFilePath).toString();
   let lines = fileData.split("\n");
+  /* omit one newline if exists for parity */
+  if(lines[lines.length - 1].length === 0) {
+    lines.splice(-1);
+  }
   return lines;
 }

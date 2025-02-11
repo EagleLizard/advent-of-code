@@ -1,5 +1,6 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
+import stylistic from '@stylistic/eslint-plugin';
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
@@ -7,6 +8,9 @@ const config = [
   {languageOptions: { globals: globals.node }},
   pluginJs.configs.recommended,
   {
+    plugins: {
+      '@stylistic': stylistic,
+    },
     rules: {
       indent: [
         'error',
@@ -16,7 +20,11 @@ const config = [
           'SwitchCase': 1
         }
       ],
-      semi: "error"
+      semi: "error",
+      eqeqeq: [ 'error', 'always' ],
+      // '@stylistic/array-bracket-spacing': [
+      //   'error', 'always', { 'objectsInArrays': false, 'arraysInArrays': false }
+      // ],
     },
   },
 ];

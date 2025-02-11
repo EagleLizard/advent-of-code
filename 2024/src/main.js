@@ -3,12 +3,22 @@ const files = require('./lib/files');
 
 const day1 = require('./day1/day1');
 
-const DAY_1_FILE_NAME = 'day1_test1.txt';
-// const DAY_1_FILE_NAME = "day1.txt";
+const NS_IN_MS = 1e6;
+
+// const DAY_1_FILE_NAME = 'day1_test1.txt';
+const DAY_1_FILE_NAME = "day1.txt";
 
 const dayArgsArr = [
-  [1, DAY_1_FILE_NAME, day1.day1Pt1, undefined],
-];
+  [1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2],
+].map(dayArgsTuple => {
+  let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
+  return {
+    day,
+    inputFileName,
+    part1Fn,
+    part2Fn,
+  };
+});
 
 (async () => {
   try {
@@ -23,12 +33,24 @@ async function main() {
   console.log("aoc 2024");
   for(let i = 0; i < dayArgsArr.length; ++i) {
     let currDayArgs = dayArgsArr[i];
-    let lines = files.getInputLines(currDayArgs[1]);
-    console.log(`Day ${currDayArgs[0]}`);
-    if(currDayArgs[2] !== undefined) {
-      let pt1Res = currDayArgs[2](lines);
-      console.log(`Part 1: ${pt1Res}`);
+    let lines = files.getInputLines(currDayArgs.inputFileName);
+    let start;
+    let end;
+    let partMs;
+    console.log(`Day ${currDayArgs.day}`);
+    if(currDayArgs.part1Fn !== undefined) {
+      start = process.hrtime.bigint();
+      let pt1Res = currDayArgs.part1Fn(lines);
+      end = process.hrtime.bigint();
+      partMs = Number(end - start) / NS_IN_MS;
+      console.log(`Part 1: ${pt1Res} | ${partMs} ms`);
     }
-
+    if(currDayArgs.part2Fn !== undefined) {
+      start = process.hrtime.bigint();
+      let pt2Res = currDayArgs.part2Fn(lines);
+      end = process.hrtime.bigint();
+      partMs = Number(end - start) / NS_IN_MS;
+      console.log(`Part 2: ${pt2Res} | ${partMs} ms`);
+    }
   }
 }
