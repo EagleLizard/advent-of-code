@@ -6,7 +6,27 @@ module.exports = {
 };
 
 function day1Pt2(inputLines) {
-  return -1;
+  let day1Input = parseInput(inputLines);
+  let list1 = day1Input.list1;
+  let list2 = day1Input.list2;
+  let countMap = {};
+  for(let i = 0; i < list1.length; ++i) {
+    let currKey = list1[i];
+    countMap[currKey] = countMap[currKey] ?? 0;
+    for(let k = 0; k < list2.length; ++k) {
+      if(list2[k] === currKey) {
+        countMap[currKey]++;
+      }
+    }
+  }
+  let similarityScore = 0;
+  let countMapKeys = Object.keys(countMap);
+  for(let i = 0; i < countMapKeys.length; ++i) {
+    let currKey = countMapKeys[i];
+    let currVal = countMap[currKey];
+    similarityScore += currKey * currVal;
+  }
+  return similarityScore;
 }
 
 function day1Pt1(inputLines) {
