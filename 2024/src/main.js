@@ -1,5 +1,6 @@
 
 const files = require('./lib/files');
+const cliColors = require('./util/cli-colors');
 
 const day1 = require('./day1/day1');
 const day7 = require('./day7/day7-main');
@@ -24,6 +25,15 @@ const dayArgsArr = [
   };
 });
 
+const t = {
+  c1: cliColors.colors.green_bright,
+  c2: cliColors.colors.cyan,
+  c3: cliColors.colors.pear,
+  c4: cliColors.colors.white_bright,
+  italic: cliColors.italic,
+  underline: cliColors.underline,
+};
+
 (async () => {
   try {
     await main();
@@ -34,39 +44,61 @@ const dayArgsArr = [
 })();
 
 async function main() {
-  console.log('aoc 2024');
+  let bannerStr = getAocBanner(t);
+  process.stdout.write(`\n${bannerStr}\n\n`);
   for(let i = 0; i < dayArgsArr.length; ++i) {
     let currDayArgs = dayArgsArr[i];
-    runDay(currDayArgs.day, currDayArgs.inputFileName, currDayArgs.part1Fn, currDayArgs.part2Fn);
+    runDay(t, currDayArgs.day, currDayArgs.inputFileName, currDayArgs.part1Fn, currDayArgs.part2Fn);
   }
 }
 
-function runDay(day, inputFileName, part1Fn, part2Fn) {
-  let dayBanner = `~ Day ${day} ~`;
+function runDay(t, day, inputFileName, part1Fn, part2Fn) {
+  let dayBannerTxt = `~ Day ${day} ~`;
+  let dayBanner = t.c1(dayBannerTxt);
   let inputLines = files.getInputLines(inputFileName);
   let ptRes;
   process.stdout.write(`${dayBanner}\n`);
   let totalStart = process.hrtime.bigint();
   if(part1Fn !== undefined) {
     ptRes = runPart(1, inputLines, part1Fn);
-    printPart(ptRes);
+    printPart(t, ptRes);
   }
   if(part2Fn !== undefined) {
     ptRes = runPart(2, inputLines, part2Fn);
-    printPart(ptRes);
+    printPart(t, ptRes);
   }
   let totalEnd = process.hrtime.bigint();
   let totalMs = Number(totalEnd - totalStart) / NS_IN_MS;
   let divWidth = 6;
   let divStr = '-'.repeat(divWidth);
-  let totalTxt = 'total';
-  let totalStr = `${totalTxt}: ${totalMs} ms`;
+  let totalTxt = t.c1('total');
+  let totalTimeStr = t.c2(`${totalMs} ms`);
+  let totalStr = t.italic(`${totalTxt}: ${totalTimeStr}`);
   process.stdout.write(`${totalStr}\n${divStr}\n`);
 }
 
-function printPart(partRes) {
+function getAocBanner(t) {
+  let padStr = '~';
+  let left = t.c1(padStr);
+  let right = t.c1(padStr);
+  let bannerTxt = ' Advent of Code 2024 [js] ';
+  let bannerTxtStr = t.c4(bannerTxt);
+  let bannerTxtLine = `${left}${bannerTxtStr}${right}`;
+  let topTxt = padStr.repeat(bannerTxt.length + (padStr.length * 2));
+  let bottomTxt = topTxt;
+  let top = t.c1(topTxt);
+  // let bottom = t.underline(t.c1(bottomTxt));
+  let bottom = t.c1(bottomTxt);
+  let bannerStr = `${top}\n${bannerTxtLine}\n${bottom}`;
+  return bannerStr;
+}
+
+function printPart(t, partRes) {
   let partMs = partRes.elapsedNs / NS_IN_MS;
-  let partStr = `Part ${partRes.partNum}: ${partRes.solution} | ${partMs} ms`;
+  let solutionStr = t.c3(partRes.solution);
+  let timeStr = t.c2(`${partMs} ms`);
+  let partTxt = t.c1(`Part ${partRes.partNum}`);
+  let partStr = `${partTxt}: ${solutionStr} | ${timeStr}`;
   process.stdout.write(`${partStr}\n`);
 }
 
