@@ -1,10 +1,10 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
+import globals from 'globals';
+import pluginJs from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
-  {files: ["**/*.js"], languageOptions: {sourceType: "commonjs"}},
+  {files: [ '**/*.js' ], languageOptions: {sourceType: 'commonjs'}},
   {languageOptions: { globals: globals.node }},
   pluginJs.configs.recommended,
   {
@@ -20,11 +20,12 @@ const config = [
           'SwitchCase': 1
         }
       ],
-      semi: "error",
+      semi: 'error',
       eqeqeq: [ 'error', 'always' ],
-      // '@stylistic/array-bracket-spacing': [
-      //   'error', 'always', { 'objectsInArrays': false, 'arraysInArrays': false }
-      // ],
+      quotes: [ 'error', 'single' ],
+      'no-multiple-empty-lines': [ 'error', { 'max': 1, 'maxBOF': 1 }],
+      '@stylistic/array-bracket-spacing': [ 'error', 'always', { 'objectsInArrays': false, 'arraysInArrays': false }],
+      '@stylistic/eol-last': [ 'error', 'always' ]
     },
   },
 ];

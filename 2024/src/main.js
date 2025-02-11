@@ -2,14 +2,18 @@
 const files = require('./lib/files');
 
 const day1 = require('./day1/day1');
+const day7 = require('./day7/day7-main');
 
 const NS_IN_MS = 1e6;
 
 // const DAY_1_FILE_NAME = 'day1_test1.txt';
-const DAY_1_FILE_NAME = "day1.txt";
+const DAY_1_FILE_NAME = 'day1.txt';
+// const DAY_7_FILE_NAME = 'day7_test.txt';
+const DAY_7_FILE_NAME = 'day7.txt';
 
 const dayArgsArr = [
-  [1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2],
+  [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
+  [ 7, DAY_7_FILE_NAME, day7.day7Part1, undefined ],
 ].map(dayArgsTuple => {
   let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
   return {
@@ -30,7 +34,7 @@ const dayArgsArr = [
 })();
 
 async function main() {
-  console.log("aoc 2024");
+  console.log('aoc 2024');
   for(let i = 0; i < dayArgsArr.length; ++i) {
     let currDayArgs = dayArgsArr[i];
     let lines = files.getInputLines(currDayArgs.inputFileName);
