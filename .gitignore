@@ -34,3 +34,7 @@ Cargo.lock
 
 2024/bin
 2024/tmp
+
+# Zig
+.zig-cache
+zig-out
