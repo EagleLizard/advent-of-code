@@ -8,7 +8,10 @@ module.exports = {
 
 function day7Part1(inputLines) {
   let equations = parseInput(inputLines);
-  let ops = [ '+', '*' ];
+  let ops = [
+    '+',
+    '*',
+  ];
   let calibrationRes = 0;
   for(let i = 0; i < equations.length; ++i) {
     let equation = equations[i];
@@ -23,7 +26,11 @@ function day7Part1(inputLines) {
 
 function day7Part2(inputLines) {
   let equations = parseInput(inputLines);
-  let ops = [ '+', '*', '||' ];
+  let ops = [
+    '+',
+    '*',
+    '||',
+  ];
   let calibrationRes = 0;
   for(let i = 0; i < equations.length; ++i) {
     let equation = equations[i];
@@ -73,7 +80,6 @@ function parseInput(inputLines) {
   let equations = [];
   for(let i = 0; i < inputLines.length; ++i) {
     let inputLine = inputLines[i];
-    // let rx = /^([0-9]+):(\s[0-9]+)+$/g;
     let [ testValStr, numsStr ] = inputLine.split(':');
     let numStrs = [ ...numsStr.matchAll(/[0-9]+/g) ].map(rxExecArr => rxExecArr[0]);
     let testVal = +testValStr;
