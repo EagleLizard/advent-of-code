@@ -3,6 +3,7 @@ const assert = require('assert');
 
 module.exports = {
   day7Part1,
+  day7Part2,
 };
 
 function day7Part1(inputLines) {
@@ -17,6 +18,20 @@ function day7Part1(inputLines) {
     }
     // console.log(`${equation.testVal}: ${equation.nums.join(' ')} - ${solvable}`);
   }
+  return calibrationRes;
+}
+
+function day7Part2(inputLines) {
+  let equations = parseInput(inputLines);
+  let ops = [ '+', '*', '||' ];
+  let calibrationRes = 0;
+  for(let i = 0; i < equations.length; ++i) {
+    let equation = equations[i];
+    let solvable = checkSolvable(equation.testVal, equation.nums, ops);
+    if(solvable) {
+      calibrationRes += equation.testVal;
+    }
+  }  
   return calibrationRes;
 }
 
@@ -47,6 +62,8 @@ function doOp(op, a, b) {
       return a + b;
     case '*':
       return a * b;
+    case '||':
+      return +`${a}${b}`;
     default:
       throw new Error(`Invalid op: ${op}`);
   }
