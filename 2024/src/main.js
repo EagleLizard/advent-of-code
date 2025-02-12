@@ -16,7 +16,7 @@ const DAY_9_FILE_NAME = 'day9.txt';
 // const DAY_9_FILE_NAME = 'day9_test1.txt';
 // const DAY_9_FILE_NAME = 'day9_test2.txt';
 
-const dayArgsArr = [
+const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
   [ 7, DAY_7_FILE_NAME, day7.day7Part1, day7.day7Part2 ],
   [ 9, DAY_9_FILE_NAME, day9.day9Part1, day9.day9Part2 ],
@@ -49,12 +49,35 @@ const t = {
 })();
 
 async function main() {
+  let dayArgsArr = DAY_ARGS_ARR.slice();
+  let argv = process.argv.slice();
+  let cliOpts = parseArgv(argv);
+
+  if(cliOpts.day !== undefined && cliOpts.day > 0) {
+    dayArgsArr = dayArgsArr.filter(daysArgs => {
+      return daysArgs.day === cliOpts.day;
+    });
+  }
   let bannerStr = getAocBanner(t);
   process.stdout.write(`\n${bannerStr}\n\n`);
   for(let i = 0; i < dayArgsArr.length; ++i) {
     let currDayArgs = dayArgsArr[i];
     runDay(t, currDayArgs.day, currDayArgs.inputFileName, currDayArgs.part1Fn, currDayArgs.part2Fn);
   }
+}
+
+function parseArgv(argv) {
+  let args = argv.slice(2);
+  let dayArg;
+  let cliOpts = {
+    day: undefined,
+  };
+
+  /* simple for now - only one arg */
+  if(args[0] === '-d' && !isNaN((dayArg = +args[1]))) {
+    cliOpts.day = dayArg;
+  }
+  return cliOpts;
 }
 
 function runDay(t, day, inputFileName, part1Fn, part2Fn) {

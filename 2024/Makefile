@@ -41,7 +41,7 @@ br-zig:
 run-zig:
 	./$(ZIG_BIN_DIR)/$(ZIG_BIN)
 run-js:
-	node src/main.js
+	node src/main.js -d $(day)
 watch-js:
 	fswatch -ro ./src ./input | xargs -n1 -I{} make run-js
 #	node --watch src/main.js
