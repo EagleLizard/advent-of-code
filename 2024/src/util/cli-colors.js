@@ -11,8 +11,9 @@ const colors = {
   green_bright: rgb(140, 255, 123),
   chartreuse: rgb(127, 255, 0),
   chartreuse_light: rgb(190, 255, 125),
-  // peach: rgb(255, 197, 109),
-  // pink: rgb(247, 173, 209),
+  peach: rgb(255, 197, 109),
+  peach_light: rgb(255, 197, 109),
+  pink: rgb(247, 173, 209),
   cyan: rgb(142, 250, 253),
 };
 

@@ -4,6 +4,7 @@ const cliColors = require('./util/cli-colors');
 
 const day1 = require('./day1/day1');
 const day7 = require('./day7/day7-main');
+const day9 = require('./day9/day9-main');
 
 const NS_IN_MS = 1e6;
 
@@ -11,10 +12,14 @@ const NS_IN_MS = 1e6;
 const DAY_1_FILE_NAME = 'day1.txt';
 // const DAY_7_FILE_NAME = 'day7_test.txt';
 const DAY_7_FILE_NAME = 'day7.txt';
+const DAY_9_FILE_NAME = 'day9.txt';
+// const DAY_9_FILE_NAME = 'day9_test1.txt';
+// const DAY_9_FILE_NAME = 'day9_test2.txt';
 
 const dayArgsArr = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
   [ 7, DAY_7_FILE_NAME, day7.day7Part1, day7.day7Part2 ],
+  [ 9, DAY_9_FILE_NAME, day9.day9Part1, undefined ],
 ].map(dayArgsTuple => {
   let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
   return {
@@ -26,7 +31,7 @@ const dayArgsArr = [
 });
 
 const t = {
-  c1: cliColors.colors.green_bright,
+  c1: cliColors.colors.chartreuse_light,
   c2: cliColors.colors.cyan,
   c3: cliColors.colors.pear,
   c4: cliColors.colors.white_bright,
