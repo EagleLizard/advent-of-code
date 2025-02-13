@@ -29,3 +29,7 @@ This works because each gap can only ever be filled - new gaps won't be created 
 I initially got a wrong answer. This was because as I moved from the back of the disk, I would look for open gaps even if the gap started after the reverse pointer. Once I fixed that, the correct solution presented itself.
 
 The solution takes ~1.2s, which is not bad but also not great. I can't think of any obvious optimizations right now.
+
+### `[02/12/2025][js]`
+
+The current naive implementation takes ~305ms.
