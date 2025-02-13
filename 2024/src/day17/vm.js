@@ -12,6 +12,33 @@ class VM {
     this.outBuf = undefined;
   }
 
+  /*
+    0 adv -
+      divide val in A by operand^2
+      write to A
+    1 bxl -
+      bitwise XOR of B and operand (literal)
+      write to B
+    2 bst -
+      combo operand % 8
+      write to B
+    3 jnz -
+      if A == 0, do nothing.
+        Else, jump to instruction at operand (literal)
+        Instruction pointer does not increment by 2 after jnz
+    4 bxc - 
+      bitwise XOR of B and C
+      write to B
+    5 out - 
+      calculate value of combo operand % 8
+      output result
+    6 bdv - 
+      same as adv
+      write to B
+    7 cdv -
+      same as adv
+      write to C
+    _*/
   step() {
     let opcode = this.instructions[this.instPtr];
     let operand = this.instructions[this.instPtr + 1];
@@ -19,6 +46,16 @@ class VM {
       /* adv */
       case 0:
         this.a = Math.floor(this.a / (2 ** this.getCombo(operand)));
+        this.instPtr += 2;
+        break;
+      /* bxl */
+      case 1:
+        this.b ^= operand;
+        this.instPtr += 2;
+        break;
+      /* bst */
+      case 2:
+        this.b = this.getCombo(operand) % 8;
         this.instPtr += 2;
         break;
       /* jnz */
@@ -29,9 +66,24 @@ class VM {
           this.instPtr += 2;
         }
         break;
+      /* bxc */
+      case 4:
+        this.b ^= this.c;
+        this.instPtr += 2;
+        break;
       /* out */
       case 5:
         this.outBuf.push(this.getCombo(operand) % 8);
+        this.instPtr += 2;
+        break;
+      /* bdv */
+      case 6:
+        this.b = Math.floor(this.a / (2 ** this.getCombo(operand)));
+        this.instPtr += 2;
+        break;
+      /* cdv */
+      case 7:
+        this.c = Math.floor(this.a / (2 ** this.getCombo(operand)));
         this.instPtr += 2;
         break;
     }
@@ -66,34 +118,6 @@ class VM {
     this.outBuf = [];
   }
 }
-
-/*
-0 adv -
-  divide val in A by operand^2
-  write to A
-1 bxl -
-  bitwise XOR of B and operand (literal)
-  write to B
-2 bst -
-  combo operand % 8
-  write to B
-3 jnz -
-  if A == 0, do nothing.
-    Else, jump to instruction at operand (literal)
-    Instruction pointer does not increment by 2 after jnz
-4 bxc - 
-  bitwise XOR of B and C
-  write to B
-5 out - 
-  calculate value of combo operand % 8
-  output result
-6 bdv - 
-  same as adv
-  write to B
-7 cdv -
-  same as adv
-  write to C
-_*/
 
 class Program {
   constructor(registers, instructions) {
