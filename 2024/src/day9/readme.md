@@ -33,3 +33,9 @@ The solution takes ~1.2s, which is not bad but also not great. I can't think of 
 ### `[02/12/2025][js]`
 
 The current naive implementation takes ~305ms.
+
+*<u>*Update:</u>*
+
+Implemented the same optimizations as the lua solution.
+
+From ~305ms to ~38ms.
