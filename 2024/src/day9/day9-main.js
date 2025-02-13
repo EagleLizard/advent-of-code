@@ -21,55 +21,80 @@ _*/
 function day9Part2(inputLines) {
   let diskFiles = parseInput(inputLines);
   let disk = getDisk(diskFiles);
-  let defraggedDisk = defragDisk(disk, diskFiles);
+  let defraggedDisk = defragDisk2(disk, diskFiles);
   let checksum = getChecksum(defraggedDisk);
   return checksum;
 }
 
-function defragDisk(disk, diskFiles) {
+function defragDisk2(disk, diskFiles) {
   disk = disk.slice();
   diskFiles = diskFiles.slice();
   diskFiles.sort((a, b) => b.id - a.id);
-  for(let i = 0; i < diskFiles.length; ++i) {
-    let diskFile = diskFiles[i];
-    let diskId = diskFile.id;
-    let idIdx = disk.indexOf(diskId);
-    let blockSize = diskFile.blockSize;
-    let gapIdx = findGapIdx(disk, blockSize, idIdx);
-    if(gapIdx !== -1) {
-      for(let k = 0; k < blockSize; ++k) {
-        /* swap */
-        disk[gapIdx + k] = diskId;
-        disk[idIdx + k] = -1;
+  let diskGaps = getDiskGaps(disk);
+  let currIdIdx = 0;
+  let currId = diskFiles[currIdIdx].id;
+  let idPtr = disk.length - 1;
+  while(idPtr > 0) {
+    let currBlockLen = 0;
+    while(disk[idPtr] !== currId) {
+      idPtr--;
+    }
+    while(disk[idPtr] === currId) {
+      currBlockLen++;
+      idPtr--;
+    }
+    if(currBlockLen < 1) {
+      throw new Error(`invalid state at idPtr: ${idPtr}`);
+    }
+    let foundGapIdx = diskGaps.findIndex((gap) => {
+      return gap.idx < idPtr && gap.len >= currBlockLen;
+    });
+    if(foundGapIdx !== -1) {
+      let foundGap = diskGaps[foundGapIdx];
+      for(let k = 0; k < currBlockLen; ++k) {
+        disk[foundGap.idx + k] = currId;
+        disk[idPtr + 1 + k] = -1;
+      }
+      if(foundGap.len > currBlockLen) {
+        foundGap.idx += currBlockLen;
+        foundGap.len -= currBlockLen;
+      } else {
+        diskGaps.splice(foundGapIdx, 1);
       }
     }
+    currIdIdx++;
+    currId = diskFiles[currIdIdx]?.id;
   }
   return disk;
 }
 
-function findGapIdx(disk, gapSize, endIdx) {
-  endIdx = endIdx ?? disk.length - 1;
-  let gsPtr = 0;
-  let gePtr = -1;
-  while(gsPtr < endIdx) {
-    while(disk[gsPtr] >= 0) {
-      gsPtr++;
+function getDiskGaps(disk) {
+  let diskGaps = [];
+  let parseGap = false;
+  let currGapLen = 0;
+  let gapStartIdx = -1;
+  for(let i = 0; i < disk.length; ++i) {
+    let block = disk[i];
+    if(block === -1) {
+      if(!parseGap) {
+        parseGap = true;
+        gapStartIdx = i;
+      }
+      currGapLen++;
+    } else {
+      if(parseGap) {
+        parseGap = false;
+        let nextGap = {
+          idx: gapStartIdx,
+          len: currGapLen,
+        };
+        diskGaps.push(nextGap);
+        gapStartIdx = -1;
+        currGapLen = 0;
+      }
     }
-    if(gsPtr >= endIdx) {
-      break;
-    }
-    gePtr = gsPtr + 1;
-    while(disk[gePtr] < 0) {
-      gePtr++;
-    }
-    let currGapSize = gePtr - gsPtr;
-    if(currGapSize >= gapSize) {
-      return gsPtr;
-    }
-    gsPtr += currGapSize;
-    gePtr = -1;
   }
-  return -1;
+  return diskGaps;
 }
  
 function getChecksum(disk) {
