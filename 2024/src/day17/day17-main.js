@@ -1,5 +1,6 @@
 
 const { VM, Program } = require('./vm');
+const { VmError } = require('../lib/errors/vm-error');
 
 module.exports = {
   day17Part1,
@@ -64,9 +65,49 @@ function day17Part2(inputLines) {
   a = 0o56006; // 3,5,5,3,0
   a = 0o560064; // 0,3,5,5,3,0
   a = 0o5600644; // 4,0,3,5,5,3,0
+  a = 0o56006446; // 1,4,0,3,5,5,3,0
+  a = 0o5600644607; // 4,5,1,4,0,3,5,5,3,0
+  a = 0o5600644613; // 4,5,1,4,0,3,5,5,3,0
+  a = 0o5600644617; // 4,5,1,4,0,3,5,5,3,0
+  a = 0o5600644625; // 1,1,1,4,0,3,5,5,3,0
+  a = 0o5600644626; // 0,1,1,4,0,3,5,5,3,0
+  a = 0o5600644627; // 4,1,1,4,0,3,5,5,3,0
+  a = 0o5600644630; // 1,2,1,4,0,3,5,5,3,0
+  a = 0o5600644631; // 5,2
+  a = 0o5600644633; // 0,2
+  a = 0o5600644635; // 1,2
+  a = 0o5600644637; // 4,2
+  a = 0o5600644640; // 5,0
+  a = 0o5600644646; // 0,0
+  a = 0o5600644647; // 4,0
+  a = 0o5600644650; // 1,3
+  a = 0o5600644651; // 5,3
+  a = 0o5600644653; // 4,3
+  a = 0o5600644657; // 4,3
+  a = 0o5600644660; // 5,1
+  a = 0o5600644662; // 1,1
+  a = 0o5600644664; // 4,1
+  a = 0o5600644666; // 0,1
+  a = 0o5600644667; // 4,1
+  a = 0o5600644670; // 1,6
+  a = 0o5600644671; // 5,6
+  a = 0o5600644674; // 4,6
+  a = 0o5600644677; // 4,6
+  a = 0o5600644700; // 5,1
+  a = 0o5600644702; // 7,1
+  a = 0o5600644710; // 1,5
+  a = 0o5600644711; // 5,5
+  a = 0o56006546; // 1,4,0,3,5,5,3,0
+  a = 0o56006605; // 1,4,0,3,5,5,3,0
   // a = 0o5600645033031057;
   runPrintRegister(program, a);
-  seekInput(program);
+  try {
+    seekInput(program);
+  } catch(e) {
+    if(e instanceof VmError) {
+      console.log(e);
+    }
+  }
   return -1;
 }
 
@@ -114,6 +155,7 @@ function seekInput(program) {
     let nextA = currA * 8;
     let k = 0;
     let doLoop2 = true;
+    let searchNextInst = false;
     while(doLoop2) {
       let a = nextA + k;
       vm.load(program);
@@ -125,7 +167,9 @@ function seekInput(program) {
           return bufVal === progSoFar[bufIdx];
         }))
       ) {
-        console.log({ progSoFar: progSoFar.join(',') });
+        console.log(a);
+        console.log(`0o${a.toString(8)}`);
+        // console.log({ progSoFar: progSoFar.join(',') });
         console.log(vm.outBuf.join());
         doLoop2 = false;
       } else {
@@ -134,11 +178,21 @@ function seekInput(program) {
           /* 
             We should only seek so far as the current octal digit,
               as additional octal digits in the A register will
-              result in additional output
-          */
-          throw new Error(`k: ${k}, i: ${i}`);
+              result in additional outputs
+          _*/
+          doLoop2 = false;
+          searchNextInst = true;
+          // throw new Error(`k: ${k}, i: ${i}`);
         }
       }
+    }
+    if(searchNextInst) {
+      console.log({
+        nextInst,
+        progSoFar: progSoFar.join(','),
+      });
+      searchNextInst = false;
+      throw new VmError(`k: ${k}, i: ${i}`);
     }
     currA = nextA + k;
     i++;
@@ -153,7 +207,7 @@ function seekInput(program) {
 
 function runPrintRegister(program, aVal) {
   let vm = new VM();
-  console.log(program.instructions.toReversed().join(','));
+  // console.log(program.instructions.toReversed().join(','));
   vm.load(program);
   vm.a = aVal;
   let doLoop = true;
@@ -172,7 +226,7 @@ function runPrintRegister(program, aVal) {
       doLoop = false;
     }
   }
-  console.log(vm.outBuf);
+  console.log(vm.outBuf.join(','));
 }
 
 function runProgDescA(program, initA) {
