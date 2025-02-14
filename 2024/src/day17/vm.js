@@ -87,7 +87,14 @@ class VM {
         this.instPtr += 2;
         break;
     }
-    return this.instPtr < this.instructions.length;
+    if(this.instPtr >= this.instructions.length) {
+      return false;
+    }
+    return {
+      opcode,
+      operand,
+    };
+    // return this.instPtr < this.instructions.length;
   }
 
   getCombo(operand) {
@@ -116,6 +123,7 @@ class VM {
     this.instructions = program.instructions.slice();
     this.program = program;
     this.outBuf = [];
+    this.instPtr = 0;
   }
 }
 

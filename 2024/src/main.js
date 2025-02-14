@@ -17,14 +17,14 @@ const DAY_9_FILE_NAME = 'day9.txt';
 // const DAY_9_FILE_NAME = 'day9_test1.txt';
 // const DAY_9_FILE_NAME = 'day9_test2.txt';
 // const DAY_17_FILE_NAME = 'day17_test.txt';
-// const DAY_17_FILE_NAME = 'day17_test2.txt';
-const DAY_17_FILE_NAME = 'day17.txt';
+const DAY_17_FILE_NAME = 'day17_test2.txt';
+// const DAY_17_FILE_NAME = 'day17.txt';
 
 const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
   [ 7, DAY_7_FILE_NAME, day7.day7Part1, day7.day7Part2 ],
   [ 9, DAY_9_FILE_NAME, day9.day9Part1, day9.day9Part2 ],
-  [ 17, DAY_17_FILE_NAME, day17.day17Part1, undefined ],
+  [ 17, DAY_17_FILE_NAME, day17.day17Part1, day17.day17Part2 ],
 ].map(dayArgsTuple => {
   let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
   return {
