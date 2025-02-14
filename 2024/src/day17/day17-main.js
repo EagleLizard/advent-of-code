@@ -100,7 +100,7 @@ function day17Part2(inputLines) {
   a = 0o56006546; // 1,4,0,3,5,5,3,0
   a = 0o56006605; // 1,4,0,3,5,5,3,0
   // a = 0o5600645033031057;
-  runPrintRegister(program, a);
+  runPrintRegister(program, BigInt(a));
   try {
     seekInput(program);
   } catch(e) {
@@ -125,7 +125,7 @@ function seekInput(program) {
   let vm = new VM();
   while(doLoop) {
     vm.load(program);
-    vm.a = i;
+    vm.a = BigInt(i);
     while(vm.step());
     if(
       (lastInst[0] === vm.outBuf[0])
@@ -136,24 +136,24 @@ function seekInput(program) {
       i++;
     }
   }
-  let initA = i;
+  let initA = BigInt(i);
   console.log(initA);
   console.log(initA.toString(8));
   /* 
     All future values of A will begin with the octal that produced the last instruction,
       and additional outputs will be prefixed by appending in octal
   _*/
-  console.log((initA * 8).toString(8));
+  console.log((initA * 8n).toString(8));
   doLoop = true;
-  i = 0;
+  i = 0n;
   let currA = initA;
   let progSoFar = [ ...lastInst ];
   // console.log({ progSoFar });
   while(doLoop && (instructions.length > 0)) {
     let nextInst = instructions.pop();
     progSoFar.unshift(nextInst);
-    let nextA = currA * 8;
-    let k = 0;
+    let nextA = currA * 8n;
+    let k = 0n;
     let doLoop2 = true;
     let searchNextInst = false;
     while(doLoop2) {
@@ -170,11 +170,12 @@ function seekInput(program) {
         console.log(a);
         console.log(`0o${a.toString(8)}`);
         // console.log({ progSoFar: progSoFar.join(',') });
+        // console.log(vm.outBuf);
         console.log(vm.outBuf.join());
         doLoop2 = false;
       } else {
         k++;
-        if(k > 7) {
+        if(k > 7n) {
           /* 
             We should only seek so far as the current octal digit,
               as additional octal digits in the A register will
@@ -190,6 +191,7 @@ function seekInput(program) {
       console.log({
         nextInst,
         progSoFar: progSoFar.join(','),
+        // progSoFarN: progSoFar,
       });
       searchNextInst = false;
       throw new VmError(`k: ${k}, i: ${i}`);

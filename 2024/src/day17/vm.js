@@ -1,10 +1,10 @@
 
 class VM {
   constructor(){
-    this.a = 0;
-    this.b = 0;
-    this.c = 0;
-    this.instPtr = 0;
+    this.a = 0n;
+    this.b = 0n;
+    this.c = 0n;
+    this.instPtr = 0n;
 
     this.program = undefined;
     this.instructions = undefined;
@@ -41,50 +41,51 @@ class VM {
     _*/
   step() {
     let opcode = this.instructions[this.instPtr];
-    let operand = this.instructions[this.instPtr + 1];
+    let operand = this.instructions[this.instPtr + 1n];
+
     switch(opcode) {
       /* adv */
-      case 0:
-        this.a = Math.floor(this.a / (2 ** this.getCombo(operand)));
-        this.instPtr += 2;
+      case 0n:
+        this.a = this.a / (2n ** this.getCombo(operand));
+        this.instPtr += 2n;
         break;
       /* bxl */
-      case 1:
-        this.b ^= operand;
-        this.instPtr += 2;
+      case 1n:
+        this.b = this.b ^ operand;
+        this.instPtr += 2n;
         break;
       /* bst */
-      case 2:
-        this.b = this.getCombo(operand) % 8;
-        this.instPtr += 2;
+      case 2n:
+        this.b = this.getCombo(operand) % 8n;
+        this.instPtr += 2n;
         break;
       /* jnz */
-      case 3:
-        if(this.a !== 0) {
+      case 3n:
+        if(this.a !== 0n) {
           this.instPtr = operand;
         } else {
-          this.instPtr += 2;
+          this.instPtr += 2n;
         }
         break;
       /* bxc */
-      case 4:
+      case 4n:
         this.b ^= this.c;
-        this.instPtr += 2;
+        this.instPtr += 2n;
         break;
       /* out */
-      case 5:
-        this.outBuf.push(this.getCombo(operand) % 8);
-        this.instPtr += 2;
+      case 5n:
+        this.outBuf.push(this.getCombo(operand) % 8n);
+        this.instPtr += 2n;
         break;
       /* bdv */
-      case 6:
-        this.b = Math.floor(this.a / (2 ** this.getCombo(operand)));
-        this.instPtr += 2;
+      case 6n:
+        this.b = this.a / (2n ** this.getCombo(operand));
+        this.instPtr += 2n;
         break;
       /* cdv */
-      case 7:
-        this.c = Math.floor(this.a / (2 ** this.getCombo(operand)));
-        this.instPtr += 2;
+      case 7n:
+        this.c = this.a / (2n ** this.getCombo(operand));
+        this.instPtr += 2n;
         break;
     }
     if(this.instPtr >= this.instructions.length) {
@@ -99,18 +100,18 @@ class VM {
 
   getCombo(operand) {
     switch(operand) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
+      case 0n:
+      case 1n:
+      case 2n:
+      case 3n:
         return operand;
-      case 4:
+      case 4n:
         return this.a;
-      case 5:
+      case 5n:
         return this.b;
-      case 6:
+      case 6n:
         return this.c;
-      case 7:
+      case 7n:
         // invalid
     }
     return;
@@ -123,18 +124,18 @@ class VM {
     this.instructions = program.instructions.slice();
     this.program = program;
     this.outBuf = [];
-    this.instPtr = 0;
+    this.instPtr = 0n;
   }
 }
 
 class Program {
   constructor(registers, instructions) {
     this.registers = {
-      a: registers.a,
-      b: registers.b,
-      c: registers.c,
+      a: BigInt(registers.a),
+      b: BigInt(registers.b),
+      c: BigInt(registers.c),
     };
-    this.instructions = instructions.slice();
+    this.instructions = instructions.slice().map(n => BigInt(n));
   }
 }
 
