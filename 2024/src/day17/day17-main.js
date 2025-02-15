@@ -97,15 +97,15 @@ function day17Part2(inputLines) {
   a = 0o5600644702; // 7,1
   a = 0o5600644710; // 1,5
   a = 0o5600644711; // 5,5
-  a = 0o56006546; // 1,4,0,3,5,5,3,0
-  a = 0o56006605; // 1,4,0,3,5,5,3,0
+  a = 0o56006446; // 1,4,0,3,5,5,3,0
+  a = 0o56006470; //
   // a = 0o5600645033031057;
-  runPrintRegister(program, BigInt(a));
+  // runPrintRegister(program, BigInt(a));
   try {
     seekInput(program);
   } catch(e) {
     if(e instanceof VmError) {
-      console.log(e);
+      console.log(`${e.name}: ${e.message}\n${e.stack?.split('\n')[1]}`);
     }
   }
   return -1;
@@ -148,6 +148,7 @@ function seekInput(program) {
   i = 0n;
   let currA = initA;
   let progSoFar = [ ...lastInst ];
+  let kStack = [];
   // console.log({ progSoFar });
   while(doLoop && (instructions.length > 0)) {
     let nextInst = instructions.pop();
@@ -155,7 +156,7 @@ function seekInput(program) {
     let nextA = currA * 8n;
     let k = 0n;
     let doLoop2 = true;
-    let searchNextInst = false;
+    let backTrack = false;
     while(doLoop2) {
       let a = nextA + k;
       vm.load(program);
@@ -169,10 +170,12 @@ function seekInput(program) {
       ) {
         console.log(a);
         console.log(`0o${a.toString(8)}`);
+        console.log(`k: ${k}`);
         // console.log({ progSoFar: progSoFar.join(',') });
         // console.log(vm.outBuf);
         console.log(vm.outBuf.join());
         doLoop2 = false;
+        kStack.push(k);
       } else {
         k++;
         if(k > 7n) {
@@ -182,18 +185,19 @@ function seekInput(program) {
               result in additional outputs
           _*/
           doLoop2 = false;
-          searchNextInst = true;
+          backTrack = true;
           // throw new Error(`k: ${k}, i: ${i}`);
         }
       }
     }
-    if(searchNextInst) {
+    if(backTrack) {
       console.log({
         nextInst,
         progSoFar: progSoFar.join(','),
         // progSoFarN: progSoFar,
+        kStack: kStack,
       });
-      searchNextInst = false;
+      backTrack = false;
       throw new VmError(`k: ${k}, i: ${i}`);
     }
     currA = nextA + k;
