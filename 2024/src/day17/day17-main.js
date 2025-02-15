@@ -4,7 +4,8 @@ const { VmError } = require('../lib/errors/vm-error');
 
 module.exports = {
   day17Part1,
-  day17Part2,
+  // day17Part2,
+  day17Part2: day17Part2_2,
 };
 
 /*
@@ -17,6 +18,62 @@ function day17Part1(inputLines) {
   while(vm.step());
   let outStr = vm.outBuf.join(',');
   return outStr;
+}
+
+function day17Part2_2(inputLines) {
+  let program = parseInput(inputLines);
+  seekInput2(program);
+}
+
+function seekInput2(program) {
+  let instructions = program.instructions.slice();
+  console.log(instructions.join(','));
+  let progPtr = instructions.length - 1;
+  let doLoop = true;
+  // let currA = 0;
+  let aStack = [ 0n ];
+  let kStack = [];
+  let progSoFar = [];
+  let iterCount = 0;
+  while(doLoop) {
+    let currInst = instructions[progPtr];
+    console.log({currInst});
+    /*
+      find the value of A that produces the current instruction
+    _*/
+    let currA = aStack[aStack.length - 1] * 8n;
+    let k = 0n;
+    let advMag = false;
+    while(k < 8n && !advMag) {
+      let a = currA + k;
+      let vm = new VM();
+      vm.load(program);
+      vm.a = a;
+      while(vm.step());
+      if(vm.outBuf[0] === currInst) {
+        console.log(vm.outBuf);
+        aStack.push(a);
+        kStack.push(k);
+        progSoFar.push(vm.outBuf[0]);
+        advMag = true;
+      } else {
+        k++;
+      }
+    }
+    if(advMag) {
+      console.log({
+        // aStack,
+        kStack: kStack.join(','),
+        progSoFar: progSoFar.toReversed().join(','),
+      });
+      progPtr--;
+    } else {
+      console.log('backtrack');
+    }
+    if(iterCount++ > 7) {
+      doLoop = false;
+    }
+  }
 }
 
 function day17Part2(inputLines) {
