@@ -30,6 +30,10 @@ function day17Part2(inputLines) {
   vm.a = aVal;
   while(vm.step());
   for(let i = 0; i < program.instructions.length; ++i) {
+    /*
+      Validate the correct A value by rerunning the program,
+        test if the vm outputs the original program
+    _*/
     assert(program.instructions[i] === vm.outBuf[i]);
   }
   return aVal;
