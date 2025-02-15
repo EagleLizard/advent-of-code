@@ -1,6 +1,7 @@
 
 const { VM, Program } = require('./vm');
 const { VmError } = require('../lib/errors/vm-error');
+const assert = require('assert');
 
 module.exports = {
   day17Part1,
@@ -20,9 +21,20 @@ function day17Part1(inputLines) {
   return outStr;
 }
 
+/*
+202367025818154 - correct
+_*/
 function day17Part2_2(inputLines) {
   let program = parseInput(inputLines);
-  seekInput2(program);
+  let aVal = seekInput2(program);
+  let vm = new VM();
+  vm.load(program);
+  vm.a = aVal;
+  while(vm.step());
+  for(let i = 0; i < program.instructions.length; ++i) {
+    assert(program.instructions[i] === vm.outBuf[i]);
+  }
+  return aVal;
 }
 
 function seekInput2(program) {
@@ -32,17 +44,30 @@ function seekInput2(program) {
   let doLoop = true;
   // let currA = 0;
   let aStack = [ 0n ];
-  let kStack = [];
+  let kStack = [ ];
   let progSoFar = [];
   let iterCount = 0;
+  let backTrack = false;
   while(doLoop) {
-    let currInst = instructions[progPtr];
-    console.log({currInst});
     /*
       find the value of A that produces the current instruction
     _*/
+    // let k = 0n;
+    let k;
+    if(backTrack) {
+      backTrack = false;
+      k = kStack.pop() + 1n;
+      // aStack.pop();
+      progSoFar.pop();
+      aStack.pop();
+      progPtr++;
+    } else {
+      k = 0n;
+    }
+    let currInst = instructions[progPtr];
+    console.log({currInst});
+    // let currA = aStack[aStack.length - 1] * 8n;
     let currA = aStack[aStack.length - 1] * 8n;
-    let k = 0n;
     let advMag = false;
     while(k < 8n && !advMag) {
       let a = currA + k;
@@ -51,7 +76,7 @@ function seekInput2(program) {
       vm.a = a;
       while(vm.step());
       if(vm.outBuf[0] === currInst) {
-        console.log(vm.outBuf);
+        console.log(vm.outBuf.join(','));
         aStack.push(a);
         kStack.push(k);
         progSoFar.push(vm.outBuf[0]);
@@ -63,17 +88,28 @@ function seekInput2(program) {
     if(advMag) {
       console.log({
         // aStack,
+        a: aStack[aStack.length - 1],
+        aOct: aStack[aStack.length - 1].toString(8),
         kStack: kStack.join(','),
         progSoFar: progSoFar.toReversed().join(','),
       });
-      progPtr--;
+      console.log(progPtr);
+      if(progPtr > 0) {
+        progPtr--;
+      } else {
+        doLoop = false;
+      }
     } else {
       console.log('backtrack');
+      backTrack = true;
     }
-    if(iterCount++ > 7) {
+    if(iterCount++ > 35) {
       doLoop = false;
     }
   }
+  // console.log(aStack);
+  let aVal = aStack.pop();
+  return aVal;
 }
 
 function day17Part2(inputLines) {
