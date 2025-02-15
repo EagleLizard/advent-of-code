@@ -45,7 +45,6 @@ function seekInput2(program) {
   let doLoop = true;
   let aStack = [ 0n ];
   let kStack = [ ];
-  let progSoFar = [];
   let backTrack = false;
   let vm = new VM();
   while(doLoop) {
@@ -56,7 +55,6 @@ function seekInput2(program) {
     if(backTrack) {
       backTrack = false;
       k = kStack.pop() + 1n;
-      progSoFar.pop();
       aStack.pop();
       progPtr++;
     } else {
@@ -73,7 +71,6 @@ function seekInput2(program) {
       if(vm.outBuf[0] === currInst) {
         aStack.push(a);
         kStack.push(k);
-        progSoFar.push(vm.outBuf[0]);
         advMag = true;
       } else {
         k++;
