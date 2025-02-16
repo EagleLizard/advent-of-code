@@ -6,6 +6,7 @@ const day1 = require('./day1/day1');
 const day7 = require('./day7/day7-main');
 const day9 = require('./day9/day9-main');
 const day17 = require('./day17/day17-main');
+const day18 = require('./day18/day18-main');
 
 const NS_IN_MS = 1e6;
 
@@ -20,12 +21,15 @@ const DAY_9_FILE_NAME = 'day9.txt';
 // const DAY_17_FILE_NAME = 'day17_test2.txt';
 // const DAY_17_FILE_NAME = 'day17_test3.txt';
 const DAY_17_FILE_NAME = 'day17.txt';
+// const DAY_18_FILE_NAME = 'day18_test.txt';
+const DAY_18_FILE_NAME = 'day18.txt';
 
 const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
   [ 7, DAY_7_FILE_NAME, day7.day7Part1, day7.day7Part2 ],
   [ 9, DAY_9_FILE_NAME, day9.day9Part1, day9.day9Part2 ],
   [ 17, DAY_17_FILE_NAME, day17.day17Part1, day17.day17Part2 ],
+  [ 18, DAY_18_FILE_NAME, day18.day18Part1, undefined ],
 ].map(dayArgsTuple => {
   let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
   return {
