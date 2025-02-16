@@ -1,34 +1,119 @@
 
+const { Queue } = require('../lib/datastruct/queue');
 const { Point } = require('../lib/geom/point');
+
+const gridEnum = {
+  safe: 0,
+  corrupt: 2,
+};
+
+const gridCharMap = {
+  [gridEnum.safe]: '.',
+  [gridEnum.corrupt]: '#',
+};
+
+const directionPoints = [
+  new Point(0, -1), // up
+  new Point(1, 0), // right
+  new Point(0, 1), // down
+  new Point(-1, 0), // left
+];
 
 module.exports = {
   day18Part1
 };
 
+/*
+382 - correct
+_*/
 function day18Part1(inputLines) {
   let day18Input = parseInput(inputLines);
   let isTest = (day18Input.maxX === 6) && (day18Input.maxY === 6);
   let width = isTest ? 7 : 71;
   let height = isTest ? 7 : 71;
   let n = isTest ? 12 : 1024;
+  let sPos = new Point(0, 0);
+  let ePos = new Point(width - 1, height - 1);
   let grid = makeGrid(day18Input.coords, width, height, n);
-  console.log(printGrid(grid));
-  return -1;
+  let foundPath = findPath(grid, width, height, sPos, ePos);
+  return foundPath.length;
+}
+
+/*
+  bfs
+_*/
+function findPath(grid, w, h, sPos, ePos) {
+  let visited = Array(h).fill(0).map(() => {
+    return Array(h).fill(0).map(() => undefined);
+  });
+  let queue = new Queue();
+  queue.push({
+    pos: sPos,
+    pathSoFar: [],
+  });
+  let foundPath = [];
+  visited[sPos.y][sPos.x] = true;
+  while(!queue.empty()) {
+    let currItem = queue.pop();
+    let pos = currItem.pos;
+    let pathSoFar = currItem.pathSoFar;
+    let x = pos.x;
+    let y = pos.y;
+    if(x === ePos.x && y === ePos.y) {
+      /* path found */
+      foundPath = pathSoFar;
+      break;
+    }
+    for(let i = 0; i < directionPoints.length; ++i) {
+      let dPt = directionPoints[i];
+      let nx = x + dPt.x;
+      let ny = y + dPt.y;
+      if(
+        (nx < w && nx > -1)
+        && (ny < h && ny > -1)
+        && (grid[ny][nx] === gridEnum.safe)
+        && visited[ny][nx] !== true
+      ) {
+        let nPos = new Point(nx, ny);
+        let nSofar = [ ...pathSoFar, pos ];
+        visited[ny][nx] = true;
+        queue.push({
+          pos: nPos,
+          pathSoFar: nSofar,
+        });
+      }
+    }
+  }
+  return foundPath;
 }
 
 function makeGrid(coords, w, h, n) {
   let grid = Array(h).fill(0).map(() => {
-    return Array(w).fill(0).map(() => '.');
+    return Array(w).fill(0).map(() => 0);
   });
-  console.log(grid[6]);
   for(let i = 0; i < n; ++i) {
     let coord = coords[i];
-    grid[coord.y][coord.x] = '#';
+    grid[coord.y][coord.x] = 2;
   }
   return grid;
 }
 
-function printGrid(grid) {
+function printGrid(srcGrid, foundPath) {
+  foundPath = foundPath ?? [];
+  let grid = [];
+  for(let y = 0; y < srcGrid.length; ++y) {
+    grid.push([]);
+    for(let x = 0; x < srcGrid[y].length; ++x) {
+      let val = srcGrid[y][x];
+      let c = gridCharMap[val];
+      grid[y].push(c);
+    }
+  }
+
+  for(let i = 0; i < foundPath.length; ++i) {
+    let coord = foundPath[i];
+    grid[coord.y][coord.x] = 'O';
+  }
   let gridStr = '';
   for(let y = 0; y < grid.length; ++y) {
     for(let x = 0; x < grid[y].length; ++x) {
