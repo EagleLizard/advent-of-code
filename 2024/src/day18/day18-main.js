@@ -20,8 +20,89 @@ const directionPoints = [
 ];
 
 module.exports = {
-  day18Part1
+  day18Part1,
+  day18Part2: day18Part2_2,
 };
+
+/*
+40,64 - wrong
+46,45 - wrong
+6,36 - correct
+_*/
+function day18Part2_2(inputLines) {
+  let day18Input = parseInput(inputLines);
+  let coords = day18Input.coords;
+  let isTest = (day18Input.maxX === 6) && (day18Input.maxY === 6);
+  let width = isTest ? 7 : 71;
+  let height = isTest ? 7 : 71;
+  let n = isTest ? 12 : 1024;
+  let sPos = new Point(0, 0);
+  let ePos = new Point(width - 1, height - 1);
+  let invalidIdx;
+  let grid = makeGrid(coords, width, height, n);
+  while(n < coords.length) {
+    // let grid = makeGrid(coords, width, height, n);
+    let coord = coords[n];
+    grid[coord.y][coord.x] = gridEnum.corrupt;
+    // console.log(printGrid(grid));
+    let foundPath = findPath(grid, width, height, sPos, ePos);
+    // console.log(printGrid(grid, foundPath));
+    // console.log(n);
+    if(foundPath === undefined) {
+      invalidIdx = n;
+      break;
+    }
+    n++;
+  }
+  // console.log(invalidIdx);
+  // console.log(n);
+  let firstInvalidCoord = coords[invalidIdx];
+  let res = `${firstInvalidCoord.x},${firstInvalidCoord.y}`;
+  // console.log(`${res} - ${invalidIdx}`);
+  return res;
+}
+function day18Part2(inputLines) {
+  let day18Input = parseInput(inputLines);
+  let coords = day18Input.coords;
+  let isTest = (day18Input.maxX === 6) && (day18Input.maxY === 6);
+  let width = isTest ? 7 : 71;
+  let height = isTest ? 7 : 71;
+  let sn = isTest ? 12 : 1024;
+  let en = coords.length;
+  let sPos = new Point(0, 0);
+  let ePos = new Point(width - 1, height - 1);
+  // console.log(printGrid(makeGrid(coords, width, height, sn)));
+  /*
+    binary search between start and end
+  _*/
+  let ln = sn;
+  let rn = en;
+  let iters = 0;
+  let mid;
+  let maxFoundIdx = -1;
+  while(ln < rn) {
+    mid = Math.floor((ln + rn) / 2);
+    console.log(`[${ln}, ${rn}] - mid: ${mid}`);
+    let grid = makeGrid(coords, width, height, mid);
+    console.log(printGrid(grid));
+    let foundPath = findPath(grid, width, height, sPos, ePos);
+    console.log(foundPath);
+    if(foundPath !== undefined) {
+      // console.log(printGrid(grid, foundPath));
+      maxFoundIdx = Math.max(mid, maxFoundIdx);
+      ln = mid + 1;
+    } else {
+      rn = mid - 1;
+    }
+    console.log(`[${ln}, ${rn}]`);
+  }
+  // console.log(coords[mid].keyStr());
+  // let midCoord = coords[mid];
+  console.log(maxFoundIdx);
+  let midCoord = coords[maxFoundIdx];
+  return `${midCoord.x},${midCoord.y}`;
+  // return -1;
+}
 
 /*
 382 - correct
@@ -51,7 +132,7 @@ function findPath(grid, w, h, sPos, ePos) {
     pos: sPos,
     pathSoFar: [],
   });
-  let foundPath = [];
+  let foundPath = undefined;
   visited[sPos.y][sPos.x] = true;
   while(!queue.empty()) {
     let currItem = queue.pop();
@@ -83,6 +164,14 @@ function findPath(grid, w, h, sPos, ePos) {
         });
       }
     }
+    // console.log('queue.head');
+    // console.log(queue.head);
+    // console.log('queue.tail');
+    // console.log(queue.tail);
+    // console.log('');
+    // if(queue.head.next === queue.head) {
+    //   break;
+    // }
   }
   return foundPath;
 }
