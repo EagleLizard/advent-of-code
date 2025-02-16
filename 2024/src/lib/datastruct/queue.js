@@ -16,10 +16,9 @@ class Queue {
     let node = new QueueNode(val);
     if(this.head === undefined) {
       this.head = node;
-    }
-    if(this.tail === undefined) {
+    } else if(this.tail === undefined) {
       this.tail = node;
-      this.head.next = this.tail;
+      this.head.next = node;
     } else {
       this.tail.next = node;
       this.tail = node;
