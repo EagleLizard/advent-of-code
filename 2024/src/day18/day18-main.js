@@ -20,8 +20,18 @@ const directionPoints = [
 ];
 
 module.exports = {
-  day18Part1
+  day18Part1,
+  day18Part2,
 };
+
+function day18Part2(inputLines) {
+  let day18Input = parseInput(inputLines);
+  let isTest = (day18Input.maxX === 6) && (day18Input.maxY === 6);
+  let width = isTest ? 7 : 71;
+  let height = isTest ? 7 : 71;
+  
+  return -1;
+}
 
 /*
 382 - correct
