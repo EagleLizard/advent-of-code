@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node src/main.js",
     "dev": "nodemon --ext 'js' -w src --exec 'npm run-s start'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

@@ -21,13 +21,51 @@ const directionPoints = [
 
 module.exports = {
   day18Part1,
-  day18Part2: day18Part2_2,
+  // day18Part2: day18Part2_2,
+  day18Part2: day18Part2_3,
 };
+
+/* 
+6,36 - correct
+  n = 2933
+*/
+function day18Part2_3(inputLines) {
+  let day18Input = parseInput(inputLines);
+  let coords = day18Input.coords;
+  let isTest = (day18Input.maxX === 6) && (day18Input.maxY === 6);
+  let width = isTest ? 7 : 71;
+  let height = isTest ? 7 : 71;
+  let n = isTest ? 12 : 1024;
+  let sPos = new Point(0, 0);
+  let ePos = new Point(width - 1, height - 1);
+  let sn = n;
+  let en = coords.length;
+  let ln = sn;
+  let rn = en;
+  let mid;
+  let bestMid = -Infinity;
+  let grid;
+  while(ln < rn) {
+    mid = Math.floor((ln + rn) / 2);
+    grid = makeGrid(coords, width, height, mid);
+    let foundPath = findPath(grid, width, height, sPos, ePos);
+    if(foundPath === undefined) {
+      rn = mid - 1;
+    } else {
+      bestMid = mid;
+      ln = mid + 1;
+    }
+  }
+  let midCoord = coords[bestMid];
+  let res = `${midCoord.x},${midCoord.y}`;
+  return res;
+}
 
 /*
 40,64 - wrong
 46,45 - wrong
 6,36 - correct
+  n = 2933
 _*/
 function day18Part2_2(inputLines) {
   let day18Input = parseInput(inputLines);
@@ -58,7 +96,7 @@ function day18Part2_2(inputLines) {
   // console.log(n);
   let firstInvalidCoord = coords[invalidIdx];
   let res = `${firstInvalidCoord.x},${firstInvalidCoord.y}`;
-  // console.log(`${res} - ${invalidIdx}`);
+  console.log(`${res} - ${invalidIdx}`);
   return res;
 }
 function day18Part2(inputLines) {
