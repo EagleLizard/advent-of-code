@@ -3,6 +3,7 @@ const assert = require('assert');
 
 module.exports = {
   day19Part1,
+  day19Part2,
 };
 
 function day19Part1(inputLines) {
@@ -18,6 +19,48 @@ function day19Part1(inputLines) {
     }
   }
   return possibleDesignCount;
+}
+
+/* 
+705756472327497 - correct
+*/
+
+function day19Part2(inputLines) {
+  let day19Input = parseInput(inputLines);
+  let towels = day19Input.towels;
+  let designs = day19Input.designs;
+  let allPossibleDesigns = 0;
+  for(let i = 0; i < designs.length; ++i) {
+    let design = designs[i];
+    let possibleDesigns = countDesigns(towels, design);
+    allPossibleDesigns += possibleDesigns;
+  }
+  return allPossibleDesigns;
+}
+
+function countDesigns(towels, srcDesign) {
+  const helper = (() => {
+    let cache = {};
+    return (design) => {
+      if(cache[design] !== undefined) {
+        return cache[design];
+      }
+      let currCount = 0;
+      if(design.length === 0) {
+        cache[design] = 1;
+        return cache[design];
+      }
+      for(let i = 0; i < towels.length; ++i) {
+        let towel = towels[i];
+        if(design.startsWith(towel)) {
+          currCount += helper(design.substring(towel.length));
+        }
+      }
+      cache[design] = currCount;
+      return cache[design];
+    };
+  })();
+  return helper(srcDesign);
 }
 
 function checkDesign(towels, srcDesign) {
