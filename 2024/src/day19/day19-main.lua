@@ -44,82 +44,38 @@ local function psf(soFar, patterns)
   return sfStr
 end
 
-local function checkDesign3(patterns, srcDesign)
-  patterns = arr.copy(patterns)
-  table.sort(patterns, function (a, b)
-    return #a > #b
-  end)
-  local designMatchMemo = (function ()
+local function checkDesign4(towels, srcDesign)
+  local helper = (function ()
     local cache = {}
-    return function(dSub, towel)
-      local ck = dSub.."_"..towel
-      if cache[ck] ~= nil then
-        return cache[ck]
+    local function _helper(design)
+      if cache[design] ~= nil then
+        return cache[design]
       end
-      local j, k = string.find(dSub, towel)
-      local res = {
-        k = k,
-        found = j == 1
-      }
-      cache[ck] = res
-      return cache[ck]
+      if #design == 0 then
+        cache[design] = true
+        return cache[design]
+      end
+      for i, towel in ipairs(towels) do
+        local j, k = string.find(design, towel)
+        if j == 1 then
+          local nd = string.sub(design, k + 1)
+          local isValid = _helper(nd)
+          if isValid then
+            cache[design] = true
+            return cache[design]
+          end
+        end
+      end
+      cache[design] = false
+      return cache[design]
     end
+    return _helper
   end)()
-  local sTime = os.clock()
-  local hCache = {}
-  local function helper(design, soFar)
-    if hCache[design] ~= nil then
-      return hCache[design]
-    end
-    -- printf("%s\n", design)
-    if #design == 0 then
-      return true
-    end
-    soFar = soFar or {}
-    for i, towel in ipairs(patterns) do
-      local dSub = string.sub(design, 1, #towel)
-      local designMatch = designMatchMemo(dSub, towel)
-      local found = designMatch.found
-      local k = designMatch.k
-      if found then
-        local nTime = os.clock()
-        local elapsedMs = (nTime - sTime) * 1e3
-        -- printf("-%s\n", towel)
-        local nd = string.sub(design, k + 1)
-        -- printf("%s\n", nd)
-        table.insert(soFar, i)
-        local isValid = helper(nd, soFar)
-        if elapsedMs > 100 then
-          sTime = nTime
-          -- printf("%s\n", psf(soFar, patterns))
-        end
-        table.remove(soFar)
-        if isValid then
-          hCache[design] = true
-          return hCache[design]
-        end
-      end
-    end
-    hCache[design] = false
-    return hCache[design]
-  end
-  -- printf("~~ %s\n", srcDesign)
-  --[[
-    find if any towel can satisfy the design at the initial idx,
-      if not return early
-  ]]
-  local hasMatch = false
-  for i, towel in ipairs(patterns) do
-    local j, k = string.find(srcDesign, towel)
-    if j == 1 then
-      hasMatch = true
-      break
-    end
-  end
-  if not hasMatch then
-    return false
-  end
   return helper(srcDesign)
+end
+
+local function day19Part2(inputLines)
+  return -1;
 end
 
 --[[ 
@@ -130,13 +86,13 @@ local function day19Part1(inputLines)
   local patterns = day19Input.patterns
   local designs = day19Input.designs
   
-  for i, pattern in ipairs(patterns) do
-    printf("%s%s", pattern, (i == #patterns and "\n") or " ")
-  end
+  -- for i, pattern in ipairs(patterns) do
+  --   printf("%s%s", pattern, (i == #patterns and "\n") or " ")
+  -- end
   local possibleDesignCount = 0
   for _, design in ipairs(designs) do
-    local validDesign = checkDesign3(patterns, design)
-    printf("%s: %s\n", design, validDesign)
+    local validDesign = checkDesign4(patterns, design)
+    -- printf("%s: %s\n", design, validDesign)
     if validDesign then
       possibleDesignCount = possibleDesignCount + 1
     end
@@ -146,6 +102,7 @@ end
 
 local day19MainModule = {
   day19Part1 = day19Part1,
+  day19Part2 = day19Part2,
 }
 
 return day19MainModule
