@@ -74,8 +74,46 @@ local function checkDesign4(towels, srcDesign)
   return helper(srcDesign)
 end
 
+local function countDesigns(towels, srcDesign)
+  local function getHelper()
+    local cache = {};
+    local function helper(design)
+      if cache[design] ~= nil then
+        return cache[design]
+      end
+      local currCount = 0
+      if #design == 0 then
+        cache[design] = 1
+        return cache[design]
+      end
+      for i, towel in ipairs(towels) do
+        local j, k = string.find(design, towel)
+        if j == 1 then
+          currCount = currCount + helper(string.sub(design, k + 1))
+        end
+      end
+      cache[design] = currCount
+      return cache[design]
+    end
+    return helper
+  end
+  return getHelper()(srcDesign)
+end
+
+--[[ 
+705756472327497 - correct
+]]
 local function day19Part2(inputLines)
-  return -1;
+  local day19Input = parseInput(inputLines)
+  local patterns = day19Input.patterns
+  local designs = day19Input.designs
+  local allPossibleDesigns = 0
+  for _, design in ipairs(designs) do
+    local possibleDesigns = countDesigns(patterns, design)
+    allPossibleDesigns = allPossibleDesigns + possibleDesigns
+  end
+
+  return allPossibleDesigns
 end
 
 --[[ 
