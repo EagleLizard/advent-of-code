@@ -27,6 +27,7 @@ function day20Part1(inputLines) {
   // let initPaths = findPaths(grid, startPos, endPos);
   let initPaths = findPaths2(grid, startPos, endPos);
   let initPath = initPaths[0];
+  printGrid(grid, initPath);
   let cheatMap = new Map();
   let numJumpPoints = jumpPoints.length;
   console.log(numJumpPoints);
@@ -41,49 +42,99 @@ function findCheatPaths2(grid, initPath) {
   /* 
     For any given jump point, find the indices of the 2 points adjacent on the initPath.
   _*/
+  let jPaths = [];
   for(let i = 0; i < jumpPoints.length; ++i) {
     let jumpStartIdx;
     let jumpEndIdx;
-    let jumpPoint = jumpPoints[i];
+    let jPt = jumpPoints[i];
     let jumpStartPt, jumpEndPt;
-    for(let k = 0; k < initPath.length; ++k) {
-      let pathPt = initPath[k];
-      if(
-        (
-          (pathPt.x === jumpPoint.x)
-          && (
-            (jumpPoint.y === (pathPt.y - 1))
-            || (jumpPoint.y === (pathPt.y + 1))
-          )
-        ) || (
-          (pathPt.y === jumpPoint.y)
-          && (
-            (jumpPoint.x === (pathPt.x - 1))
-            || (jumpPoint.x === (pathPt.x + 1))
-          )
-        )
-      ) {
-        jumpStartPt = initPath[k];
-        let dx = jumpPoint.x - jumpStartPt.x;
-        let dy = jumpPoint.y - jumpStartPt.y;
-        if(grid[jumpPoint.y + dy][jumpPoint.x + dx] === GRID_TILE_ENUM.empty) {
-          jumpStartIdx = k;
-          jumpEndPt = new Point(jumpPoint.x + dx, jumpPoint.y + dy);
-          break;
+    /*
+      Find 2 points along the track that are on the same axis
+        and adjacent to the jump point
+    _*/
+    let upPt = directions[0];
+    let downPt = directions[2];
+    let leftPt = directions[3];
+    let rightPt = directions[1];
+    let du = new Point(upPt.x + jPt.x, upPt.y + jPt.y);
+    let dd = new Point(downPt.x + jPt.x, downPt.y + jPt.y);
+    let dl = new Point(leftPt.x + jPt.x, leftPt.y + jPt.y);
+    let dr = new Point(rightPt.x + jPt.x, rightPt.y + jPt.y);
+    let horiz = (
+      (grid[dl.y][dl.x] === GRID_TILE_ENUM.empty)
+      && (grid[dr.y][dr.x] === GRID_TILE_ENUM.empty)
+    );
+    let vert = (
+      (grid[du.y][du.x] === GRID_TILE_ENUM.empty)
+      && (grid[dd.y][dd.x] === GRID_TILE_ENUM.empty)
+    );
+    /*
+      make new horizontal path
+    _*/
+    if(horiz) {
+      // let sPt = dl;
+      // let ePt = dr;
+      let sPt, ePt;
+      let jPath = [];
+      for(let k = 0; k < initPath.length; ++k) {
+        let iPt = initPath[k];
+        if(sPt === undefined) {
+          if(iPt.x === dl.x && iPt.y === dl.y) {
+            sPt = dl;
+          } else if(iPt.x === dr.x && iPt.y === dr.y) {
+            sPt = dr;
+          }
+          jPath.push(iPt);
+        }else if(sPt !== undefined && ePt === undefined) {
+          if(iPt.x === dl.x && iPt.y === dl.y) {
+            ePt = dl;
+          } else if(iPt.x === dr.x && iPt.y === dr.y) {
+            ePt = dr;
+          }
+          if(ePt !== undefined) {
+            jPath.push(jPt);
+            jPath.push(ePt);
+          }
+        }else if(sPt !== undefined && ePt !== undefined) {
+          jPath.push(iPt);
         }
       }
-    }
-    if(jumpStartIdx !== undefined) {
-      for(let k = jumpStartIdx; k < initPath.length; ++k) {
-        let pathPt = initPath[k];
-        if(pathPt.x === jumpEndPt.x && pathPt.y === jumpEndPt.y) {
-          jumpEndIdx = k;
-          break;
+      if(sPt !== undefined && ePt !== undefined) {
+        jPaths.push(jPath);
+      }
+    } else if(vert) {
+      /* vertical */
+      let sPt, ePt;
+      let jPath = [];
+      for(let k = 0; k < initPath.length; ++k) {
+        let iPt = initPath[k];
+        if(sPt === undefined) {
+          if(iPt.x === du.x && iPt.y === du.y) {
+            sPt = du;
+          } else if(iPt.x === dd.x && iPt.y === dd.y) {
+            sPt = dd;
+          }
+          jPath.push(iPt);
+        } else if (sPt !== undefined && ePt === undefined) {
+          if(iPt.x === du.x && iPt.y === du.y) {
+            ePt = du;
+          } else if(iPt.x === dd.x && iPt.y === dd.y) {
+            ePt = dd;
+          }
+          if(ePt !== undefined) {
+            jPath.push(jPt);
+            jPath.push(ePt);
+          }
+        } else if(sPt !== undefined && ePt !== undefined) {
+          jPath.push(iPt);
         }
       }
+      if(sPt !== undefined && ePt !== undefined) {
+        jPaths.push(jPath);
+      }
     }
-    console.log(jumpEndIdx - jumpStartIdx);
   }
+  console.log(jPaths.length);
   console.log(cheatMap);
   let cheatMapTuples = [ ...cheatMap ].toSorted((a, b) => {
     return a[0] - b[0];
@@ -267,8 +318,10 @@ function copyGrid(grid) {
   return nextGrid;
 }
 
-function printGrid(grid) {
+function printGrid(grid, trackPath) {
+  let charGrid = [];
   for(let y = 0; y < grid.length; ++y) {
+    let row = [];
     for(let x = 0; x < grid[y].length; ++x) {
       let tileVal = grid[y][x];
       let c;
@@ -280,7 +333,23 @@ function printGrid(grid) {
         c = `${tileVal}`;
       }
       // process.stdout.write(`${grid[y][x]}`);
-      process.stdout.write(c);
+      // process.stdout.write(c);
+      row.push(c);
+    }
+    // process.stdout.write('\n');
+    charGrid.push(row);
+  }
+  if(trackPath !== undefined) {
+    for(let i = 0; i < trackPath.length; ++i) {
+      let tPt = trackPath[i];
+      'å∫ç∂´ƒ©˙ˆ∆˚¬µ˜øπœ®ß†¨√∑≈¥¡™£¢∞§¶•ªº';
+      // charGrid[tPt.y][tPt.x] = '∆';
+      charGrid[tPt.y][tPt.x] = 'o';
+    }
+  }
+  for(let y = 0; y < charGrid.length; ++y) {
+    for(let x = 0; x < charGrid[y].length; ++x) {
+      process.stdout.write(charGrid[y][x]);
     }
     process.stdout.write('\n');
   }
