@@ -28,7 +28,7 @@ function day20Part1(inputLines) {
   let startPos = day20Input.startPos;
   let endPos = day20Input.endPos;
   let jumpPoints = getJumpable(grid);
-  printGrid(grid);
+  // printGrid(grid);
   // let initPaths = findPaths(grid, startPos, endPos);
   let initPaths = findPaths2(grid, startPos, endPos);
   let initPathLen = initPaths[0];
@@ -199,19 +199,19 @@ function findPaths2(grid, sPos, ePos) {
     visited[mvPt.y][mvPt.x] = true;
     for(let d = 0; d < directions.length; ++d) {
       let dPt = directions[d];
-      let adjPt = new Point(mvPt.x + dPt.x, mvPt.y + dPt.y);
+      let nx = mvPt.x + dPt.x;
+      let ny = mvPt.y + dPt.y;
       if(
-        adjPt.x < w
-        && adjPt.x >= 0
-        && adjPt.y < h
-        && adjPt.y >= 0
-        && grid[adjPt.y][adjPt.x] === GRID_TILE_ENUM.empty
-        && !visited[adjPt.y][adjPt.x]
+        nx < w
+        && nx >= 0
+        && ny < h
+        && ny >= 0
+        && grid[ny][nx] === GRID_TILE_ENUM.empty
+        && !visited[ny][nx]
       ) {
-        let nsf = soFar + 1;
         queue.push({
-          mvPt: adjPt,
-          soFar: nsf,
+          mvPt: new Point(nx, ny),
+          soFar: soFar + 1,
         });
       }
     }

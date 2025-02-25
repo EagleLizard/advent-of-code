@@ -28,3 +28,9 @@ From ~331500ms (~5.5m) to ~22100ms (~22.1s)
 Making the naive solution faster. Using an array of maps instead of strings for tracking visited nodes.
 
 From ~22100ms (22.1s) to ~3100ms (3.1s)
+
+*<u>*Update3:</u>*
+
+Making the naive solution faster.
+
+From ~3100ms (3.1s) to ~2800ms (2.8s)
