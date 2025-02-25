@@ -17,6 +17,9 @@ module.exports = {
   day20Part1,
 };
 
+/*
+1506 - too low
+_*/
 function day20Part1(inputLines) {
   let day20Input = parseInput(inputLines);
   let grid = day20Input.grid;
@@ -27,13 +30,13 @@ function day20Part1(inputLines) {
   // let initPaths = findPaths(grid, startPos, endPos);
   let initPaths = findPaths2(grid, startPos, endPos);
   let initPath = initPaths[0];
-  printGrid(grid, initPath);
+  // printGrid(grid, initPath);
   let cheatMap = new Map();
   let numJumpPoints = jumpPoints.length;
   console.log(numJumpPoints);
   // findCheatPaths(grid, startPos, endPos, initPath);
-  findCheatPaths2(grid, initPath);
-  return -1;
+  let savedCheatCount = findCheatPaths2(grid, initPath);
+  return savedCheatCount;
 }
 
 function findCheatPaths2(grid, initPath) {
@@ -43,99 +46,28 @@ function findCheatPaths2(grid, initPath) {
     For any given jump point, find the indices of the 2 points adjacent on the initPath.
   _*/
   let jPaths = [];
+  let savedCheatCount = 0;
   for(let i = 0; i < jumpPoints.length; ++i) {
-    let jumpStartIdx;
-    let jumpEndIdx;
     let jPt = jumpPoints[i];
-    let jumpStartPt, jumpEndPt;
-    /*
-      Find 2 points along the track that are on the same axis
-        and adjacent to the jump point
-    _*/
-    let upPt = directions[0];
-    let downPt = directions[2];
-    let leftPt = directions[3];
-    let rightPt = directions[1];
-    let du = new Point(upPt.x + jPt.x, upPt.y + jPt.y);
-    let dd = new Point(downPt.x + jPt.x, downPt.y + jPt.y);
-    let dl = new Point(leftPt.x + jPt.x, leftPt.y + jPt.y);
-    let dr = new Point(rightPt.x + jPt.x, rightPt.y + jPt.y);
-    let horiz = (
-      (grid[dl.y][dl.x] === GRID_TILE_ENUM.empty)
-      && (grid[dr.y][dr.x] === GRID_TILE_ENUM.empty)
-    );
-    let vert = (
-      (grid[du.y][du.x] === GRID_TILE_ENUM.empty)
-      && (grid[dd.y][dd.x] === GRID_TILE_ENUM.empty)
-    );
-    /*
-      make new horizontal path
-    _*/
-    if(horiz) {
-      // let sPt = dl;
-      // let ePt = dr;
-      let sPt, ePt;
-      let jPath = [];
-      for(let k = 0; k < initPath.length; ++k) {
-        let iPt = initPath[k];
-        if(sPt === undefined) {
-          if(iPt.x === dl.x && iPt.y === dl.y) {
-            sPt = dl;
-          } else if(iPt.x === dr.x && iPt.y === dr.y) {
-            sPt = dr;
-          }
-          jPath.push(iPt);
-        }else if(sPt !== undefined && ePt === undefined) {
-          if(iPt.x === dl.x && iPt.y === dl.y) {
-            ePt = dl;
-          } else if(iPt.x === dr.x && iPt.y === dr.y) {
-            ePt = dr;
-          }
-          if(ePt !== undefined) {
-            jPath.push(jPt);
-            jPath.push(ePt);
-          }
-        }else if(sPt !== undefined && ePt !== undefined) {
-          jPath.push(iPt);
-        }
-      }
-      if(sPt !== undefined && ePt !== undefined) {
-        jPaths.push(jPath);
-      }
-    } else if(vert) {
-      /* vertical */
-      let sPt, ePt;
-      let jPath = [];
-      for(let k = 0; k < initPath.length; ++k) {
-        let iPt = initPath[k];
-        if(sPt === undefined) {
-          if(iPt.x === du.x && iPt.y === du.y) {
-            sPt = du;
-          } else if(iPt.x === dd.x && iPt.y === dd.y) {
-            sPt = dd;
-          }
-          jPath.push(iPt);
-        } else if (sPt !== undefined && ePt === undefined) {
-          if(iPt.x === du.x && iPt.y === du.y) {
-            ePt = du;
-          } else if(iPt.x === dd.x && iPt.y === dd.y) {
-            ePt = dd;
-          }
-          if(ePt !== undefined) {
-            jPath.push(jPt);
-            jPath.push(ePt);
-          }
-        } else if(sPt !== undefined && ePt !== undefined) {
-          jPath.push(iPt);
-        }
-      }
-      if(sPt !== undefined && ePt !== undefined) {
-        jPaths.push(jPath);
-      }
+    let foundPath = findCheat(grid, initPath, jPt);
+    if(foundPath !== undefined) {
+      jPaths.push(foundPath);
     }
   }
-  console.log(jPaths.length);
-  console.log(cheatMap);
+  for(let i = 0; i < jPaths.length; ++i) {
+    let jPath = jPaths[i];
+    let lenDiff = initPath.length - jPath.length;
+    let currCheatCount = cheatMap.has(lenDiff)
+      ? cheatMap.get(lenDiff)
+      : 0
+    ;
+    cheatMap.set(lenDiff, currCheatCount + 1);
+    if(lenDiff >= 100) {
+      savedCheatCount++;
+    }
+  }
+  // console.log(jPaths.length);
+  // console.log(cheatMap);
   let cheatMapTuples = [ ...cheatMap ].toSorted((a, b) => {
     return a[0] - b[0];
   });
@@ -144,6 +76,61 @@ function findCheatPaths2(grid, initPath) {
     let cheatCount = cheatMapTuple[1];
     console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
   });
+  return savedCheatCount;
+}
+
+function findCheat(grid, initPath, cPt) {
+  let sPt, ePt;
+  let jPath = [];
+  let pt1, pt2;
+  if(
+    (grid[cPt.y][cPt.x + 1] === GRID_TILE_ENUM.empty)
+    && (grid[cPt.y][cPt.x - 1] === GRID_TILE_ENUM.empty)
+  ) {
+    /* horizontal */
+    pt1 = new Point(cPt.x + 1, cPt.y);
+    pt2 = new Point(cPt.x - 1, cPt.y);
+  } else if(
+    (grid[cPt.y + 1][cPt.x] === GRID_TILE_ENUM.empty)
+    && (grid[cPt.y - 1][cPt.x] === GRID_TILE_ENUM.empty)
+  ) {
+    /* vertical */
+    pt1 = new Point(cPt.x, cPt.y + 1);
+    pt2 = new Point(cPt.x, cPt.y - 1);
+  }
+  if(pt1 === undefined || pt2 === undefined) {
+    return undefined;
+  }
+  
+  for(let i = 0; i < initPath.length; ++i) {
+    let iPt = initPath[i];
+    if(sPt === undefined) {
+      if(
+        (iPt.x === pt1.x && iPt.y === pt1.y)
+        || (iPt.x === pt2.x && iPt.y === pt2.y)
+      ) {
+        sPt = iPt;
+      }
+      jPath.push(iPt);
+    } else if(sPt !== undefined && ePt === undefined) {
+      if(
+        (iPt.x === pt1.x && iPt.y === pt1.y)
+        || (iPt.x === pt2.x && iPt.y === pt2.y)
+      ) {
+        ePt = iPt;
+      }
+      if(ePt !== undefined) {
+        jPath.push(cPt);
+        jPath.push(ePt);
+      }
+    } else if(sPt !== undefined && ePt !== undefined) {
+      jPath.push(iPt);
+    }
+  }
+  if(ePt === undefined) {
+    return undefined;
+  }
+  return jPath;
 }
 
 function findCheatPaths(grid, startPos, endPos, initPath) {
@@ -318,7 +305,7 @@ function copyGrid(grid) {
   return nextGrid;
 }
 
-function printGrid(grid, trackPath) {
+function printGrid(grid, trackPath, cheatPoint) {
   let charGrid = [];
   for(let y = 0; y < grid.length; ++y) {
     let row = [];
@@ -346,6 +333,9 @@ function printGrid(grid, trackPath) {
       // charGrid[tPt.y][tPt.x] = '∆';
       charGrid[tPt.y][tPt.x] = 'o';
     }
+  }
+  if(cheatPoint !== undefined) {
+    charGrid[cheatPoint.y][cheatPoint.x] = ' ';
   }
   for(let y = 0; y < charGrid.length; ++y) {
     for(let x = 0; x < charGrid[y].length; ++x) {
