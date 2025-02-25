@@ -24,18 +24,121 @@ function day20Part1(inputLines) {
   let endPos = day20Input.endPos;
   let jumpPoints = getJumpable(grid);
   printGrid(grid);
-  let initPaths = findPaths(grid, startPos, endPos);
+  // let initPaths = findPaths(grid, startPos, endPos);
+  let initPaths = findPaths2(grid, startPos, endPos);
   let initPath = initPaths[0];
   let cheatMap = new Map();
+  let numJumpPoints = jumpPoints.length;
+  console.log(numJumpPoints);
+  // findCheatPaths(grid, startPos, endPos, initPath);
+  findCheatPaths2(grid, initPath);
+  return -1;
+}
+
+function findCheatPaths2(grid, initPath) {
+  let cheatMap = new Map();
+  let jumpPoints = getJumpable(grid);
+  /* 
+    For any given jump point, find the indices of the 2 points adjacent on the initPath.
+  _*/
+  for(let i = 0; i < jumpPoints.length; ++i) {
+    let jumpStartIdx;
+    let jumpEndIdx;
+    let jumpPoint = jumpPoints[i];
+    let jumpStartPt, jumpEndPt;
+    for(let k = 0; k < initPath.length; ++k) {
+      let pathPt = initPath[k];
+      if(
+        (
+          (pathPt.x === jumpPoint.x)
+          && (
+            (jumpPoint.y === (pathPt.y - 1))
+            || (jumpPoint.y === (pathPt.y + 1))
+          )
+        ) || (
+          (pathPt.y === jumpPoint.y)
+          && (
+            (jumpPoint.x === (pathPt.x - 1))
+            || (jumpPoint.x === (pathPt.x + 1))
+          )
+        )
+      ) {
+        jumpStartPt = initPath[k];
+        let dx = jumpPoint.x - jumpStartPt.x;
+        let dy = jumpPoint.y - jumpStartPt.y;
+        if(grid[jumpPoint.y + dy][jumpPoint.x + dx] === GRID_TILE_ENUM.empty) {
+          jumpStartIdx = k;
+          jumpEndPt = new Point(jumpPoint.x + dx, jumpPoint.y + dy);
+          break;
+        }
+      }
+    }
+    if(jumpStartIdx !== undefined) {
+      for(let k = jumpStartIdx; k < initPath.length; ++k) {
+        let pathPt = initPath[k];
+        if(pathPt.x === jumpEndPt.x && pathPt.y === jumpEndPt.y) {
+          jumpEndIdx = k;
+          break;
+        }
+      }
+    }
+    console.log(jumpEndIdx - jumpStartIdx);
+  }
+  console.log(cheatMap);
+  let cheatMapTuples = [ ...cheatMap ].toSorted((a, b) => {
+    return a[0] - b[0];
+  });
+  cheatMapTuples.forEach(cheatMapTuple => {
+    let savedPicos = cheatMapTuple[0];
+    let cheatCount = cheatMapTuple[1];
+    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
+  });
+}
+
+function findCheatPaths(grid, startPos, endPos, initPath) {
+  let cheatMap = new Map();
+  let jumpPoints = getJumpable(grid);
   for(let i = 0; i < jumpPoints.length; ++i) {
     let jumpPoint = jumpPoints[i];
     let gridCopy = copyGrid(grid);
     gridCopy[jumpPoint.y][jumpPoint.x] = GRID_TILE_ENUM.empty;
-    let foundPaths = findPaths(gridCopy, startPos, endPos);
+    // let foundPaths = findPaths(gridCopy, startPos, endPos);
+    let foundTrackPoint;
+    let foundTrackPointIdx;
+    for(let k = 0; k < initPath.length; ++k) {
+      let pathPt = initPath[k];
+      /*
+        find the first point on the original path that is adjacent to the cheat path
+      _*/
+      if(
+        (
+          (pathPt.x === jumpPoint.x)
+          && (
+            (jumpPoint.y === (pathPt.y - 1))
+            || (jumpPoint.y === (pathPt.y + 1))
+          )
+        ) || (
+          (pathPt.y === jumpPoint.y)
+          && (
+            (jumpPoint.x === (pathPt.x - 1))
+            || (jumpPoint.x === (pathPt.x + 1))
+          )
+        )
+      ) {
+        foundTrackPointIdx = k;
+        break;
+        // foundTrackPoint = pathPt;
+      }
+    }
+    foundTrackPoint = initPath[foundTrackPointIdx];
+    // console.log(foundTrackPoint);
+    // let foundPaths = findPaths2(gridCopy, startPos, endPos);
+    let foundPaths = findPaths2(gridCopy, foundTrackPoint, endPos);
     // console.log(`foundPaths: ${foundPaths.length}`);
     for(let k = 0; k < foundPaths.length; ++k) {
       let foundPath = foundPaths[k];
-      let pathLenDiff = initPath.length - foundPath.length;
+      // let pathLenDiff = initPath.length - foundPath.length;
+      let pathLenDiff = initPath.length - (foundPath.length + foundTrackPointIdx + 1);
       if(pathLenDiff > 0) {
         // console.log(`${k}: ${pathLenDiff}`);
         let currCheatCount = cheatMap.get(pathLenDiff);
@@ -56,8 +159,53 @@ function day20Part1(inputLines) {
     let savedPicos = cheatMapTuple[0];
     let cheatCount = cheatMapTuple[1];
     console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  })
-  return -1;
+  });
+}
+
+function findPaths2(grid, sPos, ePos) {
+  let w = grid[0].length;
+  let h = grid.length;
+  let foundPaths = [];
+  let queue = [
+    {
+      mvPt: sPos,
+      visited: {},
+      soFar: [],
+    }
+  ];
+  while(queue.length > 0) {
+    let currItem = queue.shift();
+    let mvPt = currItem.mvPt;
+    let soFar = currItem.soFar;
+    let visited = currItem.visited;
+    if(mvPt.x === ePos.x && mvPt.y === ePos.y) {
+      let foundPath = soFar.slice();
+      foundPaths.push(foundPath);
+    }
+    visited[mvPt.keyStr()] = true;
+    for(let d = 0; d < directions.length; ++d) {
+      let dPt = directions[d];
+      let adjPt = new Point(mvPt.x + dPt.x, mvPt.y + dPt.y);
+      if(
+        adjPt.x < w
+        && adjPt.x >= 0
+        && adjPt.y < h
+        && adjPt.y >= 0
+        && grid[adjPt.y][adjPt.x] === GRID_TILE_ENUM.empty
+        && !visited[adjPt.keyStr()]
+      ) {
+        let nsf = soFar.slice();
+        let nv = Object.assign({}, visited);
+        nsf.push(adjPt);
+        queue.push({
+          mvPt: adjPt,
+          visited: nv,
+          soFar: nsf,
+        });
+      }
+    }
+  }
+  return foundPaths;
 }
 
 function findPaths(grid, sPos, ePos) {
@@ -86,7 +234,7 @@ function findPaths(grid, sPos, ePos) {
         && !visited[adjPt.keyStr()]
       ) {
         soFar.push(adjPt);
-        console.log(soFar.length);
+        // console.log(soFar.length);
         helper(adjPt, soFar);
         soFar.pop();
       }
