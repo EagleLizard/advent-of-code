@@ -22,3 +22,9 @@ Current solution (not smart) took ~331500ms (~5.5m)
 Making the naive solution faster.
 
 From ~331500ms (~5.5m) to ~22100ms (~22.1s)
+
+*<u>*Update2:</u>*
+
+Making the naive solution faster. Using an array of maps instead of strings for tracking visited nodes.
+
+From ~22100ms (22.1s) to ~3100ms (3.1s)

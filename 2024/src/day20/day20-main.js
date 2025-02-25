@@ -71,13 +71,13 @@ function findCheatPaths3(srcGrid, sPos, ePos, initPathLen) {
       }
     }
   }
-  [ ...cheatMap ].toSorted((a, b) => {
-    return a[0] - b[0];
-  }).forEach(cheatMapTuple => {
-    let savedPicos = cheatMapTuple[0];
-    let cheatCount = cheatMapTuple[1];
-    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  });
+  // [ ...cheatMap ].toSorted((a, b) => {
+  //   return a[0] - b[0];
+  // }).forEach(cheatMapTuple => {
+  //   let savedPicos = cheatMapTuple[0];
+  //   let cheatCount = cheatMapTuple[1];
+  //   console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
+  // });
   return savedCheatCount;
 }
 
@@ -178,26 +178,25 @@ function findCheat(grid, initPath, cPt) {
 function findPaths2(grid, sPos, ePos) {
   let w = grid[0].length;
   let h = grid.length;
-  let visited = {};
+  let visited = [];
   let foundPaths = [];
-  // let queue = [];
   let queue = new Queue();
   queue.push({
     mvPt: sPos,
     soFar: 0,
   });
-  visited[sPos.keyStr()] = true;
-  // while(queue.length > 0) {
+  for(let y = 0; y < grid.length; ++y) {
+    visited.push({});
+  }
+  visited[sPos.y][sPos.x] = true;
   while(!queue.empty()) {
-    // let currItem = queue.shift();
     let currItem = queue.pop();
     let mvPt = currItem.mvPt;
     let soFar = currItem.soFar;
     if(mvPt.x === ePos.x && mvPt.y === ePos.y) {
-      // let foundPath = soFar.slice();
       foundPaths.push(soFar);
     }
-    visited[mvPt.keyStr()] = true;
+    visited[mvPt.y][mvPt.x] = true;
     for(let d = 0; d < directions.length; ++d) {
       let dPt = directions[d];
       let adjPt = new Point(mvPt.x + dPt.x, mvPt.y + dPt.y);
@@ -207,11 +206,9 @@ function findPaths2(grid, sPos, ePos) {
         && adjPt.y < h
         && adjPt.y >= 0
         && grid[adjPt.y][adjPt.x] === GRID_TILE_ENUM.empty
-        && !visited[adjPt.keyStr()]
+        && !visited[adjPt.y][adjPt.x]
       ) {
         let nsf = soFar + 1;
-        // let nv = Object.assign({}, visited);
-        // nsf.push(adjPt);
         queue.push({
           mvPt: adjPt,
           soFar: nsf,
