@@ -28,6 +28,7 @@ const DAY_18_FILE_NAME = 'day18.txt';
 // const DAY_19_FILE_NAME = 'day19_test.txt';
 const DAY_19_FILE_NAME = 'day19.txt';
 const DAY_20_FILE_NAME = 'day20_test.txt';
+// const DAY_20_FILE_NAME = 'day20.txt';
 
 const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],

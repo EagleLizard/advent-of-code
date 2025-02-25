@@ -6,6 +6,13 @@ const GRID_TILE_ENUM = {
   wall: 2,
 };
 
+const directions = [
+  new Point(0, -1),
+  new Point(1, 0),
+  new Point(0, 1),
+  new Point(-1, 0),
+];
+
 module.exports = {
   day20Part1,
 };
@@ -15,29 +22,56 @@ function day20Part1(inputLines) {
   let grid = day20Input.grid;
   let startPos = day20Input.startPos;
   let endPos = day20Input.endPos;
-  // console.log(grid.map(row => row.join('')).join('\n'));
+  let jumpPoints = getJumpable(grid);
   printGrid(grid);
-  let paths = findPaths(grid, startPos, endPos);
+  let initPaths = findPaths(grid, startPos, endPos);
+  let initPath = initPaths[0];
+  let cheatMap = new Map();
+  for(let i = 0; i < jumpPoints.length; ++i) {
+    let jumpPoint = jumpPoints[i];
+    let gridCopy = copyGrid(grid);
+    gridCopy[jumpPoint.y][jumpPoint.x] = GRID_TILE_ENUM.empty;
+    let foundPaths = findPaths(gridCopy, startPos, endPos);
+    // console.log(`foundPaths: ${foundPaths.length}`);
+    for(let k = 0; k < foundPaths.length; ++k) {
+      let foundPath = foundPaths[k];
+      let pathLenDiff = initPath.length - foundPath.length;
+      if(pathLenDiff > 0) {
+        // console.log(`${k}: ${pathLenDiff}`);
+        let currCheatCount = cheatMap.get(pathLenDiff);
+        if(currCheatCount === undefined) {
+          currCheatCount = 0;
+        }
+        cheatMap.set(pathLenDiff, currCheatCount + 1);
+      }
+    }
+    if(i > 1) {
+      // break;
+    }
+  }
+  let cheatMapTuples = [ ...cheatMap ].toSorted((a, b) => {
+    return a[0] - b[0];
+  });
+  cheatMapTuples.forEach(cheatMapTuple => {
+    let savedPicos = cheatMapTuple[0];
+    let cheatCount = cheatMapTuple[1];
+    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
+  })
   return -1;
 }
-
-let directions = [
-  new Point(0, -1),
-  new Point(1, 0),
-  new Point(0, 1),
-  new Point(-1, 0),
-];
 
 function findPaths(grid, sPos, ePos) {
   let w = grid[0].length;
   let h = grid.length;
   let visited = {};
+  let foundPaths = [];
   helper(sPos);
+  return foundPaths;
   function helper(mvPt, soFar) {
     soFar = soFar ?? [];
     if(mvPt.x === ePos.x && mvPt.y === ePos.y) {
-      console.log(soFar);
-      console.log(soFar.length);
+      let foundPath = soFar.slice();
+      foundPaths.push(foundPath);
     }
     visited[mvPt.keyStr()] = true;
     for(let d = 0; d < directions.length; d++) {
@@ -52,12 +86,37 @@ function findPaths(grid, sPos, ePos) {
         && !visited[adjPt.keyStr()]
       ) {
         soFar.push(adjPt);
+        console.log(soFar.length);
         helper(adjPt, soFar);
         soFar.pop();
       }
     }
     visited[mvPt.keyStr()] = false;
   }
+}
+
+function getJumpable(grid) {
+  let jumpPoints = [];
+  for(let y = 0; y < grid.length; ++y) {
+    for(let x = 0; x < grid[y].length; ++x) {
+      if(grid[y][x] === GRID_TILE_ENUM.jump) {
+        jumpPoints.push(new Point(x, y));
+      }
+    }
+  }
+  return jumpPoints;
+}
+
+function copyGrid(grid) {
+  let nextGrid = [];
+  for(let y = 0; y < grid.length; ++y) {
+    let row = [];
+    for(let x = 0; x < grid[y].length; ++x) {
+      row.push(grid[y][x]);
+    }
+    nextGrid.push(row);
+  }
+  return nextGrid;
 }
 
 function printGrid(grid) {
