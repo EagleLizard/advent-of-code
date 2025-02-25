@@ -1,3 +1,4 @@
+const { Queue } = require('../lib/datastruct/queue');
 const { Point } = require('../lib/geom/point');
 
 const GRID_TILE_ENUM = {
@@ -30,18 +31,21 @@ function day20Part1(inputLines) {
   printGrid(grid);
   // let initPaths = findPaths(grid, startPos, endPos);
   let initPaths = findPaths2(grid, startPos, endPos);
-  let initPath = initPaths[0];
+  let initPathLen = initPaths[0];
   // printGrid(grid, initPath);
-  let cheatMap = new Map();
   let numJumpPoints = jumpPoints.length;
   console.log(numJumpPoints);
   // findCheatPaths(grid, startPos, endPos, initPath);
   // let savedCheatCount = findCheatPaths2(grid, initPath);
-  let savedCheatCount = findCheatPaths3(grid, startPos, endPos, initPath);
+  let savedCheatCount = findCheatPaths3(grid, startPos, endPos, initPathLen);
   return savedCheatCount;
 }
 
-function findCheatPaths3(srcGrid, sPos, ePos, initPath) {
+function findCheatPaths3(srcGrid, sPos, ePos, initPathLen) {
+  let isTest = initPathLen < 5_000;
+  let targetDiff = isTest ? 10 : 100;
+  // console.log(initPath.length); 
+  // return;
   let cheatMap = new Map();
   let jumpPoints = getJumpable(srcGrid);
   let savedCheatCount = 0;
@@ -54,26 +58,26 @@ function findCheatPaths3(srcGrid, sPos, ePos, initPath) {
     let foundPaths = findPaths2(grid, sPos, ePos);
     for(let k = 0; k < foundPaths.length; ++k) {
       let foundPath = foundPaths[k];
-      if(foundPath.length < initPath.length) {
-        let lenDiff = initPath.length - foundPath.length;
+      if(foundPath < initPathLen) {
+        let lenDiff = initPathLen - foundPath;
         let currCheatCount = (cheatMap.has(lenDiff))
           ? cheatMap.get(lenDiff)
           : 0
         ;
         cheatMap.set(lenDiff, currCheatCount + 1);
-        if(lenDiff >= 100) {
+        if(lenDiff >= targetDiff) {
           savedCheatCount++;
         }
       }
     }
   }
-  // [ ...cheatMap ].toSorted((a, b) => {
-  //   return a[0] - b[0];
-  // }).forEach(cheatMapTuple => {
-  //   let savedPicos = cheatMapTuple[0];
-  //   let cheatCount = cheatMapTuple[1];
-  //   console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  // });
+  [ ...cheatMap ].toSorted((a, b) => {
+    return a[0] - b[0];
+  }).forEach(cheatMapTuple => {
+    let savedPicos = cheatMapTuple[0];
+    let cheatCount = cheatMapTuple[1];
+    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
+  });
   return savedCheatCount;
 }
 
@@ -176,19 +180,22 @@ function findPaths2(grid, sPos, ePos) {
   let h = grid.length;
   let visited = {};
   let foundPaths = [];
-  let queue = [];
+  // let queue = [];
+  let queue = new Queue();
   queue.push({
     mvPt: sPos,
-    soFar: [],
+    soFar: 0,
   });
   visited[sPos.keyStr()] = true;
-  while(queue.length > 0) {
-    let currItem = queue.shift();
+  // while(queue.length > 0) {
+  while(!queue.empty()) {
+    // let currItem = queue.shift();
+    let currItem = queue.pop();
     let mvPt = currItem.mvPt;
     let soFar = currItem.soFar;
     if(mvPt.x === ePos.x && mvPt.y === ePos.y) {
-      let foundPath = soFar.slice();
-      foundPaths.push(foundPath);
+      // let foundPath = soFar.slice();
+      foundPaths.push(soFar);
     }
     visited[mvPt.keyStr()] = true;
     for(let d = 0; d < directions.length; ++d) {
@@ -202,9 +209,9 @@ function findPaths2(grid, sPos, ePos) {
         && grid[adjPt.y][adjPt.x] === GRID_TILE_ENUM.empty
         && !visited[adjPt.keyStr()]
       ) {
-        let nsf = soFar.slice();
+        let nsf = soFar + 1;
         // let nv = Object.assign({}, visited);
-        nsf.push(adjPt);
+        // nsf.push(adjPt);
         queue.push({
           mvPt: adjPt,
           soFar: nsf,

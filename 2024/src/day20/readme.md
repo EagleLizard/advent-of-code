@@ -16,3 +16,9 @@ The better solution I thought of was to find the initial path, then for every pi
 My first attempt was too low, so I made a slightly more efficient naive implementation and let it run. It took 6 minutes and produced the right answer. My clever solution was off by one. Smh.
 
 Current solution (not smart) took ~331500ms (~5.5m)
+
+*<u>*Update:</u>*
+
+Making the naive solution faster.
+
+From ~331500ms (~5.5m) to ~22100ms (~22.1s)
