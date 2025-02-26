@@ -13,60 +13,46 @@ module.exports = {
 
 function day20Part2(inputLines) {
   let day20Input = parseInput(inputLines);
-  let grid = day20Grid.getPart2Grid(day20Input.grid);
+  let grid = day20Input.grid;
   let startPos = day20Input.startPos;
   let endPos = day20Input.endPos;
-  let dist = 20;
-  dist = 8;
   // dist = 12;
-  printGrid(grid, undefined, undefined);
+  // printGrid(grid, undefined, undefined);
   // printGridM(grid, startPos, dist);
   // let initPath = findPaths2(grid, startPos, endPos)?.[0];
-  /*
-    Store the distance of every point on the original racetrack
-      to the destination point for fast lookup
-  _*/
-  let pathDistMap = day20Grid.getPathDistMap(grid, startPos, endPos);
-  console.log(pathDistMap.distMap[endPos.y].get(endPos.x));
-  for(let i = 0; i < pathDistMap.path.length; ++i) {
-    let currPt = pathDistMap.path[i];
-    // printGridM(grid, currPt, dist);
-  }
+  
+  let longCheatPaths = findLongCheatPaths(grid, startPos, endPos);
 }
 
-function printGridM(srcGrid, sPos, dist) {
-  let grid = day20Grid.copyGrid(srcGrid);
-  let mPts = getManhattanPts(grid, sPos, dist);
-  let charGrid = [];
-  for(let i = 0; i < mPts.length; ++i) {
-    let mPt = mPts[i];
-    grid[mPt.y][mPt.x] = GRID_TILE_ENUM.search;
-  }
+function findLongCheatPaths(srcGrid, sPos, ePos) {
+  let dist = 20;
+  // dist = 8;
+  let grid = day20Grid.getPart2Grid(srcGrid);
+  let pathDistMap = day20Grid.getPathDistMap(grid, sPos, ePos);
+  let distMap = pathDistMap.distMap;
+  let visited = [];
   for(let y = 0; y < grid.length; ++y) {
-    let row = [];
-    for(let x = 0; x < grid[y].length; ++x) {
-      let gridVal = grid[y][x];
-      let c;
-      if(gridVal === GRID_TILE_ENUM.wall || gridVal === GRID_TILE_ENUM.jump) {
-        c = '#';
-      } else if(gridVal === GRID_TILE_ENUM.search) {
-        c = 'm';
-      } else if(gridVal === GRID_TILE_ENUM.empty) {
-        c = '.';
-      }
-      row.push(c);
-    }
-    charGrid.push(row);
+    visited.push({});
   }
-  
-  charGrid[sPos.y][sPos.x] = 'S';
- 
-  for(let y = 0; y < charGrid.length; ++y) {
-    for(let x = 0; x < charGrid[y].length; ++x) {
-      let c = charGrid[y][x];
-      process.stdout.write(c);
+  visited[sPos.y][sPos.x] = true;
+  for(let i = 0; i < pathDistMap.path.length; ++i) {
+    let currPt = pathDistMap.path[i];
+    let allMPts = getManhattanPts(grid, currPt, dist);
+    let mPts = [];
+    /* filter points that have been visited  */
+    for(let k = 0; k < allMPts.length; ++k) {
+      let mPt = allMPts[k];
+      if(!visited[mPt.y][mPt.x]) {
+        mPts.push(mPt);
+      }
     }
-    process.stdout.write('\n');
+    visited[currPt.y][currPt.x] = true;
+    let currDist = distMap[currPt.y].get(currPt.x);
+    // printGridM(grid, currPt, mPts, dist);
+    // console.log({ currDist });
+    if(i > 20) {
+      break;
+    }
   }
 }
 
@@ -95,7 +81,7 @@ function getManhattanPts(grid, srcPt, dist) {
   if(left < 0) {
     left = 0;
   }
-  console.log({ up, right, down, left });
+  // console.log({ up, right, down, left });
   let mPts = [];
   for(let y = up; y <= down; ++y) {
     for(let x = left; x <= right; ++x) {
@@ -141,6 +127,46 @@ function wallCollision(grid, sPt, ePt) {
     }
   }
   return false;
+}
+
+function printGridM(srcGrid, sPos, mPts, dist) {
+  let grid = day20Grid.copyGrid(srcGrid);
+  // let mPts = getManhattanPts(grid, sPos, dist);
+  let charGrid = [];
+  for(let i = 0; i < mPts.length; ++i) {
+    let mPt = mPts[i];
+    grid[mPt.y][mPt.x] = GRID_TILE_ENUM.search;
+  }
+  for(let y = 0; y < grid.length; ++y) {
+    let row = [];
+    for(let x = 0; x < grid[y].length; ++x) {
+      let gridVal = grid[y][x];
+      let c;
+      if(gridVal === GRID_TILE_ENUM.wall || gridVal === GRID_TILE_ENUM.jump) {
+        c = '#';
+      } else if(gridVal === GRID_TILE_ENUM.search) {
+        c = 'm';
+      } else if(gridVal === GRID_TILE_ENUM.empty) {
+        c = '.';
+      }
+      row.push(c);
+    }
+    charGrid.push(row);
+  }
+  
+  charGrid[sPos.y][sPos.x] = 'S';
+ 
+  let gridStr = '';
+  for(let y = 0; y < charGrid.length; ++y) {
+    for(let x = 0; x < charGrid[y].length; ++x) {
+      let c = charGrid[y][x];
+      // process.stdout.write(c);
+      gridStr += c;
+    }
+    // process.stdout.write('\n');
+    gridStr += '\n';
+  }
+  process.stdout.write(gridStr);
 }
 
 /*

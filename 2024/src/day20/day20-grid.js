@@ -51,7 +51,20 @@ function getPathDistMap(grid, sPos, ePos) {
     visited[mvPt.y][mvPt.x] = true;
     distMap[mvPt.y].set(mvPt.x, soFar);
     if(mvPt.x === ePos.x && mvPt.y === ePos.y) {
-      /* found */
+      /*
+        found
+        At this point, distMap contains the distance traveled at any point so-far.
+          Now that the length to the end is known, we want to convert this to the
+          length of the given point to the end of the path
+      _*/
+      for(let y = 0; y < distMap.length; ++y) {
+        let currMap = distMap[y];
+        let keys = [ ...currMap.keys() ];
+        for(let i = 0; i < keys.length; ++i) {
+          let key = keys[i];
+          currMap.set(key, soFar - currMap.get(key));
+        }
+      }
       let res = {
         path: pathSoFar,
         distMap,
