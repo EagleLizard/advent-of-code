@@ -5,6 +5,7 @@ const GRID_TILE_ENUM = {
   empty: 0,
   jump: 1,
   wall: 2,
+  search: 3,
 };
 
 const directions = [
@@ -16,7 +17,127 @@ const directions = [
 
 module.exports = {
   day20Part1,
+  day20Part2,
 };
+
+function day20Part2(inputLines) {
+  let day20Input = parseInput(inputLines);
+  let grid = day20Input.grid;
+  let startPos = day20Input.startPos;
+  let endPos = day20Input.endPos;
+  let dist = 20;
+  dist = 8;
+  // dist = 12;
+  printGrid(day20Input.grid, undefined, undefined);
+  printGridM(grid, startPos, dist);
+}
+
+function printGridM(srcGrid, sPos, dist) {
+  let grid = copyGrid(srcGrid);
+  let mPts = getManhattanPts(grid, sPos, dist);
+  let charGrid = [];
+  for(let i = 0; i < mPts.length; ++i) {
+    let mPt = mPts[i];
+    grid[mPt.y][mPt.x] = GRID_TILE_ENUM.search;
+  }
+  for(let y = 0; y < grid.length; ++y) {
+    let row = [];
+    for(let x = 0; x < grid[y].length; ++x) {
+      let gridVal = grid[y][x];
+      let c;
+      if(gridVal === GRID_TILE_ENUM.wall || gridVal === GRID_TILE_ENUM.jump) {
+        c = '#';
+      } else if(gridVal === GRID_TILE_ENUM.search) {
+        c = 'm';
+      } else if(gridVal === GRID_TILE_ENUM.empty) {
+        c = '.';
+      }
+      row.push(c);
+    }
+    charGrid.push(row);
+  }
+  for(let y = 0; y < charGrid.length; ++y) {
+    for(let x = 0; x < charGrid[y].length; ++x) {
+      let c = charGrid[y][x];
+      process.stdout.write(c);
+    }
+    process.stdout.write('\n');
+  }
+}
+
+function getManhattanPts(grid, srcPt, dist) {
+  let w = grid[0].length;
+  let h = grid.length;
+  /*
+  |x1 - x2| + |y1 - y2|
+  a point is in the sphere if it's manhattan distance is >= dist
+  Find the upper and lower bounds:
+    x-dist < x < x + dist
+  _*/
+  let up = srcPt.y - dist;
+  let right = srcPt.x + dist;
+  let down = srcPt.y + dist;
+  let left = srcPt.x - dist;
+  if(up < 0) {
+    up = 0;
+  }
+  if(right > (w - 1)) {
+    right = w - 1;
+  }
+  if(down > (h - 1)) {
+    down = h - 1;
+  }
+  if(left < 0) {
+    left = 0;
+  }
+  console.log({ up, right, down, left });
+  let mPts = [];
+  for(let y = up; y <= down; ++y) {
+    for(let x = left; x <= right; ++x) {
+      let d = Math.abs(x - srcPt.x) + Math.abs(y - srcPt.y);
+      // if(d === dist && grid[y][x] === GRID_TILE_ENUM.empty) {
+      if(d <= dist && grid[y][x] === GRID_TILE_ENUM.empty) {
+        let mPt = new Point(x, y);
+        /*
+          check if a wall would need to be crossed to reach destination
+        _*/
+        let collision = wallCollision(grid, srcPt, mPt);
+        if(collision) {
+          mPts.push(new Point(x, y));
+        }
+      }
+    }
+  }
+  return mPts;
+}
+
+function wallCollision(grid, sPt, ePt) {
+  /*
+    try bounding box
+  _*/
+  let minX = Math.min(sPt.x, ePt.x);
+  let maxX = Math.max(sPt.x, ePt.x);
+  let minY = Math.min(sPt.y, ePt.y);
+  let maxY = Math.max(sPt.y, ePt.y);
+  for(let y = minY; y <= maxY; ++y) {
+    if(
+      grid[y][minX] !== GRID_TILE_ENUM.empty
+      || grid[y][maxX] !== GRID_TILE_ENUM.empty
+    ) {
+      // console.log(y, minX, maxX);
+      return true;
+    }
+  }
+  for(let x = minX; x <= maxX; ++x) {
+    if(
+      grid[minY][x] !== GRID_TILE_ENUM.empty
+      || grid[maxY][x] !== GRID_TILE_ENUM.empty
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /*
 1506 - too low
