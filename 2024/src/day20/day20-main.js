@@ -1,22 +1,129 @@
+
 const { Queue } = require('../lib/datastruct/queue');
 const { Point } = require('../lib/geom/point');
+const day20Grid = require('./day20-grid');
 
-const GRID_TILE_ENUM = {
-  empty: 0,
-  jump: 1,
-  wall: 2,
-};
-
-const directions = [
-  new Point(0, -1),
-  new Point(1, 0),
-  new Point(0, 1),
-  new Point(-1, 0),
-];
+const GRID_TILE_ENUM = day20Grid.GRID_TILE_ENUM;
+const directions = day20Grid.directions;
 
 module.exports = {
   day20Part1,
+  day20Part2,
 };
+
+/*
+1037936 - correct
+_*/
+function day20Part2(inputLines) {
+  let day20Input = parseInput(inputLines);
+  let grid = day20Input.grid;
+  let startPos = day20Input.startPos;
+  let endPos = day20Input.endPos;
+  let longCheatPaths = findLongCheatPaths2(grid, startPos, endPos);
+  return longCheatPaths;
+}
+
+function findLongCheatPaths2(srcGrid, sPos, ePos) {
+  let dist = 20;
+  // dist = 5;
+  let grid = day20Grid.getPart2Grid(srcGrid);
+  let pathDistMap = day20Grid.getPathDistMap(grid, sPos, ePos);
+  let distMap = pathDistMap.distMap;
+  let initPath = pathDistMap.path;
+
+  let isTest = initPath.length < 5_000;
+  let saveTarget = isTest ? 50 : 100;
+
+  let visited = [];
+  let savedCheatCount = 0;
+  for(let y = 0; y < grid.length; ++y) {
+    visited.push({});
+  }
+  let fullPath = [ sPos, ...initPath ];
+  /*
+    when calculating the cheat distance, I need to account for the
+      length of the path of the cheat as well
+  _*/
+  for(let i = 0; i < fullPath.length; ++i) {
+    let currPt = fullPath[i];
+    visited[currPt.y][currPt.x] = true;
+    let currDist = fullPath.length - 1 - i;
+    let allMPts = day20Grid.getManhattanPts(grid, currPt, dist);
+    let mPts = [];
+    for(let k = 0; k < allMPts.length; ++k) {
+      let mPt = allMPts[k].point;
+      let mDist = allMPts[k].mDist;
+      if(!visited[mPt.y][mPt.x]) {
+        /* compare vs. the cost of going to that point normally */
+        let baseMCost = distMap[mPt.y].get(mPt.x);
+        if((baseMCost + mDist) < currDist) {
+          mPts.push(allMPts[k]);
+        } 
+      }
+    }
+    /*
+      At this point, mPts should contain only all possible cheats
+        that would actually save time vs. walking the path normally
+    _*/
+    for(let k = 0; k < mPts.length; ++k) {
+      let mPt = mPts[k].point;
+      let mDist = mPts[k].mDist;
+      let cDist = distMap[mPt.y].get(mPt.x) + mDist;
+      let savedPicos = currDist - cDist;
+      if(savedPicos >= saveTarget) {
+        savedCheatCount++;
+      }
+    }
+  }
+  return savedCheatCount;
+}
+
+function printGridM(srcGrid, sPos, mPts) {
+  let grid = day20Grid.copyGrid(srcGrid);
+  // let mPts = getManhattanPts(grid, sPos, dist);
+  let charGrid = [];
+  for(let i = 0; i < mPts.length; ++i) {
+    let mPt = mPts[i].point;
+    let mDist = mPts[i].mDist;
+    grid[mPt.y][mPt.x] = GRID_TILE_ENUM.search;
+  }
+  for(let y = 0; y < grid.length; ++y) {
+    let row = [];
+    for(let x = 0; x < grid[y].length; ++x) {
+      let gridVal = grid[y][x];
+      let c;
+      if(gridVal === GRID_TILE_ENUM.wall || gridVal === GRID_TILE_ENUM.jump) {
+        c = '#';
+      } else if(gridVal === GRID_TILE_ENUM.search) {
+        c = 'm';
+        let mPt = mPts.find(mPt => mPt.point.x === x && mPt.point.y === y);
+        if(mPt !== undefined) {
+          c = mPt.mDist.toString(32);
+        }
+        // c = mDist.toString(32);
+      } else if(gridVal === GRID_TILE_ENUM.empty) {
+        c = '.';
+      }
+      row.push(c);
+    }
+    charGrid.push(row);
+  }
+  
+  charGrid[sPos.y][sPos.x] = 'S';
+ 
+  for(let y = 0; y < charGrid.length; ++y) {
+    let lineStr = '';
+    for(let x = 0; x < charGrid[y].length; ++x) {
+      let c = charGrid[y][x];
+      // process.stdout.write(c);
+      lineStr += c;
+    }
+    // process.stdout.write('\n');
+    // gridStr += '\n';
+    process.stdout.write(`${lineStr}\n`);
+  }
+  // process.stdout.write(gridStr);
+}
 
 /*
 1506 - too low
@@ -51,7 +158,7 @@ function findCheatPaths3(srcGrid, sPos, ePos, initPathLen) {
   let savedCheatCount = 0;
   for(let i = 0; i < jumpPoints.length; ++i) {
     let jPt = jumpPoints[i];
-    let grid = copyGrid(srcGrid);
+    let grid = day20Grid.copyGrid(srcGrid);
     grid[jPt.y][jPt.x] = GRID_TILE_ENUM.empty;
     // console.log(jPt);
     // printGrid(grid);
@@ -79,100 +186,6 @@ function findCheatPaths3(srcGrid, sPos, ePos, initPathLen) {
   //   console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
   // });
   return savedCheatCount;
-}
-
-function findCheatPaths2(grid, initPath) {
-  let cheatMap = new Map();
-  let jumpPoints = getJumpable(grid);
-  /* 
-    For any given jump point, find the indices of the 2 points adjacent on the initPath.
-  _*/
-  let jPaths = [];
-  let savedCheatCount = 0;
-  for(let i = 0; i < jumpPoints.length; ++i) {
-    let jPt = jumpPoints[i];
-    let foundPath = findCheat(grid, initPath, jPt);
-    if(foundPath !== undefined) {
-      jPaths.push(foundPath);
-    }
-  }
-  for(let i = 0; i < jPaths.length; ++i) {
-    let jPath = jPaths[i];
-    let lenDiff = initPath.length - jPath.length;
-    let currCheatCount = cheatMap.has(lenDiff)
-      ? cheatMap.get(lenDiff)
-      : 0
-    ;
-    cheatMap.set(lenDiff, currCheatCount + 1);
-    if(lenDiff >= 100) {
-      savedCheatCount++;
-    }
-  }
-  // console.log(jPaths.length);
-  // console.log(cheatMap);
-  let cheatMapTuples = [ ...cheatMap ].toSorted((a, b) => {
-    return a[0] - b[0];
-  });
-  cheatMapTuples.forEach(cheatMapTuple => {
-    let savedPicos = cheatMapTuple[0];
-    let cheatCount = cheatMapTuple[1];
-    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  });
-  return savedCheatCount;
-}
-
-function findCheat(grid, initPath, cPt) {
-  let sPt, ePt;
-  let jPath = [];
-  let pt1, pt2;
-  if(
-    (grid[cPt.y][cPt.x + 1] === GRID_TILE_ENUM.empty)
-    && (grid[cPt.y][cPt.x - 1] === GRID_TILE_ENUM.empty)
-  ) {
-    /* horizontal */
-    pt1 = new Point(cPt.x + 1, cPt.y);
-    pt2 = new Point(cPt.x - 1, cPt.y);
-  } else if(
-    (grid[cPt.y + 1][cPt.x] === GRID_TILE_ENUM.empty)
-    && (grid[cPt.y - 1][cPt.x] === GRID_TILE_ENUM.empty)
-  ) {
-    /* vertical */
-    pt1 = new Point(cPt.x, cPt.y + 1);
-    pt2 = new Point(cPt.x, cPt.y - 1);
-  }
-  if(pt1 === undefined || pt2 === undefined) {
-    return undefined;
-  }
-  
-  for(let i = 0; i < initPath.length; ++i) {
-    let iPt = initPath[i];
-    if(sPt === undefined) {
-      if(
-        (iPt.x === pt1.x && iPt.y === pt1.y)
-        || (iPt.x === pt2.x && iPt.y === pt2.y)
-      ) {
-        sPt = iPt;
-      }
-      jPath.push(iPt);
-    } else if(sPt !== undefined && ePt === undefined) {
-      if(
-        (iPt.x === pt1.x && iPt.y === pt1.y)
-        || (iPt.x === pt2.x && iPt.y === pt2.y)
-      ) {
-        ePt = iPt;
-      }
-      if(ePt !== undefined) {
-        jPath.push(cPt);
-        jPath.push(ePt);
-      }
-    } else if(sPt !== undefined && ePt !== undefined) {
-      jPath.push(iPt);
-    }
-  }
-  if(ePt === undefined) {
-    return undefined;
-  }
-  return jPath;
 }
 
 function findPaths2(grid, sPos, ePos) {
@@ -229,18 +242,6 @@ function getJumpable(grid) {
     }
   }
   return jumpPoints;
-}
-
-function copyGrid(grid) {
-  let nextGrid = [];
-  for(let y = 0; y < grid.length; ++y) {
-    let row = [];
-    for(let x = 0; x < grid[y].length; ++x) {
-      row.push(grid[y][x]);
-    }
-    nextGrid.push(row);
-  }
-  return nextGrid;
 }
 
 function printGrid(grid, trackPath, cheatPoint) {

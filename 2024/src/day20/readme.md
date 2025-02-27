@@ -34,3 +34,26 @@ From ~22100ms (22.1s) to ~3100ms (3.1s)
 Making the naive solution faster.
 
 From ~3100ms (3.1s) to ~2800ms (2.8s)
+
+## Part 2
+
+I should be able to scan from any point on the original path outward.
+
+I should only explore paths that are actual cheats that phase through walls.
+```
+0123
+
+  3
+012
+
+ 3
+ 2
+01
+```
+
+I could find all of the points within the cheat distance as candidates. Only including paths that would pass through a wall, avoiding traveling exactly on the original path.
+
+So for a cheat path to be considered:
+
+1. it must pass through a wall
+2. it must end on an empty tile
