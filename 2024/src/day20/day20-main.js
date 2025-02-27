@@ -29,21 +29,65 @@ function findLongCheatPaths2(srcGrid, sPos, ePos) {
   // dist = 5;
   let grid = day20Grid.getPart2Grid(srcGrid);
   let pathDistMap = day20Grid.getPathDistMap(grid, sPos, ePos);
-  let mPts = day20Grid.getManhattanPts(grid, sPos, dist);
+  let distMap = pathDistMap.distMap;
+  let initPath = pathDistMap.path;
+  let initPathLen = initPath.length;
   let visited = [];
   let cheatMap = new Map();
   for(let y = 0; y < grid.length; ++y) {
     visited.push({});
   }
   visited[sPos.y][sPos.x] = true;
-  printGridM(grid, sPos, mPts, dist);
+  // printGridM(grid, sPos, mPts, dist);
   /*
     when calculating the cheat distance, I need to account for the
       length of the path of the cheat as well
   _*/
+  for(let i = 0; i < initPathLen; ++i) {
+    let currPt = initPath[i];
+    visited[currPt.y][currPt.x] = true;
+    let currDist = initPathLen - 1 - i;
+    let allMPts = day20Grid.getManhattanPts(grid, currPt, dist);
+    let mPts = [];
+    for(let k = 0; k < allMPts.length; ++k) {
+      let mPt = allMPts[k].point;
+      let mDist = allMPts[k].mDist;
+      if(!visited[mPt.y][mPt.x]) {
+        /* get the cost of going to that point normally */
+        let baseMCost = distMap[mPt.y].get(mPt.x);
+        // console.log(`mDist: ${mDist}`);
+        // console.log(`baseMCost: ${baseMCost}`);
+        // console.log(`baseMCost + mDist: ${baseMCost + mDist}`);
+        // console.log(`currDist: ${currDist}`);
+        // printGridM(grid, currPt, [ allMPts[k] ]);
+
+        if((baseMCost + mDist) < currDist) {
+          //
+          mPts.push(allMPts[k]);
+        } 
+        // mPts.push(allMPts[k]);
+      }
+    }
+    /*
+      At this point, mPts should contain only all possible cheats
+        that would actually save time vs. walking the path normally
+    _*/
+    
+    // console.log(`${pathDistMap.path.length - 1 - i}, ${distMap[currPt.y].get(currPt.x)}`);
+    console.log(`curr step: ${i}`);
+    printGridM(grid, currPt, mPts);
+    // if(i > 8) {
+    //   printGridM(srcGrid, currPt, mPts);
+    //   break;
+    // }
+    // if((i % 100) === 0) {
+    //   printGridM(srcGrid, currPt, mPts, dist);
+    //   // break;
+    // }
+  }
 }
 
-function printGridM(srcGrid, sPos, mPts, dist) {
+function printGridM(srcGrid, sPos, mPts) {
   let grid = day20Grid.copyGrid(srcGrid);
   // let mPts = getManhattanPts(grid, sPos, dist);
   let charGrid = [];
@@ -61,7 +105,7 @@ function printGridM(srcGrid, sPos, mPts, dist) {
         c = '#';
       } else if(gridVal === GRID_TILE_ENUM.search) {
         c = 'm';
-        let mPt = mPts.find(mPt => mPt.point.x === x && mPt.point.y);
+        let mPt = mPts.find(mPt => mPt.point.x === x && mPt.point.y === y);
         if(mPt !== undefined) {
           c = mPt.mDist.toString(32);
         }
@@ -78,15 +122,17 @@ function printGridM(srcGrid, sPos, mPts, dist) {
  
   let gridStr = '';
   for(let y = 0; y < charGrid.length; ++y) {
+    let lineStr = '';
     for(let x = 0; x < charGrid[y].length; ++x) {
       let c = charGrid[y][x];
       // process.stdout.write(c);
-      gridStr += c;
+      lineStr += c;
     }
     // process.stdout.write('\n');
-    gridStr += '\n';
+    // gridStr += '\n';
+    process.stdout.write(`${lineStr}\n`);
   }
-  process.stdout.write(gridStr);
+  // process.stdout.write(gridStr);
 }
 
 /*
