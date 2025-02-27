@@ -19,11 +19,6 @@ function day20Part2(inputLines) {
   let grid = day20Input.grid;
   let startPos = day20Input.startPos;
   let endPos = day20Input.endPos;
-  // dist = 12;
-  // printGrid(grid, undefined, undefined);
-  // printGridM(grid, startPos, dist);
-  // let initPath = findPaths2(grid, startPos, endPos)?.[0];
-  
   let longCheatPaths = findLongCheatPaths2(grid, startPos, endPos);
   return longCheatPaths;
 }
@@ -40,14 +35,11 @@ function findLongCheatPaths2(srcGrid, sPos, ePos) {
   let saveTarget = isTest ? 50 : 100;
 
   let visited = [];
-  let cheatMap = new Map();
   let savedCheatCount = 0;
   for(let y = 0; y < grid.length; ++y) {
     visited.push({});
   }
-  // visited[sPos.y][sPos.x] = true;
   let fullPath = [ sPos, ...initPath ];
-  // printGridM(grid, sPos, mPts, dist);
   /*
     when calculating the cheat distance, I need to account for the
       length of the path of the cheat as well
@@ -62,19 +54,11 @@ function findLongCheatPaths2(srcGrid, sPos, ePos) {
       let mPt = allMPts[k].point;
       let mDist = allMPts[k].mDist;
       if(!visited[mPt.y][mPt.x]) {
-        /* get the cost of going to that point normally */
+        /* compare vs. the cost of going to that point normally */
         let baseMCost = distMap[mPt.y].get(mPt.x);
-        // console.log(`mDist: ${mDist}`);
-        // console.log(`baseMCost: ${baseMCost}`);
-        // console.log(`baseMCost + mDist: ${baseMCost + mDist}`);
-        // console.log(`currDist: ${currDist}`);
-        // printGridM(grid, currPt, [ allMPts[k] ]);
-
         if((baseMCost + mDist) < currDist) {
-          //
           mPts.push(allMPts[k]);
         } 
-        // mPts.push(allMPts[k]);
       }
     }
     /*
@@ -86,36 +70,11 @@ function findLongCheatPaths2(srcGrid, sPos, ePos) {
       let mDist = mPts[k].mDist;
       let cDist = distMap[mPt.y].get(mPt.x) + mDist;
       let savedPicos = currDist - cDist;
-      // let currCheatCount = cheatMap.has(savedPicos)
-      //   ? cheatMap.get(savedPicos)
-      //   : 0
-      // ;
       if(savedPicos >= saveTarget) {
         savedCheatCount++;
       }
-      // cheatMap.set(savedPicos, currCheatCount + 1);
     }
-    
-    // console.log(`curr step: ${i}`);
-    // printGridM(grid, currPt, mPts);
-    // if(i > 0) {
-    //   printGridM(srcGrid, currPt, mPts);
-    //   break;
-    // }
-    // if((i % 100) === 0) {
-    //   printGridM(srcGrid, currPt, mPts, dist);
-    //   // break;
-    // }
   }
-  // [ ...cheatMap ].toSorted((a, b) => {
-  //   return a[0] - b[0];
-  // }).filter(cmTuple => {
-  //   return cmTuple[0] >= 50;
-  // }).forEach(cmTuple => {
-  //   let savedPicos = cmTuple[0];
-  //   let cheatCount = cmTuple[1];
-  //   console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  // });
   return savedCheatCount;
 }
 
@@ -152,7 +111,6 @@ function printGridM(srcGrid, sPos, mPts) {
   
   charGrid[sPos.y][sPos.x] = 'S';
  
-  let gridStr = '';
   for(let y = 0; y < charGrid.length; ++y) {
     let lineStr = '';
     for(let x = 0; x < charGrid[y].length; ++x) {
