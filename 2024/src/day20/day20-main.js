@@ -134,153 +134,95 @@ function day20Part1(inputLines) {
   let grid = day20Input.grid;
   let startPos = day20Input.startPos;
   let endPos = day20Input.endPos;
-  let jumpPoints = getJumpable(grid);
-  // printGrid(grid);
-  // let initPaths = findPaths(grid, startPos, endPos);
-  let initPaths = findPaths2(grid, startPos, endPos);
-  let initPathLen = initPaths[0];
-  // printGrid(grid, initPath);
-  let numJumpPoints = jumpPoints.length;
-  console.log(numJumpPoints);
-  // findCheatPaths(grid, startPos, endPos, initPath);
-  // let savedCheatCount = findCheatPaths2(grid, initPath);
-  let savedCheatCount = findCheatPaths3(grid, startPos, endPos, initPathLen);
+  
+  let savedCheatCount = findCheatPaths4(grid, startPos, endPos);
+  
   return savedCheatCount;
 }
 
-function findCheatPaths3(srcGrid, sPos, ePos, initPathLen) {
-  let isTest = initPathLen < 5_000;
-  let targetDiff = isTest ? 10 : 100;
-  // console.log(initPath.length); 
-  // return;
-  let cheatMap = new Map();
-  let jumpPoints = getJumpable(srcGrid);
+function findCheatPaths4(srcGrid, sPos, ePos) {
+  let grid = day20Grid.copyGrid(srcGrid);
+  let pathDistMap = day20Grid.getPathDistMap(grid, sPos, ePos);
+  let distMap = pathDistMap.distMap;
+  // let initPath = pathDistMap.path;
+  let fullPath = [ sPos, ...pathDistMap.path ];
+
+  let isTest = fullPath.length < 5_000;
+  let saveTarget = isTest ? 10 : 100;
+
   let savedCheatCount = 0;
-  for(let i = 0; i < jumpPoints.length; ++i) {
-    let jPt = jumpPoints[i];
-    let grid = day20Grid.copyGrid(srcGrid);
-    grid[jPt.y][jPt.x] = GRID_TILE_ENUM.empty;
-    // console.log(jPt);
-    // printGrid(grid);
-    let foundPaths = findPaths2(grid, sPos, ePos);
-    for(let k = 0; k < foundPaths.length; ++k) {
-      let foundPath = foundPaths[k];
-      if(foundPath < initPathLen) {
-        let lenDiff = initPathLen - foundPath;
-        let currCheatCount = (cheatMap.has(lenDiff))
-          ? cheatMap.get(lenDiff)
-          : 0
-        ;
-        cheatMap.set(lenDiff, currCheatCount + 1);
-        if(lenDiff >= targetDiff) {
+
+  let visited = [];
+  for(let y = 0; y < grid.length; ++y) {
+    visited.push({});
+  }
+  for(let i = 0; i < fullPath.length; ++i) {
+    let currPt = fullPath[i];
+    let currDist = fullPath.length - 1 - i;
+    visited[currPt.y][currPt.x] = true;
+    /*
+      find any adjacent jump points
+    _*/
+    let adjPts = [];
+    for(let k = 0; k < directions.length; ++k) {
+      let d = directions[k];
+      let jx = currPt.x + d.x;
+      let jy = currPt.y + d.y;
+      /*
+        the destination point for the jump will be the direction
+          of the current jump point with 2x distance
+      _*/
+      let dx = jx + d.x;
+      let dy = jy + d.y;
+      if(
+        grid[jy][jx] === GRID_TILE_ENUM.jump
+        && (
+          grid[dy][dx] === GRID_TILE_ENUM.empty
+          && !visited[dy][dx]
+        )
+      ) {
+        let cDist = distMap[dy].get(dx) + 2;
+        let savedPicos = currDist - cDist;
+        if(savedPicos >= saveTarget) {
           savedCheatCount++;
         }
       }
     }
   }
-  // [ ...cheatMap ].toSorted((a, b) => {
-  //   return a[0] - b[0];
-  // }).forEach(cheatMapTuple => {
-  //   let savedPicos = cheatMapTuple[0];
-  //   let cheatCount = cheatMapTuple[1];
-  //   console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  // });
   return savedCheatCount;
 }
 
-function findPaths2(grid, sPos, ePos) {
-  let w = grid[0].length;
-  let h = grid.length;
-  let visited = [];
-  let foundPaths = [];
-  let queue = new Queue();
-  queue.push({
-    mvPt: sPos,
-    soFar: 0,
-  });
-  for(let y = 0; y < grid.length; ++y) {
-    visited.push({});
-  }
-  visited[sPos.y][sPos.x] = true;
-  while(!queue.empty()) {
-    let currItem = queue.pop();
-    let mvPt = currItem.mvPt;
-    let soFar = currItem.soFar;
-    if(mvPt.x === ePos.x && mvPt.y === ePos.y) {
-      foundPaths.push(soFar);
-    }
-    visited[mvPt.y][mvPt.x] = true;
-    for(let d = 0; d < directions.length; ++d) {
-      let dPt = directions[d];
-      let nx = mvPt.x + dPt.x;
-      let ny = mvPt.y + dPt.y;
-      if(
-        nx < w
-        && nx >= 0
-        && ny < h
-        && ny >= 0
-        && grid[ny][nx] === GRID_TILE_ENUM.empty
-        && !visited[ny][nx]
-      ) {
-        queue.push({
-          mvPt: new Point(nx, ny),
-          soFar: soFar + 1,
-        });
-      }
-    }
-  }
-  return foundPaths;
-}
-
-function getJumpable(grid) {
-  let jumpPoints = [];
-  for(let y = 0; y < grid.length; ++y) {
-    for(let x = 0; x < grid[y].length; ++x) {
-      if(grid[y][x] === GRID_TILE_ENUM.jump) {
-        jumpPoints.push(new Point(x, y));
-      }
-    }
-  }
-  return jumpPoints;
-}
-
-function printGrid(grid, trackPath, cheatPoint) {
+function printGrid2(srcGrid, sPos, ePos, trackPath) {
+  let grid = day20Grid.copyGrid(srcGrid);
   let charGrid = [];
   for(let y = 0; y < grid.length; ++y) {
     let row = [];
     for(let x = 0; x < grid[y].length; ++x) {
-      let tileVal = grid[y][x];
+      let gridVal = grid[y][x];
       let c;
-      if(tileVal === GRID_TILE_ENUM.empty) {
-        c = '.';
-      } else if(tileVal === GRID_TILE_ENUM.wall) {
+      if(gridVal === GRID_TILE_ENUM.wall) {
         c = '#';
-      } else {
-        c = `${tileVal}`;
+      } else if(gridVal === GRID_TILE_ENUM.jump) {
+        c = '#';
+      } else if(gridVal === GRID_TILE_ENUM.empty) {
+        c = '.';
       }
-      // process.stdout.write(`${grid[y][x]}`);
-      // process.stdout.write(c);
       row.push(c);
     }
-    // process.stdout.write('\n');
     charGrid.push(row);
   }
-  if(trackPath !== undefined) {
-    for(let i = 0; i < trackPath.length; ++i) {
-      let tPt = trackPath[i];
-      'å∫ç∂´ƒ©˙ˆ∆˚¬µ˜øπœ®ß†¨√∑≈¥¡™£¢∞§¶•ªº';
-      // charGrid[tPt.y][tPt.x] = '∆';
-      charGrid[tPt.y][tPt.x] = 'o';
-    }
+  if(sPos !== undefined) {
+    charGrid[sPos.y][sPos.x] = 'S';
   }
-  if(cheatPoint !== undefined) {
-    charGrid[cheatPoint.y][cheatPoint.x] = ' ';
+  if(ePos !== undefined) {
+    charGrid[ePos.y][ePos.x] = 'E';
   }
   for(let y = 0; y < charGrid.length; ++y) {
+    let lineStr = '';
     for(let x = 0; x < charGrid[y].length; ++x) {
-      process.stdout.write(charGrid[y][x]);
+      lineStr += charGrid[y][x];
     }
-    process.stdout.write('\n');
+    process.stdout.write(`${lineStr}\n`);
   }
 }
 

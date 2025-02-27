@@ -35,6 +35,14 @@ Making the naive solution faster.
 
 From ~3100ms (3.1s) to ~2800ms (2.8s)
 
+### `[02/27/2025][js]`
+
+*<u>*Update4:</u>*
+
+I applied some of the optimization concepts from part 2.
+
+From ~2800ms (2.8s) to ~71ms
+
 ## Part 2
 
 I should be able to scan from any point on the original path outward.
