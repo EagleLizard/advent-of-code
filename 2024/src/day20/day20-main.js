@@ -31,14 +31,18 @@ function findLongCheatPaths(srcGrid, sPos, ePos) {
   let pathDistMap = day20Grid.getPathDistMap(grid, sPos, ePos);
   let distMap = pathDistMap.distMap;
   let visited = [];
+  let cheatMap = new Map();
   for(let y = 0; y < grid.length; ++y) {
     visited.push({});
   }
   visited[sPos.y][sPos.x] = true;
+  let initPathDist = distMap[sPos.y].get(sPos.x);
+  // console.log({ initPathDist });
   for(let i = 0; i < pathDistMap.path.length; ++i) {
     let currPt = pathDistMap.path[i];
     let allMPts = getManhattanPts(grid, currPt, dist);
     let mPts = [];
+    visited[currPt.y][currPt.x] = true;
     /* filter points that have been visited  */
     for(let k = 0; k < allMPts.length; ++k) {
       let mPt = allMPts[k];
@@ -46,14 +50,41 @@ function findLongCheatPaths(srcGrid, sPos, ePos) {
         mPts.push(mPt);
       }
     }
-    visited[currPt.y][currPt.x] = true;
     let currDist = distMap[currPt.y].get(currPt.x);
+    // console.log(currDist);
+    for(let k = 0; k < mPts.length; ++k) {
+      /* this approach didn't work */
+      let mPt = mPts[k];
+      // console.log(mPt);
+      // let mDist = distMap[mPt.y].get(mPt.x);
+      let mDist = distMap[mPt.y].get(mPt.x);
+      let cDist = currDist - mDist;
+      let savedLen = cDist;
+      let currCheatCount = cheatMap.has(savedLen)
+        ? cheatMap.get(savedLen)
+        : 0
+      ;
+      cheatMap.set(savedLen, currCheatCount + 1);
+      if(savedLen === 83) {
+        console.log(savedLen);
+        console.log({ mPt });
+      }
+    }
     // printGridM(grid, currPt, mPts, dist);
     // console.log({ currDist });
-    if(i > 20) {
-      break;
-    }
+    // if(i > 20) {
+    //   break;
+    // }
   }
+  [ ...cheatMap ].toSorted((a, b) => {
+    return a[0] - b[0];
+  }).filter(cheatMapTuple => {
+    return cheatMapTuple[0] >= 50;
+  }).forEach(cheatMapTuple => {
+    let savedPicos = cheatMapTuple[0];
+    let cheatCount = cheatMapTuple[1];
+    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
+  });
 }
 
 function getManhattanPts(grid, srcPt, dist) {
