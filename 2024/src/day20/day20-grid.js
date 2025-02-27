@@ -18,10 +18,70 @@ const directions = [
 module.exports = {
   GRID_TILE_ENUM,
   directions,
+  getManhattanPts,
   getPathDistMap,
   getPart2Grid,
   copyGrid,
 };
+
+function getManhattanPts(grid, srcPt, dist) {
+  /*
+  |x1 - x2| + |y1 - y2|
+  a point is in the sphere if it's manhattan distance is >= dist
+  Find the upper and lower bounds:
+    x-dist < x < x + dist
+  _*/
+  let w = grid[0].length;
+  let h = grid.length;
+  let up = Math.max(srcPt.y - dist, 0);
+  let right = Math.min(srcPt.x + dist, w - 1);
+  let down = Math.min(srcPt.y + dist, h - 1);
+  let left = Math.max(srcPt.x - dist, 0);
+  let mPts = [];
+  for(let y = up; y <= down; ++y) {
+    for(let x = left; x <= right; ++x) {
+      let mDist = Math.abs(x - srcPt.x) + Math.abs(y - srcPt.y);
+      if(mDist <= dist && grid[y][x] === GRID_TILE_ENUM.empty) {
+        let mPt = new Point(x, y);
+        let collision = wallCollision(grid, srcPt, mPt);
+        if(collision) {
+          mPts.push({
+            point: mPt,
+            mDist,
+          });
+        }
+      }
+    }
+  }
+  return mPts;
+}
+
+function wallCollision(grid, sPt, ePt) {
+  /*
+    try bounding box
+  _*/
+  let minX = Math.min(sPt.x, ePt.x);
+  let maxX = Math.max(sPt.x, ePt.x);
+  let minY = Math.min(sPt.y, ePt.y);
+  let maxY = Math.max(sPt.y, ePt.y);
+  for(let y = minY; y <= maxY; ++y) {
+    if(
+      grid[y][minX] !== GRID_TILE_ENUM.empty
+      || grid[y][maxX] !== GRID_TILE_ENUM.empty
+    ) {
+      return true;
+    }
+  }
+  for(let x = minX; x <= maxX; ++x) {
+    if(
+      grid[minY][x] !== GRID_TILE_ENUM.empty
+      || grid[maxY][x] !== GRID_TILE_ENUM.empty
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /*
   Given a grid with a single path, find the path and return

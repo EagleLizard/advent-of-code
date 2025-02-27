@@ -21,143 +21,26 @@ function day20Part2(inputLines) {
   // printGridM(grid, startPos, dist);
   // let initPath = findPaths2(grid, startPos, endPos)?.[0];
   
-  let longCheatPaths = findLongCheatPaths(grid, startPos, endPos);
+  let longCheatPaths = findLongCheatPaths2(grid, startPos, endPos);
 }
 
-function findLongCheatPaths(srcGrid, sPos, ePos) {
+function findLongCheatPaths2(srcGrid, sPos, ePos) {
   let dist = 20;
-  // dist = 8;
+  // dist = 5;
   let grid = day20Grid.getPart2Grid(srcGrid);
   let pathDistMap = day20Grid.getPathDistMap(grid, sPos, ePos);
-  let distMap = pathDistMap.distMap;
+  let mPts = day20Grid.getManhattanPts(grid, sPos, dist);
   let visited = [];
   let cheatMap = new Map();
   for(let y = 0; y < grid.length; ++y) {
     visited.push({});
   }
   visited[sPos.y][sPos.x] = true;
-  let initPathDist = distMap[sPos.y].get(sPos.x);
-  // console.log({ initPathDist });
-  for(let i = 0; i < pathDistMap.path.length; ++i) {
-    let currPt = pathDistMap.path[i];
-    let allMPts = getManhattanPts(grid, currPt, dist);
-    let mPts = [];
-    visited[currPt.y][currPt.x] = true;
-    /* filter points that have been visited  */
-    for(let k = 0; k < allMPts.length; ++k) {
-      let mPt = allMPts[k];
-      if(!visited[mPt.y][mPt.x]) {
-        mPts.push(mPt);
-      }
-    }
-    let currDist = distMap[currPt.y].get(currPt.x);
-    // console.log(currDist);
-    for(let k = 0; k < mPts.length; ++k) {
-      /* this approach didn't work */
-      let mPt = mPts[k];
-      // console.log(mPt);
-      // let mDist = distMap[mPt.y].get(mPt.x);
-      let mDist = distMap[mPt.y].get(mPt.x);
-      let cDist = currDist - mDist;
-      let savedLen = cDist;
-      let currCheatCount = cheatMap.has(savedLen)
-        ? cheatMap.get(savedLen)
-        : 0
-      ;
-      cheatMap.set(savedLen, currCheatCount + 1);
-      if(savedLen === 83) {
-        console.log(savedLen);
-        console.log({ mPt });
-      }
-    }
-    // printGridM(grid, currPt, mPts, dist);
-    // console.log({ currDist });
-    // if(i > 20) {
-    //   break;
-    // }
-  }
-  [ ...cheatMap ].toSorted((a, b) => {
-    return a[0] - b[0];
-  }).filter(cheatMapTuple => {
-    return cheatMapTuple[0] >= 50;
-  }).forEach(cheatMapTuple => {
-    let savedPicos = cheatMapTuple[0];
-    let cheatCount = cheatMapTuple[1];
-    console.log(`cheats: ${cheatCount}, picos=${savedPicos}`);
-  });
-}
-
-function getManhattanPts(grid, srcPt, dist) {
-  let w = grid[0].length;
-  let h = grid.length;
+  printGridM(grid, sPos, mPts, dist);
   /*
-  |x1 - x2| + |y1 - y2|
-  a point is in the sphere if it's manhattan distance is >= dist
-  Find the upper and lower bounds:
-    x-dist < x < x + dist
+    when calculating the cheat distance, I need to account for the
+      length of the path of the cheat as well
   _*/
-  let up = srcPt.y - dist;
-  let right = srcPt.x + dist;
-  let down = srcPt.y + dist;
-  let left = srcPt.x - dist;
-  if(up < 0) {
-    up = 0;
-  }
-  if(right > (w - 1)) {
-    right = w - 1;
-  }
-  if(down > (h - 1)) {
-    down = h - 1;
-  }
-  if(left < 0) {
-    left = 0;
-  }
-  // console.log({ up, right, down, left });
-  let mPts = [];
-  for(let y = up; y <= down; ++y) {
-    for(let x = left; x <= right; ++x) {
-      let d = Math.abs(x - srcPt.x) + Math.abs(y - srcPt.y);
-      // if(d === dist && grid[y][x] === GRID_TILE_ENUM.empty) {
-      if(d <= dist && grid[y][x] === GRID_TILE_ENUM.empty) {
-        let mPt = new Point(x, y);
-        /*
-          check if a wall would need to be crossed to reach destination
-        _*/
-        let collision = wallCollision(grid, srcPt, mPt);
-        if(collision) {
-          mPts.push(new Point(x, y));
-        }
-      }
-    }
-  }
-  return mPts;
-}
-
-function wallCollision(grid, sPt, ePt) {
-  /*
-    try bounding box
-  _*/
-  let minX = Math.min(sPt.x, ePt.x);
-  let maxX = Math.max(sPt.x, ePt.x);
-  let minY = Math.min(sPt.y, ePt.y);
-  let maxY = Math.max(sPt.y, ePt.y);
-  for(let y = minY; y <= maxY; ++y) {
-    if(
-      grid[y][minX] !== GRID_TILE_ENUM.empty
-      || grid[y][maxX] !== GRID_TILE_ENUM.empty
-    ) {
-      return true;
-    }
-  }
-  for(let x = minX; x <= maxX; ++x) {
-    if(
-      grid[minY][x] !== GRID_TILE_ENUM.empty
-      || grid[maxY][x] !== GRID_TILE_ENUM.empty
-    ) {
-      return true;
-    }
-  }
-  return false;
 }
 
 function printGridM(srcGrid, sPos, mPts, dist) {
@@ -165,7 +48,8 @@ function printGridM(srcGrid, sPos, mPts, dist) {
   // let mPts = getManhattanPts(grid, sPos, dist);
   let charGrid = [];
   for(let i = 0; i < mPts.length; ++i) {
-    let mPt = mPts[i];
+    let mPt = mPts[i].point;
+    let mDist = mPts[i].mDist;
     grid[mPt.y][mPt.x] = GRID_TILE_ENUM.search;
   }
   for(let y = 0; y < grid.length; ++y) {
@@ -177,6 +61,11 @@ function printGridM(srcGrid, sPos, mPts, dist) {
         c = '#';
       } else if(gridVal === GRID_TILE_ENUM.search) {
         c = 'm';
+        let mPt = mPts.find(mPt => mPt.point.x === x && mPt.point.y);
+        if(mPt !== undefined) {
+          c = mPt.mDist.toString(32);
+        }
+        // c = mDist.toString(32);
       } else if(gridVal === GRID_TILE_ENUM.empty) {
         c = '.';
       }
