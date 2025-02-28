@@ -1,9 +1,11 @@
-const { Keypad } = require('./keypad');
+
+const { Dirpad } = require('./dirpad');
 const { Numpad } = require('./numpad');
 
 const numpadKeyVals = [
   7, 8, 9,
   4, 5, 6,
+  1, 2, 3,
   undefined, 0, 'A',
 ];
 const dirpadKeyVal = [
@@ -16,38 +18,39 @@ module.exports = {
 };
 
 function day21Part1(inputLines) {
-  let numpad = new Numpad();
-  
-  /*
-    clockwise starting w/ up:
-      0,1,2,3 = up,right,down,left
-  _*/
-  let dirpad = new Keypad();
-  // console.log(numpad.keys);
-  // console.log(dirpad.keys);
-  // numpad.press(0, 0);
-  // numpad.press(1, 0);
-  // numpad.press(2, 0);
-  // numpad.press(0, 1);
-  // numpad.press(1, 1);
-  // numpad.press(2, 1);
-  // // numpad.press(0, 2);
-  // numpad.press(1, 2);
-  // numpad.press(2, 2);
-  let handleKeyPress = (val) => {
-    console.log(`key: ${val}`);
-  };
-  let handleActivate = () => {
+  // let numpad = new Numpad();
+  let numpad2 = new Numpad();
+  let dirpad = new Dirpad();
+
+  numpad2.onActivate(() => {
     console.log('activate');
-  };
-  numpad.onKeyPress(handleKeyPress);
-  numpad.onActivate(handleActivate);
-  for(let i = 0; i < numpad.numKeys(); ++i) {
+  });
+  numpad2.onKeyPress((keyVal) => {
+    console.log(`keyVal: ${keyVal}`);
+  });
+
+  dirpad.onActivate(() => {
+    console.log('dirpad activate');
+  });
+  dirpad.onKeyPress((keyVal) => {
+    console.log(`dirpad.onKeyPress keyVal: ${keyVal}`);
+  });
+
+  for(let i = 0; i < numpad2.numKeys(); ++i) {
     try {
-      numpad.press(i);
+      numpad2.press(i);
     } catch(e) {
       console.error(e);
     }
   }
+
+  for(let i = 0; i < dirpad.numKeys(); ++i) {
+    try {
+      dirpad.press(i);
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
   return -1;
 }

@@ -1,38 +1,39 @@
-const { Point } = require('../lib/geom/point');
 
-const KEYPAD_KEY_TYPE_ENUM = {
-  empty: 0,
-  val: 1, 
-  activate: 2,
-};
+const { KeypadKey, KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
+const { KeypadError } = require('./keypad-error');
 
 const KEYS_PER_ROW = 3;
 
 module.exports = {
-  KEYPAD_KEY_TYPE_ENUM,
   Keypad,
-  KeypadKey,
-  KeypadError,
 };
 
-function Keypad() {
+function Keypad(keys) {
   let self = this;
+  if(keys === undefined || !Array.isArray(keys)) {
+    throw new KeypadError(`Expected keys to be type array, received: ${typeof keys}`);
+  }
   self.keys = [
     [],
   ];
-  self.onKeyPressFns = new Map();
-  self.numKeys = 0;
+  self.keyCount = 0;
+  self.keyPressFn = undefined;
+  self.activateFn = undefined;
+  self.keyPressFns = new Map();
+  for(let i = 0; i < keys.length; ++i) {
+    let keyVal = keys[i];
+    self.addKey(keyVal);
+  }
 }
 
+Keypad.prototype.numKeys = function() {
+  return this.keyCount;
+};
 Keypad.prototype.getWidth = function() {
-  let self = this;
-  let width = self.keys[0].length;
-  return width;
+  return this.keys[0].length;
 };
 Keypad.prototype.getHeight = function() {
-  let self = this;
-  let height = self.keys.length;
-  return height;
+  return this.keys.length;
 };
 
 /**
@@ -54,39 +55,18 @@ Keypad.prototype.getKeyAt = function(x, y) {
   return keypadKey;
 };
 
-/**
- * 
- * @param {number} x 
- * @param {number | undefined} y 
- */
 Keypad.prototype.press = function(x, y) {
   let self = this;
   let keypadKey = self.getKeyAt(x, y);
   if(keypadKey === undefined) {
     throw new KeypadError(`No key at (${x}, ${y})`);
   }
-  let keyPressFn = self.onKeyPressFns.has(keypadKey.id)
-    ? self.onKeyPressFns.get(keypadKey.id)
+  // console.log(keypadKey);
+  let keyPressFn = self.keyPressFns.has(keypadKey.id)
+    ? self.keyPressFns.get(keypadKey.id)
     : undefined
   ;
   keyPressFn?.(keypadKey);
-};
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {(key: KeypadKey) => void} cb 
- */
-Keypad.prototype.onKeyPress = function(x, y, cb) {
-  let self = this;
-  let keypadKey = self.getKeyAt(x, y);
-  if(keypadKey === undefined) {
-    throw new KeypadError(`No key at (${x}, ${y})`);
-  }
-  if(self.onKeyPressFns.has(keypadKey.id)) {
-    throw new KeypadError(`Key at (${x}, ${y}) already has onKeyPress() registered`);
-  }
-  self.onKeyPressFns.set(keypadKey.id, cb);
 };
 
 /**
@@ -99,38 +79,50 @@ Keypad.prototype.addKey = function(keyVal) {
   }
   let keypadKey = new KeypadKey(keyVal);
   self.keys[self.keys.length - 1].push(keypadKey);
-  self.numKeys++;
-  let x = self.keys[self.keys.length - 1].length - 1;
-  let y = self.keys.length - 1;
-  let keyPos = new Point(x, y);
-  return keyPos;
-  // return keypadKey;
-};
-
-let keypadKeyIdCounter = 0;
-
-/**
- * @class
- */
-function KeypadKey(keyValue) {
-  let self = this;
-  // /** @property {string} type */
-  self.type = KEYPAD_KEY_TYPE_ENUM.val;
-  if(keyValue === undefined) {
-    self.type = KEYPAD_KEY_TYPE_ENUM.empty;
-  } else if(keyValue === 'A') {
-    self.type = KEYPAD_KEY_TYPE_ENUM.activate;
+  self.keyCount++;
+  // console.log(self);
+  switch(keypadKey.type) {
+    case KEYPAD_KEY_TYPE_ENUM.activate:
+      self.keyPressFns.set(keypadKey.id, self.handleActivate.bind(self));
+      break;
+    case KEYPAD_KEY_TYPE_ENUM.val:
+      self.keyPressFns.set(keypadKey.id, self.handleKeyPress.bind(self));
+      break;
+    case KEYPAD_KEY_TYPE_ENUM.empty:
+      self.keyPressFns.set(keypadKey.id, self.handleEmptyKeyPress.bind(self));
   }
-  self.val = keyValue;
-  self.id = keypadKeyIdCounter++;
-}
-
-function KeypadError(message) {
+  return keypadKey;
+};
+/**
+ * 
+ * @param {() => void} cb
+ */
+Keypad.prototype.onActivate = function(cb) {
   let self = this;
-  Error.captureStackTrace(self, KeypadError);
-  self.message = message;
-  self.name = 'KeypadError';
-}
-
-KeypadError.prototype = Object.create(Error.prototype);
-KeypadError.prototype.constructor = KeypadError;
+  if(self.activateFn !== undefined) {
+    throw new KeypadError('Numpad activate() function already registered');
+  }
+  self.activateFn = cb;
+};
+/**
+ * 
+ * @param {(keypadKey: any) => void} cb 
+ */
+Keypad.prototype.onKeyPress = function(cb) {
+  let self = this;
+  if(self.keyPressFn !== undefined) {
+    throw new KeypadError('Numpad keyPress() function already registered');
+  }
+  self.keyPressFn = cb;
+};
+Keypad.prototype.handleKeyPress = function(keypadKey) {
+  let self = this;
+  self.keyPressFn?.(keypadKey.val);
+};
+Keypad.prototype.handleActivate = function() {
+  let self = this;
+  self.activateFn?.();
+};
+Keypad.prototype.handleEmptyKeyPress = function() {
+  throw new KeypadError('Empty key pressed');
+};
