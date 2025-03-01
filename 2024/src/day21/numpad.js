@@ -1,5 +1,7 @@
 
 const { Keypad: Keypad2 } = require('./keypad');
+const { KeypadError } = require('./keypad-error');
+const { KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
 
 const NUMPAD_KEY_VALS = [
   7, 8, 9,
@@ -15,8 +17,29 @@ module.exports = {
 function Numpad() {
   let self = this;
   self.keypad = new Keypad2(NUMPAD_KEY_VALS);
+  self.keyPressFn = undefined;
+  self.activateFn = undefined;
+  self.keypad.onKeyPress((keypadKey) => {
+    if(keypadKey.type === KEYPAD_KEY_TYPE_ENUM.activate) {
+      return self.activateFn?.(keypadKey.val);
+    } else {
+      return self.keyPressFn?.(keypadKey.val);
+    }
+  });
 }
 
+Numpad.prototype.getKeyPath = function(sPos, ePos) {
+  return this.keypad.getKeyPath(sPos, ePos);
+};
+Numpad.prototype.getKeyPos = function(keyVal) {
+  return this.keypad.getKeyPos(keyVal);
+};
+Numpad.prototype.getKeyAt = function(x, y) {
+  return this.keypad.getKeyAt(x, y);
+};
+Numpad.prototype.getOrigin = function() {
+  return this.keypad.origin;
+};
 Numpad.prototype.getWidth = function() {
   return this.keypad.getWidth();
 };
@@ -31,8 +54,16 @@ Numpad.prototype.press = function(x, y) {
   return this.keypad.press(x, y);
 };
 Numpad.prototype.onKeyPress = function(cb) {
-  return this.keypad.onKeyPress(cb);
+  let self = this;
+  if(self.keyPressFn !== undefined) {
+    throw new KeypadError('Numpad keyPress() function already registered');
+  }
+  self.keyPressFn = cb;
 };
 Numpad.prototype.onActivate = function(cb) {
-  return this.keypad.onActivate(cb);
+  let self = this;
+  if(self.activateFn !== undefined) {
+    throw new KeypadError('Numpad onActivate() function already registered');
+  }
+  self.activateFn = cb;
 };
