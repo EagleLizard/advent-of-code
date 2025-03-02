@@ -72,41 +72,50 @@ function getMovesToNumpad3(srcCode) {
   let r3 = new Robot(r2.dirpad);
   let keysPressed = [];
   numpad.onKeyPress((keyVal) => {
+    // console.log(keyVal);
     keysPressed.push(keyVal);
   });
   numpad.onActivate(() => {
-    console.log([ ...keysPressed, 'A' ]);
+    console.log([ ...keysPressed, 'A' ].join(''));
+    keysPressed.length = 0;
   });
+  /*
+    to get all possible paths, we need to get:
+      1. all paths to first keycode
+  _*/
+  // let numpadPaths = numpad.getKeyPaths(r1.pos, numpad.getKeyPos(0));
 
-  let robots = [
-    r1,
-    // r2,
-  ];
-  let currCode = code.slice();
-  for(let i = 0; i < robots.length; ++i) {
-    let robot = robots[i];
-    let allPaths = getPossibleMoves(code, robot);
-    console.log(allPaths.length);
-    for(let k = 0; k < allPaths.length; ++k) {
-      let currPaths = allPaths[k];
+  let allCodePaths = r1.findAllCodePaths(code);
+  let minPathLen = Infinity;
+  let maxPathLen = -Infinity;
+  for(let i = 0; i < allCodePaths.length; ++i) {
+    let codePath = allCodePaths[i];
+    if(codePath.length < minPathLen) {
+      minPathLen = codePath.length;
     }
-
+    if(codePath.length > maxPathLen) {
+      maxPathLen = codePath.length;
+    }
+    // for(let k = 0; k < codePath.length; ++k) {
+    //   let mv = codePath[k];
+    //   r1.pressKey(mv);
+    // }
   }
-
-}
-
-function getPossibleMoves(code, robot) {
-  let keyPaths = [];
-  for(let i = 0; i < code.length; ++i) {
-    let currKey = code[i];
-    let kPaths = robot.pathsToKey(currKey);
-    for(let k = 0; k < kPaths.length; ++k) {
-      let kPath = kPaths[k];
-      kPath.push(ACTIVATE_KEY_VAL);
-    };
-    keyPaths.push(kPaths);
+  console.log({ minPathLen });
+  console.log({ maxPathLen });
+  let shortestPaths = [];
+  for(let i = 0; i < allCodePaths.length; ++i) {
+    let codePath = allCodePaths[i];
+    if(codePath.length === minPathLen) {
+      shortestPaths.push(codePath);
+    }
   }
-  return keyPaths;
+  console.log({ shortestPathCount: shortestPaths.length });
+  console.log('shortestPaths:');
+  shortestPaths.forEach(shortPath => {
+    console.log(shortPath.map(moveToChar).join(''));
+  });
+  // console.log(numpadPaths.map(numpadPath => numpadPath.map(moveToChar).join('')));
 }
 
 function moveToChar(move) {

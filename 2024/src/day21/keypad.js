@@ -155,7 +155,7 @@ Keypad.prototype.getKeyAt = function(x, y) {
     y = Math.floor(x / KEYS_PER_ROW);
     x = x % KEYS_PER_ROW;
   }
-  // console.log({x, y})
+  // console.log({x, y});
   let keypadKey = self.keys[y][x];
   return keypadKey;
 };

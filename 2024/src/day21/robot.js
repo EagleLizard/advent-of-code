@@ -4,7 +4,7 @@ const { Point } = require('../lib/geom/point');
 const { Dirpad } = require('./dirpad');
 const { Keypad } = require('./keypad');
 const { KeypadError } = require('./keypad-error');
-const { KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
+const { KEYPAD_KEY_TYPE_ENUM, ACTIVATE_KEY_VAL } = require('./keypad-key');
 
 const directions = Directions.getDirectionPoints();
 
@@ -41,6 +41,82 @@ function Robot(keypad) {
   }
 }
 
+Robot.prototype.resetArm = function() {
+  let self = this;
+  let origin = self.keypad.getOrigin();
+  self.pos.x = origin.x;
+  self.pos.y = origin.y;
+};
+
+Robot.prototype.findAllCodePaths = function(codeKeyVals) {
+  /*
+    to get all possible paths, we need to get:
+      1. all paths to from each point to the next point
+      2. get every path permutation
+  _*/
+  let self = this;
+
+  let codeKeyPts = [
+    self.keypad.getOrigin(),
+  ];
+  for(let i = 0; i < codeKeyVals.length; ++i) {
+    codeKeyPts.push(self.keypad.getKeyPos(codeKeyVals[i]));
+  }
+  let keyPtPairs = [];
+  for(let i = 0; i < codeKeyPts.length - 1; ++i) {
+    let pt = codeKeyPts[i];
+    let nPt = codeKeyPts[i + 1];
+    keyPtPairs.push([ pt, nPt ]);
+  }
+  // keyPtPairs.forEach(ptTuple => {
+  //   console.log(`${self.keypad.getKeyAt(ptTuple[0].x, ptTuple[0].y).val} -> ${self.keypad.getKeyAt(ptTuple[1].x, ptTuple[1].y).val}`);
+  // });
+  let pairPaths = [];
+  for(let i = 0; i < keyPtPairs.length; ++i) {
+    let [ sPos, ePos ] = keyPtPairs[i];
+    let keyPaths = self.keypad.getKeyPaths(sPos, ePos);
+    console.log(`${self.keypad.getKeyAt(sPos.x, sPos.y).val} -> ${self.keypad.getKeyAt(ePos.x, ePos.y).val}`);
+    for(let k = 0; k < keyPaths.length; ++k) {
+      /*
+        every key on the keypad must also be pressed with the current
+          dirpad via 'activate'
+      _*/
+      keyPaths[k].push(ACTIVATE_KEY_VAL);
+    }
+    pairPaths.push(keyPaths);
+  }
+
+  let possiblePaths = [];
+  helper(pairPaths);
+  return possiblePaths;
+
+  function helper(keyPaths, pathsSoFar) {
+    pathsSoFar = pathsSoFar ?? [];
+    if(keyPaths.length === 0) {
+      let foundPath = [];
+      /* flatten moves */
+      for(let i = 0; i < pathsSoFar.length; ++i) {
+        let currMoves = pathsSoFar[i];
+        for(let k = 0; k < currMoves.length; ++k) {
+          foundPath.push(currMoves[k]);
+        }
+      }
+      // possiblePaths.push(pathsSoFar.slice());
+      possiblePaths.push(foundPath);
+      return;
+    }
+    let currPaths = keyPaths[0];
+    let restPaths = keyPaths.slice(1);
+    for(let i = 0; i < currPaths.length; ++i) {
+      let currPath = currPaths[i];
+      // console.log(currPath);
+      pathsSoFar.push(currPath);
+      helper(restPaths, pathsSoFar);
+      pathsSoFar.pop();
+    }
+  }
+};
+
 Robot.prototype.onKeyPress = function(cb) {
   let self = this;
   let kpfId = keyPressFnIdCounter++;
@@ -64,7 +140,7 @@ Robot.prototype.pathToKey = function(keyVal) {
   return keyPath;
 };
 
-Robot.prototype.pathsToKey = function(keyVal) {
+Robot.prototype.getKeyPaths = function(keyVal) {
   let self = this;
   let destKeyPos = self.keypad.getKeyPos(keyVal);
   let keyPaths = self.keypad.getKeyPaths(self.pos, destKeyPos);
