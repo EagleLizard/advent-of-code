@@ -88,7 +88,14 @@ function day21Part1(inputLines) {
   return -1;
 }
 
-/*
+/* 
+2 robots:
+  029A: v<<A>>^A<A>AvA<^AA>A<vAAA>^A
+     1: v<<A>^>A<A>A<AA>vA^Av<AAA^>A
+3 robots;
+  029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
+     1: 
+
 029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
       v<A<AA>^>AvA^<A>vA^Av<<A>^>AvA^Av<<A>^>AAvA<A^>A<A>Av<A<A>^>AAA<A>vA^A
 980A: <v<A>>^AAAvA^A<vA<AA>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>A
@@ -115,6 +122,33 @@ function getMovesToNumpad2(srcCode) {
   r2.setKeypad(r1.dirpad);
   let r3 = new Robot();
   r3.setKeypad(r2.dirpad);
+
+  r1.onKeyPress((keypadKey, robot) => {
+    let dirpadKeyChars = [];
+    for(let y = 0; y < robot.dirpad.keypad.keys.length; ++y) {
+      let cRow = [];
+      for(let x = 0; x < robot.dirpad.keypad.keys[y].length; ++x) {
+        let dpKey = robot.dirpad.keypad.keys[y][x];
+        let c;
+        if(dpKey.type === KEYPAD_KEY_TYPE_ENUM.empty) {
+          c = ' ';
+        } else if(dpKey.type === KEYPAD_KEY_TYPE_ENUM.activate) {
+          c = dpKey.val;
+        } else {
+          c = '^>v<'[dpKey.val];
+        }
+        cRow.push(c);
+      }
+      dirpadKeyChars.push(cRow);
+    }
+    let dirpadStr = dirpadKeyChars.map(cRow => {
+      return cRow.join(' ');
+    }).join('\n');
+    // console.log(`${dirpadStr}\n`);
+    // for(let y = 0; y < robot.dirpad.keys.length; ++y) {
+    //   console.log(robot.dirpad.keys);
+    // }
+  });
 
   // r3.dirpad.press(0,0);
 

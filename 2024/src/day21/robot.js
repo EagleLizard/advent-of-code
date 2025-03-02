@@ -9,6 +9,7 @@ const { KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
 const directions = Directions.getDirectionPoints();
 
 let robotIdCounter = 0;
+let keyPressFnIdCounter = 0;
 
 module.exports = {
   Robot,
@@ -22,10 +23,13 @@ function Robot() {
   // let origin = keypad.getOrigin();
   // self.pos = new Point(origin.x, origin.y);
   self.pos = undefined;
-  self.keyPressFn = undefined;
+  self.keyPressFns = new Map();
   self.dirpad = new Dirpad();
   self.dirpad.onKeyPress((keypadKey) => {
-    self.keyPressFn?.(keypadKey);
+    let kpFns = [ ...self.keyPressFns.values() ];
+    for(let i = 0; i < kpFns.length; ++i) {
+      kpFns[i](keypadKey, self);
+    }
     if(keypadKey.type === KEYPAD_KEY_TYPE_ENUM.activate) {
       return self.handleActivate(keypadKey);
     } else {
@@ -36,12 +40,10 @@ function Robot() {
 
 Robot.prototype.onKeyPress = function(cb) {
   let self = this;
-  if(self.keyPressFn !== undefined) {
-    throw new KeypadError('Robot onKeyPress() function already registered');
-  }
-  self.keyPressFn = cb;
+  let kpfId = keyPressFnIdCounter++;
+  self.keyPressFns.set(kpfId, cb);
   return () => {
-    self.keyPressFn = undefined;
+    return self.keyPressFns.delete(kpfId);
   };
 };
 
@@ -54,16 +56,8 @@ Robot.prototype.setKeypad = function(keypad) {
 
 Robot.prototype.pathToKey = function(keyVal) {
   let self = this;
-  // let keyAtArm = self.keypad.getKeyAt(self.pos.x, self.pos.y);
-  // console.log(self.keypad);
   let destKeyPos = self.keypad.getKeyPos(keyVal);
-  // console.log('from:');
-  // console.log(self.pos);
-  // console.log(self.keypad.getKeyAt(self.pos.x, self.pos.y));
-  // console.log('to:');
-  // console.log(destKeyPos);
   let keyPath = self.keypad.getKeyPath(self.pos, destKeyPos);
-  // console.log({ keyPath });
   return keyPath;
 };
 
