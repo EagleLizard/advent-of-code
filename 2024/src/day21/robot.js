@@ -48,7 +48,7 @@ Robot.prototype.resetArm = function() {
   self.pos.y = origin.y;
 };
 
-Robot.prototype.findAllCodePaths = function(codeKeyVals) {
+Robot.prototype.findMinCodePaths = function(codeKeyVals, minPathLen) {
   /*
     to get all possible paths, we need to get:
       1. all paths to from each point to the next point
@@ -87,11 +87,19 @@ Robot.prototype.findAllCodePaths = function(codeKeyVals) {
   }
 
   let possiblePaths = [];
+  minPathLen = minPathLen ?? Infinity;
   helper(pairPaths);
   return possiblePaths;
 
   function helper(keyPaths, pathsSoFar) {
     pathsSoFar = pathsSoFar ?? [];
+    let sfPathLen = 0;
+    for(let k = 0; k < pathsSoFar.length; ++k) {
+      sfPathLen += pathsSoFar[k].length;
+    }
+    if(sfPathLen > minPathLen) {
+      return;
+    }
     if(keyPaths.length === 0) {
       let foundPath = [];
       /* flatten moves */
@@ -101,10 +109,14 @@ Robot.prototype.findAllCodePaths = function(codeKeyVals) {
           foundPath.push(currMoves[k]);
         }
       }
+      if(foundPath.length < minPathLen) {
+        minPathLen = foundPath.length;
+      }
       // possiblePaths.push(pathsSoFar.slice());
       possiblePaths.push(foundPath);
       return;
     }
+
     let currPaths = keyPaths[0];
     let restPaths = keyPaths.slice(1);
     for(let i = 0; i < currPaths.length; ++i) {
@@ -115,6 +127,39 @@ Robot.prototype.findAllCodePaths = function(codeKeyVals) {
       pathsSoFar.pop();
     }
   }
+};
+
+Robot.prototype.findMinCodePath = function(codeKeyVals) {
+  let self = this;
+  let codeKeyPts = [
+    self.keypad.getOrigin(),
+  ];
+  for(let i = 0; i < codeKeyVals.length; ++i) {
+    codeKeyPts.push(self.keypad.getKeyPos(codeKeyVals[i]));
+  }
+  let keyPtPairs = [];
+  for(let i = 0; i < codeKeyPts.length - 1; ++i) {
+    let pt = codeKeyPts[i];
+    let nPt = codeKeyPts[i + 1];
+    keyPtPairs.push([ pt, nPt ]);
+  }
+  let pairPaths = [];
+  for(let i = 0; i < keyPtPairs.length; ++i) {
+    let [ sPos, ePos ] = keyPtPairs[i];
+    let foundPath = self.keypad.getKeyPath(sPos, ePos);
+    foundPath.push(ACTIVATE_KEY_VAL);
+    pairPaths.push(foundPath);
+  }
+  /* flatten */
+  let foundMinPath = [];
+  for(let i = 0; i < pairPaths.length; ++i) {
+    let pairPath = pairPaths[i];
+    for(let k = 0; k < pairPath.length; ++k) {
+      let mv = pairPath[k];
+      foundMinPath.push(mv);
+    }
+  }
+  return foundMinPath;
 };
 
 Robot.prototype.onKeyPress = function(cb) {

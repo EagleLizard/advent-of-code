@@ -84,38 +84,12 @@ function getMovesToNumpad3(srcCode) {
       1. all paths to first keycode
   _*/
   // let numpadPaths = numpad.getKeyPaths(r1.pos, numpad.getKeyPos(0));
-
-  let allCodePaths = r1.findAllCodePaths(code);
-  let minPathLen = Infinity;
-  let maxPathLen = -Infinity;
-  for(let i = 0; i < allCodePaths.length; ++i) {
-    let codePath = allCodePaths[i];
-    if(codePath.length < minPathLen) {
-      minPathLen = codePath.length;
-    }
-    if(codePath.length > maxPathLen) {
-      maxPathLen = codePath.length;
-    }
-    // for(let k = 0; k < codePath.length; ++k) {
-    //   let mv = codePath[k];
-    //   r1.pressKey(mv);
-    // }
-  }
-  console.log({ minPathLen });
-  console.log({ maxPathLen });
-  let shortestPaths = [];
-  for(let i = 0; i < allCodePaths.length; ++i) {
-    let codePath = allCodePaths[i];
-    if(codePath.length === minPathLen) {
-      shortestPaths.push(codePath);
-    }
-  }
-  console.log({ shortestPathCount: shortestPaths.length });
-  console.log('shortestPaths:');
-  shortestPaths.forEach(shortPath => {
-    console.log(shortPath.map(moveToChar).join(''));
+  let firstShortPath = r1.findMinCodePath(code);
+  console.log(firstShortPath.map(moveToChar).join(''));
+  let minCodePaths = r1.findMinCodePaths(code, firstShortPath.length);
+  minCodePaths.forEach(minCodePath => {
+    console.log(minCodePath.map(moveToChar).join(''));
   });
-  // console.log(numpadPaths.map(numpadPath => numpadPath.map(moveToChar).join('')));
 }
 
 function moveToChar(move) {
