@@ -1,6 +1,7 @@
 
 const { Queue } = require('../lib/datastruct/queue');
 const { Dirpad } = require('./dirpad');
+const { KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
 const { Numpad } = require('./numpad');
 const { Robot } = require('./robot');
 
@@ -104,6 +105,7 @@ function getMovesToNumpad2(srcCode) {
     npKeysPressed.push(key);
   });
   numpad.onActivate(() => {
+    // console.log('onActivate():');
     console.log([ ...npKeysPressed, 'A' ].join(''));
     npKeysPressed = [];
   });
@@ -114,6 +116,8 @@ function getMovesToNumpad2(srcCode) {
   let r3 = new Robot();
   r3.setKeypad(r2.dirpad);
 
+  // r3.dirpad.press(0,0);
+
   let robots = [
     r1,
     r2,
@@ -122,30 +126,27 @@ function getMovesToNumpad2(srcCode) {
   // r1.onKeyPress((key) => {
   //   console.log(key.val);
   // });
+  let robotsSoFar = [];
   let currCode = srcCode.slice();
   for(let rbi = 0; rbi < robots.length; ++rbi) {
     let robot = robots[rbi];
     let keysPressed = [];
-    let offFn = robot.onKeyPress((keypadKey) => {
+    let okpOffFn = robot.onKeyPress((keypadKey) => {
       keysPressed.push(keypadKey.val);
     });
     for(let ck = 0; ck < currCode.length; ++ck) {
       let codeKey = currCode[ck];
       let moves = robot.pathToKey(codeKey);
-      // console.log(moves);
       /*
         each set of moves needs to also be entered via 'activate'
       _*/
       moves.push('A');
       for(let mvi = 0; mvi < moves.length; ++mvi) {
         let mv = moves[mvi];
-        // keysPressed.push(mv);
         robot.pressKey(mv);
       }
-      // break;
     }
-    offFn();
-    // console.log(keysPressed);
+    okpOffFn();
     console.log(
       keysPressed.map(keyPressed => {
         if(keyPressed === 'A') {
@@ -156,43 +157,7 @@ function getMovesToNumpad2(srcCode) {
       }).join('')
     );
     currCode = keysPressed;
-  }
-}
-function getMovesToNumpad(robots, srcCode) {
-  /*
-    For every code, get the moves starting with the numpad robot,
-      and pass it through to each step
-  _*/
-  let code = srcCode.slice();
-  for(let i = 0; i < code.length; ++i) {
-    let numpadKeyVal = code[i];
-    console.log(`numpad keyVal: ${numpadKeyVal}`);
-    let keyVals = [ numpadKeyVal ];
-    for(let k = 0; k < robots.length; ++k) {
-      let robot = robots[k];
-      let nextKeyVals = [];
-      for(let kvi = 0; kvi < keyVals.length; ++kvi) {
-        let keyVal = keyVals[kvi];
-        let moves = robot.pathToKey(keyVal);
-        console.log({ moves });
-        for(let m = 0; m < moves.length; ++m) {
-          nextKeyVals.push(moves[m]);
-        }
-        /*
-          each set of moves needs to also be entered via 'activate'
-        _*/
-        nextKeyVals.push('A');
-      }
-      console.log({ nextKeyVals });
-      keyVals = nextKeyVals;
-      // break;
-      // keyVals = nextKeyVals;
-      // console.log(keyVals);
-    }
-    console.log(keyVals);
-    if(i > 0) {
-      break;
-    }
+    robotsSoFar.push(robot);
   }
 }
 

@@ -8,12 +8,15 @@ const { KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
 
 const directions = Directions.getDirectionPoints();
 
+let robotIdCounter = 0;
+
 module.exports = {
   Robot,
 };
 
 function Robot() {
   let self = this;
+  self.id = robotIdCounter++;
   /** @type {Numpad | Dirpad}*/
   self.keypad = undefined;
   // let origin = keypad.getOrigin();
@@ -56,6 +59,7 @@ Robot.prototype.pathToKey = function(keyVal) {
   let destKeyPos = self.keypad.getKeyPos(keyVal);
   // console.log('from:');
   // console.log(self.pos);
+  // console.log(self.keypad.getKeyAt(self.pos.x, self.pos.y));
   // console.log('to:');
   // console.log(destKeyPos);
   let keyPath = self.keypad.getKeyPath(self.pos, destKeyPos);

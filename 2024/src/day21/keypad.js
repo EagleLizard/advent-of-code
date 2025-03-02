@@ -9,6 +9,8 @@ const directions = Directions.getDirectionPoints();
 
 const KEYS_PER_ROW = 3;
 
+let onKeyPressIdCounter = 0;
+
 module.exports = {
   Keypad,
 };
@@ -44,13 +46,10 @@ Keypad.prototype.getHeight = function() {
 
 Keypad.prototype.getKeyPos = function(keyVal) {
   let self = this;
-  let fx, fy;
   for(let y = 0; y < self.keys.length; ++y) {
     for(let x = 0; x < self.keys[y].length; ++x) {
       if(self.keys[y][x].val === keyVal) {
-        fx = x;
-        fy = y;
-        return new Point(fx, fy);
+        return new Point(x, y);
       }
     }
   }
@@ -75,10 +74,8 @@ Keypad.prototype.getKeyPath = function(sPos, ePos) {
     let currItem = queue.pop();
     let pos = currItem.pos;
     let soFar = currItem.soFar;
-    // console.log(pos);
     if(pos.x === ePos.x && pos.y === ePos.y) {
-      // console.log(pos);
-      // console.log(soFar);
+
       return soFar;
     }
     visited[pos.y].set(pos.x, true);
@@ -96,7 +93,7 @@ Keypad.prototype.getKeyPath = function(sPos, ePos) {
       ) {
         queue.push({
           pos: new Point(ax, ay),
-          soFar: [ ...soFar, d],
+          soFar: [ ...soFar, d ],
         });
       }
     }
@@ -128,11 +125,7 @@ Keypad.prototype.press = function(x, y) {
   if(keypadKey === undefined) {
     throw new KeypadError(`No key at (${x}, ${y})`);
   }
-  let keyPressFn = self.keyPressFns.has(keypadKey.id)
-    ? self.keyPressFns.get(keypadKey.id)
-    : undefined
-  ;
-  keyPressFn?.(keypadKey);
+  self.handleKeyPress(keypadKey);
 };
 
 /**
@@ -140,25 +133,16 @@ Keypad.prototype.press = function(x, y) {
  */
 Keypad.prototype.addKey = function(keyVal) {
   let self = this;
-  let x, y;
-  y = self.keys.length - 1;
-  if(self.keys[y].length >= KEYS_PER_ROW) {
+  if(self.keys[self.keys.length - 1].length >= KEYS_PER_ROW) {
     self.keys.push([]);
-    y++;
   }
   let keypadKey = new KeypadKey(keyVal);
-  self.keys[y].push(keypadKey);
-  x = self.keys[y].length - 1;
+  self.keys[self.keys.length - 1].push(keypadKey);
   self.keyCount++;
-  // console.log(self);
-  switch(keypadKey.type) {
-    case KEYPAD_KEY_TYPE_ENUM.activate:
-      self.origin = new Point(x, y);
-    case KEYPAD_KEY_TYPE_ENUM.val:
-      self.keyPressFns.set(keypadKey.id, self.handleKeyPress.bind(self));
-      break;
-    case KEYPAD_KEY_TYPE_ENUM.empty:
-      self.keyPressFns.set(keypadKey.id, self.handleEmptyKeyPress.bind(self));
+  if(keypadKey.type === KEYPAD_KEY_TYPE_ENUM.activate) {
+    let y = self.keys.length - 1;
+    let x = self.keys[y].length - 1;
+    self.origin = new Point(x, y);
   }
   return keypadKey;
 };
@@ -168,13 +152,22 @@ Keypad.prototype.addKey = function(keyVal) {
  */
 Keypad.prototype.onKeyPress = function(cb) {
   let self = this;
-  if(self.keyPressFn !== undefined) {
-    throw new KeypadError('Keypad keyPress() function already registered');
-  }
-  self.keyPressFn = cb;
+  let okpId = onKeyPressIdCounter++;
+  self.keyPressFns.set(okpId, cb);
+  return () => {
+    return self.keyPressFns.delete(okpId);
+  };
 };
 Keypad.prototype.handleKeyPress = function(keypadKey) {
-  return this.keyPressFn?.(keypadKey);
+  let self = this;
+  if(keypadKey.type === KEYPAD_KEY_TYPE_ENUM.empty) {
+    throw new KeypadError('Empty key pressed');
+  }
+  let kpFns = [ ...self.keyPressFns.values() ];
+  for(let i = 0; i < kpFns.length; ++i) {
+    let kpFn = kpFns[i];
+    kpFn(keypadKey);
+  }
 };
 Keypad.prototype.handleEmptyKeyPress = function() {
   throw new KeypadError('Empty key pressed');
