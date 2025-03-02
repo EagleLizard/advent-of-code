@@ -1,6 +1,8 @@
 
 let keypadKeyIdCounter = 0;
 
+const ACTIVATE_KEY_VAL = 'A';
+
 const KEYPAD_KEY_TYPE_ENUM = {
   empty: 0,
   val: 1, 
@@ -9,6 +11,7 @@ const KEYPAD_KEY_TYPE_ENUM = {
 
 module.exports = {
   KEYPAD_KEY_TYPE_ENUM,
+  ACTIVATE_KEY_VAL,
   KeypadKey,
 };
 
@@ -21,7 +24,7 @@ function KeypadKey(keyValue) {
   self.type = KEYPAD_KEY_TYPE_ENUM.val;
   if(keyValue === undefined) {
     self.type = KEYPAD_KEY_TYPE_ENUM.empty;
-  } else if(keyValue === 'A') {
+  } else if(keyValue === ACTIVATE_KEY_VAL) {
     self.type = KEYPAD_KEY_TYPE_ENUM.activate;
   }
   self.val = keyValue;

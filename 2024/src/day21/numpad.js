@@ -28,6 +28,9 @@ function Numpad() {
   });
 }
 
+Numpad.prototype.getKeyPaths = function(sPos, ePos) {
+  return this.keypad.getKeyPaths(sPos, ePos);
+};
 Numpad.prototype.getKeyPath = function(sPos, ePos) {
   return this.keypad.getKeyPath(sPos, ePos);
 };
@@ -53,6 +56,10 @@ Numpad.prototype.numKeys = function() {
 Numpad.prototype.press = function(x, y) {
   return this.keypad.press(x, y);
 };
+/**
+ * 
+ * @param {(keypadKey: KeypadKey) => void} cb 
+ */
 Numpad.prototype.onKeyPress = function(cb) {
   let self = this;
   if(self.keyPressFn !== undefined) {

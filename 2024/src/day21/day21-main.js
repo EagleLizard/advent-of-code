@@ -1,7 +1,7 @@
 
 const { Queue } = require('../lib/datastruct/queue');
 const { Dirpad } = require('./dirpad');
-const { KEYPAD_KEY_TYPE_ENUM } = require('./keypad-key');
+const { KEYPAD_KEY_TYPE_ENUM, ACTIVATE_KEY_VAL } = require('./keypad-key');
 const { Numpad } = require('./numpad');
 const { Robot } = require('./robot');
 
@@ -54,38 +54,63 @@ function day21Part1(inputLines) {
   for(let i = 0; i < codes.length; ++i) {
     let code = codes[i];
     console.log(code.join(''));
-    let moves = getMovesToNumpad2(code);
+    // let moves = getMovesToNumpad2(code);
+    let moves = getMovesToNumpad3(code);
     if(i > -1) {
-      // break;
+      break;
     }
   }
-  
-  // r2.pressKey(0, 1); // L
-  // r2.pressKey(1, 1); // D
-  // r2.pressKey(0, 1); // L
-  // r2.pressKey(2, 0); // A
-  // /* inner robot L */
-  // r2.pressKey(2, 1); // R
-  // r2.pressKey(2, 1); // R
-  // r2.pressKey(1, 0); // U
-  // r2.pressKey(2, 0); // A
-  // /* inner robot A */
 
-  /*
-  robot.pressKey(0, 1); // L
-  robot.pressKey(2, 0); // A
-  robot.pressKey(1, 0); // U
-  robot.pressKey(2, 0); // A
-  robot.pressKey(2, 1); // R
-  robot.pressKey(1, 0); // U
-  robot.pressKey(1, 0); // U
-  robot.pressKey(2, 0); // A
-  robot.pressKey(1, 1); // D
-  robot.pressKey(1, 1); // D
-  robot.pressKey(1, 1); // D
-  robot.pressKey(2, 0); // A
-  _*/
   return -1;
+}
+
+function getMovesToNumpad3(srcCode) {
+  let code = srcCode.slice();
+  let numpad = new Numpad();
+  let r1 = new Robot(numpad);
+  let r2 = new Robot(r1.dirpad);
+  let r3 = new Robot(r2.dirpad);
+  let keysPressed = [];
+  numpad.onKeyPress((keyVal) => {
+    keysPressed.push(keyVal);
+  });
+  numpad.onActivate(() => {
+    console.log([ ...keysPressed, 'A' ]);
+  });
+
+  let robots = [
+    r1,
+    // r2,
+  ];
+  let currCode = code.slice();
+  for(let i = 0; i < robots.length; ++i) {
+    let robot = robots[i];
+    let allPaths = getPossibleMoves(code, robot);
+    console.log(allPaths.length);
+    for(let k = 0; k < allPaths.length; ++k) {
+      let currPaths = allPaths[k];
+    }
+
+  }
+
+}
+
+function getPossibleMoves(code, robot) {
+  let keyPaths = [];
+  for(let i = 0; i < code.length; ++i) {
+    let currKey = code[i];
+    let kPaths = robot.pathsToKey(currKey);
+    for(let k = 0; k < kPaths.length; ++k) {
+      let kPath = kPaths[k];
+      kPath.push(ACTIVATE_KEY_VAL);
+    };
+    keyPaths.push(kPaths);
+  }
+  return keyPaths;
+}
+
+function moveToChar(move) {
+  return '^>v<'[move] ?? move ?? ' ';
 }
 
 /* 
@@ -94,7 +119,7 @@ function day21Part1(inputLines) {
      1: v<<A>^>A<A>A<AA>vA^Av<AAA^>A
 3 robots;
   029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
-     1: 
+     1: v<A<AA>^>AvA^<A>vA^Av<<A>^>AvA^Av<<A>^>AAvA<A^>A<A>Av<A<A>^>AAA<A>vA^A
 
 029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
       v<A<AA>^>AvA^<A>vA^Av<<A>^>AvA^Av<<A>^>AAvA<A^>A<A>Av<A<A>^>AAA<A>vA^A
@@ -122,33 +147,6 @@ function getMovesToNumpad2(srcCode) {
   r2.setKeypad(r1.dirpad);
   let r3 = new Robot();
   r3.setKeypad(r2.dirpad);
-
-  r1.onKeyPress((keypadKey, robot) => {
-    let dirpadKeyChars = [];
-    for(let y = 0; y < robot.dirpad.keypad.keys.length; ++y) {
-      let cRow = [];
-      for(let x = 0; x < robot.dirpad.keypad.keys[y].length; ++x) {
-        let dpKey = robot.dirpad.keypad.keys[y][x];
-        let c;
-        if(dpKey.type === KEYPAD_KEY_TYPE_ENUM.empty) {
-          c = ' ';
-        } else if(dpKey.type === KEYPAD_KEY_TYPE_ENUM.activate) {
-          c = dpKey.val;
-        } else {
-          c = '^>v<'[dpKey.val];
-        }
-        cRow.push(c);
-      }
-      dirpadKeyChars.push(cRow);
-    }
-    let dirpadStr = dirpadKeyChars.map(cRow => {
-      return cRow.join(' ');
-    }).join('\n');
-    // console.log(`${dirpadStr}\n`);
-    // for(let y = 0; y < robot.dirpad.keys.length; ++y) {
-    //   console.log(robot.dirpad.keys);
-    // }
-  });
 
   // r3.dirpad.press(0,0);
 

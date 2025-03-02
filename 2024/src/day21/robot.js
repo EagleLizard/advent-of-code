@@ -15,7 +15,7 @@ module.exports = {
   Robot,
 };
 
-function Robot() {
+function Robot(keypad) {
   let self = this;
   self.id = robotIdCounter++;
   /** @type {Numpad | Dirpad}*/
@@ -36,6 +36,9 @@ function Robot() {
       return self.handleKeyPress(keypadKey);
     }
   });
+  if(keypad !== undefined) {
+    self.setKeypad(keypad);
+  }
 }
 
 Robot.prototype.onKeyPress = function(cb) {
@@ -59,6 +62,13 @@ Robot.prototype.pathToKey = function(keyVal) {
   let destKeyPos = self.keypad.getKeyPos(keyVal);
   let keyPath = self.keypad.getKeyPath(self.pos, destKeyPos);
   return keyPath;
+};
+
+Robot.prototype.pathsToKey = function(keyVal) {
+  let self = this;
+  let destKeyPos = self.keypad.getKeyPos(keyVal);
+  let keyPaths = self.keypad.getKeyPaths(self.pos, destKeyPos);
+  return keyPaths;
 };
 
 // Robot.prototype.pressKey = function(x, y) {
