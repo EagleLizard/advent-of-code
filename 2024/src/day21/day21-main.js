@@ -91,11 +91,12 @@ function getMovesToNumpad3(srcCode) {
     let robot = robots[rbi];
     let nextKeyCodes = [];
     console.log({ rbi });
-    console.log(currKeyCodes);
+    // console.log(currKeyCodes);
     let minKeyCodeLen = undefined;
     for(let ck = 0; ck < currKeyCodes.length; ++ck) {
       let currKeyCode = currKeyCodes[ck];
-      let minCodePaths = robot.findMinCodePaths(currKeyCode, minKeyCodeLen);
+      // let minCodePaths = robot.findMinCodePaths(currKeyCode, minKeyCodeLen);
+      let minCodePaths = robot.findMinCodePaths3(currKeyCode, minKeyCodeLen);
       console.log(minCodePaths.length);
       for(let mcp = 0; mcp < minCodePaths.length; ++mcp) {
         let minCodePath = minCodePaths[mcp];
@@ -117,7 +118,7 @@ function getMovesToNumpad3(srcCode) {
     console.log({ 'nextKeyCodes.length': nextKeyCodes.length });
     console.log({ 'minKeyCodes.length': minKeyCodes.length });
     currKeyCodes = minKeyCodes;
-    if(rbi > -1) {
+    if(rbi > 0) {
       break;
     }
   }
