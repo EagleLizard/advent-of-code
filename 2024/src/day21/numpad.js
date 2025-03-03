@@ -28,6 +28,9 @@ function Numpad() {
   });
 }
 
+Numpad.prototype.getMinPaths = function(sPos, ePos) {
+  return this.keypad.getMinPaths(sPos, ePos);
+};
 Numpad.prototype.getKeyPaths = function(sPos, ePos) {
   return this.keypad.getKeyPaths(sPos, ePos);
 };

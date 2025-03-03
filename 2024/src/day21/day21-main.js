@@ -48,62 +48,83 @@ function day21Part1(inputLines) {
   // }
   let robots = [
     r1,
-    // r2,
-    // r3,
+    r2,
+    r3,
   ];
+  let complexitySum = 0;
   for(let i = 0; i < codes.length; ++i) {
     let code = codes[i];
     console.log(code.join(''));
     // let moves = getMovesToNumpad2(code);
-    let moves = getMovesToNumpad3(code);
+    let complexity = getMovesToNumpad3(code, robots);
+    console.log(code);
+    console.log({ complexity });
+    complexitySum += complexity;
     if(i > -1) {
-      break;
+      // break;
     }
   }
 
-  return -1;
+  return complexitySum;
 }
 
-function getMovesToNumpad3(srcCode) {
+function getMovesToNumpad4(srcCode) {
   let code = srcCode.slice();
   let numpad = new Numpad();
-  let r1 = new Robot(numpad);
-  let r2 = new Robot(r1.dirpad);
-  let r3 = new Robot(r2.dirpad);
-  let keysPressed = [];
-  numpad.onKeyPress((keyVal) => {
-    // console.log(keyVal);
-    keysPressed.push(keyVal);
-  });
-  numpad.onActivate(() => {
-    console.log([ ...keysPressed, 'A' ].join(''));
-    keysPressed = [];
-  });
+  let sPos = numpad.getOrigin();
+  // let ePos = numpad.getKeyPos(code[0]);
+  let ePos = numpad.getKeyPos(7);
+  console.log({ sPos });
+  console.log({ ePos });
+  let keyPaths = numpad.getMinPaths(ePos, sPos);
+  console.log(keyPaths.forEach(keyPath => {
+    console.log(movesToStr(keyPath));
+  }));
+}
 
-  let robots = [
-    r1,
-    r2,
-    r3,
-  ];
+function getMovesToNumpad3(srcCode, robots) {
+  let code = srcCode.slice();
+  // let numpad = new Numpad();
+  // let r1 = new Robot(numpad);
+  // let r2 = new Robot(r1.dirpad);
+  // let r3 = new Robot(r2.dirpad);
+  let keysPressed = [];
+  // numpad.onKeyPress((keyVal) => {
+  //   // console.log(keyVal);
+  //   keysPressed.push(keyVal);
+  // });
+  // numpad.onActivate(() => {
+  //   console.log([ ...keysPressed, 'A' ].join(''));
+  //   keysPressed = [];
+  // });
+
+  // let robots = [
+  //   r1,
+  //   r2,
+  //   r3,
+  // ];
 
   let currKeyCodes = [ code.slice() ];
+  let minKeyCodeLen;
   for(let rbi = 0; rbi < robots.length; ++rbi) {
     let robot = robots[rbi];
     let nextKeyCodes = [];
-    console.log({ rbi });
+    // console.log({ rbi });
     // console.log(currKeyCodes);
-    let minKeyCodeLen = undefined;
+    let currMinKeyCodeLen = undefined;
     for(let ck = 0; ck < currKeyCodes.length; ++ck) {
       let currKeyCode = currKeyCodes[ck];
       // let minCodePaths = robot.findMinCodePaths(currKeyCode, minKeyCodeLen);
-      let minCodePaths = robot.findMinCodePaths3(currKeyCode, minKeyCodeLen);
-      console.log(minCodePaths.length);
+      // let minCodePaths = robot.findMinCodePaths3(currKeyCode);
+      let minCodePaths = robot.findMinCodePaths3(currKeyCode, currMinKeyCodeLen);
+      // console.log(minCodePaths.length);
       for(let mcp = 0; mcp < minCodePaths.length; ++mcp) {
         let minCodePath = minCodePaths[mcp];
-        if((minKeyCodeLen === undefined) || (minCodePath.length < minKeyCodeLen)) {
-          minKeyCodeLen = minCodePath.length;
+        if((currMinKeyCodeLen === undefined) || (minCodePath.length < currMinKeyCodeLen)) {
+          currMinKeyCodeLen = minCodePath.length;
         }
-        if(minCodePath.length <= minKeyCodeLen) {
+        // if(minCodePath.length <= currMinKeyCodeLen && rbi < robots.length - 1) {
+        if(minCodePath.length <= currMinKeyCodeLen) {
           nextKeyCodes.push(minCodePath);
         }
       }
@@ -111,17 +132,23 @@ function getMovesToNumpad3(srcCode) {
     let minKeyCodes = [];
     for(let nkc = 0; nkc < nextKeyCodes.length; ++nkc) {
       let nextKeyCode = nextKeyCodes[nkc];
-      if(nextKeyCode.length <= minKeyCodeLen) {
+      if(nextKeyCode.length <= currMinKeyCodeLen) {
         minKeyCodes.push(nextKeyCode);
       }
     }
-    console.log({ 'nextKeyCodes.length': nextKeyCodes.length });
-    console.log({ 'minKeyCodes.length': minKeyCodes.length });
+    // console.log({ 'nextKeyCodes.length': nextKeyCodes.length });
+    // console.log({ 'minKeyCodes.length': minKeyCodes.length });
     currKeyCodes = minKeyCodes;
+    minKeyCodeLen = currMinKeyCodeLen;
     if(rbi > 0) {
-      break;
+      // break;
     }
   }
+  let keyCodeNum = +(code.join('').match(/[0-9]+/));
+  console.log(`${minKeyCodeLen} * ${keyCodeNum}`);
+  let complexity = minKeyCodeLen * keyCodeNum;
+  return complexity;
+  // console.log(movesToStr(currKeyCodes[0]));
 
   // let minCodePaths = r1.findMinCodePaths(code);
   // /*
@@ -134,7 +161,9 @@ function getMovesToNumpad3(srcCode) {
   //   console.log(nextMinPaths.length);
   // }
 }
-
+function movesToStr(moves) {
+  return moves.map(moveToChar).join('');
+}
 function moveToChar(move) {
   return '^>v<'[move] ?? move ?? ' ';
 }

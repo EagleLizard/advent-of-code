@@ -99,6 +99,62 @@ Keypad.prototype.getKeyPath = function(sPos, ePos) {
     }
   }
 };
+Keypad.prototype.getMinPaths = function(sPos, ePos) {
+  let self = this;
+  let w = self.getWidth();
+  let h = self.getHeight();
+  let foundPaths = [];
+  let minPathLen = Infinity;
+  /**@type {Map<number, boolean>[]} */
+  let visited = [];
+  for(let y = 0; y < self.keys.length; ++y) {
+    visited.push(new Map());
+  }
+  visited[sPos.y].set(sPos.x, true);
+  helper(sPos);
+  let minPaths = [];
+  for(let i = 0; i < foundPaths.length; ++i) {
+    let foundPath = foundPaths[i];
+    if(foundPath.length <= minPathLen) {
+      minPaths.push(foundPath);
+    }
+  }
+  return minPaths;
+  // return foundPaths;
+  function helper(pos, soFar) {
+    soFar = soFar ?? [];
+    if(soFar.length > minPathLen) {
+      return;
+    }
+    if(pos.x === ePos.x && pos.y === ePos.y) {
+      let foundPath = soFar.slice();
+      if(foundPath.length < minPathLen) {
+        minPathLen = foundPath.length;
+      }
+      foundPaths.push(foundPath);
+      return;
+    }
+    for(let d = 0; d < directions.length; ++d) {
+      // for(let d = (directions.length - 1); d >= 0; --d) {
+      let dPt = directions[d];
+      let nx = pos.x + dPt.x;
+      let ny = pos.y + dPt.y;
+      if(
+        (ny >= 0 && ny < h)
+        && (nx >= 0 && nx < w)
+        && !(visited[ny].has(nx) && visited[ny].get(nx))
+        && (self.keys[ny][nx] !== KEYPAD_KEY_TYPE_ENUM.empty)
+      ) {
+        let nPos = new Point(nx, ny);
+        soFar.push(d);
+        visited[ny].set(nx, true);
+        helper(nPos, soFar);
+        visited[ny].delete(nx);
+        soFar.pop();
+      }
+    }
+  }
+};
 
 Keypad.prototype.getKeyPaths = function(sPos, ePos) {
   let self = this;
@@ -121,6 +177,7 @@ Keypad.prototype.getKeyPaths = function(sPos, ePos) {
       return;
     }
     for(let d = 0; d < directions.length; ++d) {
+    // for(let d = (directions.length - 1); d >= 0; --d) {
       let dPt = directions[d];
       let nx = pos.x + dPt.x;
       let ny = pos.y + dPt.y;
@@ -137,7 +194,7 @@ Keypad.prototype.getKeyPaths = function(sPos, ePos) {
         visited[ny].delete(nx);
         soFar.pop();
       }
-    } 
+    }
   }
 };
 /**

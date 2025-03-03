@@ -15,6 +15,9 @@ function Dirpad() {
   self.keypad = new Keypad(DIRPAD_KEY_VALS);
 }
 
+Dirpad.prototype.getMinPaths = function(sPos, ePos) {
+  return this.keypad.getMinPaths(sPos, ePos);
+};
 Dirpad.prototype.getKeyPaths = function(sPos, ePos) {
   return this.keypad.getKeyPaths(sPos, ePos);
 };

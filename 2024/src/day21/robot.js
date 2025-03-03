@@ -39,6 +39,7 @@ function Robot(keypad) {
   if(keypad !== undefined) {
     self.setKeypad(keypad);
   }
+  self.getKeyPathsMemoCache = new Map();
 }
 
 Robot.prototype.resetArm = function() {
@@ -48,16 +49,57 @@ Robot.prototype.resetArm = function() {
   self.pos.y = origin.y;
 };
 
+Robot.prototype.getKeyPathsMemo = function() {
+  let self = this;
+  let cache = new Map();
+  // let cache = self.getKeyPathsMemoCache;
+  return function(sPos, ePos) {
+    let cacheKey = getCacheKey(sPos, ePos);
+    if(cache.has(cacheKey)) {
+      return cache.get(cacheKey);
+    }
+    let res = self.keypad.getKeyPaths(sPos, ePos);
+    cache.set(cacheKey, res);
+    return res;
+  };
+  function getCacheKey(sPos, ePos) {
+    return `${sPos.x},${sPos.y}-${ePos.x},${ePos.y}`;
+  }
+};
+
+Robot.prototype.getMinPathsMemo = function() {
+  let self = this;
+  let cache = new Map();
+  return function(sPos, ePos) {
+    let cacheKey = getCacheKey(sPos, ePos);
+    if(cache.has(cacheKey)) {
+      return cache.get(cacheKey);
+    }
+    let res = self.keypad.getMinPaths(sPos, ePos);
+    cache.set(cacheKey, res);
+    return res;
+  };
+  function getCacheKey(sPos, ePos) {
+    return `${sPos.x},${sPos.y}-${ePos.x},${ePos.y}`;
+  }
+};
+
 Robot.prototype.findMinCodePaths3 = function(srcCodeKeyVals, minPathLen) {
+  // console.log(srcCodeKeyVals.join(''));
   let self = this;
   let origin = self.keypad.getOrigin();
   let foundPaths = [];
-  minPathLen = minPathLen ?? Infinity;
-  helper(srcCodeKeyVals.length - 1);
+  let getKeyPaths = self.getKeyPathsMemo();
+  let getMinPaths = self.getMinPathsMemo();
+  // minPathLen = minPathLen ?? Infinity;
+  minPathLen = Infinity;
+  // helper(srcCodeKeyVals.length - 1);
+  helper(0);
   let minPaths = [];
   for(let i = 0; i < foundPaths.length; ++i) {
     let foundPath = foundPaths[i];
     if(foundPaths[i].length <= minPathLen) {
+      // console.log(movesToStr(foundPath));
       minPaths.push(foundPath);
     }
   }
@@ -67,11 +109,12 @@ Robot.prototype.findMinCodePaths3 = function(srcCodeKeyVals, minPathLen) {
     if(pathSoFar.length > minPathLen) {
       return;
     }
-    if(ckIdx < 0) {
+    // if(ckIdx < 0) {
+    if(ckIdx > (srcCodeKeyVals.length - 1)) {
       if(pathSoFar.length < minPathLen) {
         minPathLen = pathSoFar.length;
       }
-      console.log(movesToStr(pathSoFar));
+      // console.log(movesToStr(pathSoFar));
       foundPaths.push(pathSoFar);
       return;
     }
@@ -81,16 +124,20 @@ Robot.prototype.findMinCodePaths3 = function(srcCodeKeyVals, minPathLen) {
       ? origin
       : self.keypad.getKeyPos(srcCodeKeyVals[ckIdx - 1])
     ;
-    let ckPaths = self.keypad.getKeyPaths(prevPos, pos);
+    let ckPaths = getMinPaths(prevPos, pos);
     for(let i = 0; i < ckPaths.length; ++i) {
       let ckPath = ckPaths[i];
-      let nPsf = [ ...ckPath, ACTIVATE_KEY_VAL, ...pathSoFar ];
-      helper(ckIdx - 1, nPsf);
+      // let nPsf = [ ...ckPath, ACTIVATE_KEY_VAL, ...pathSoFar ];
+      let nPsf = [ ...pathSoFar, ...ckPath, ACTIVATE_KEY_VAL ];
+      helper(ckIdx + 1, nPsf);
     }
     // helper(ckIdx - 1);
   }
 };
-
+/* 
+<<vA>>^A<A>AvA<^AA>A<vAAA>^A
+<<vA>>^A<A>A<AAv>A^A<vAAA>^A
+_*/
 Robot.prototype.findMinCodePaths2 = function(srcCodeKeyVals) {
   let self = this;
   let initSPos = self.keypad.getOrigin();
