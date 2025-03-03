@@ -55,10 +55,10 @@ Robot.prototype.findMinCodePaths = function(codeKeyVals, minPathLen) {
       2. get every path permutation
   _*/
   let self = this;
-
-  let codeKeyPts = [
-    self.keypad.getOrigin(),
-  ];
+  /*
+    assume a starting point of origin
+  _*/
+  let codeKeyPts = [ self.keypad.getOrigin() ];
   for(let i = 0; i < codeKeyVals.length; ++i) {
     codeKeyPts.push(self.keypad.getKeyPos(codeKeyVals[i]));
   }
@@ -68,14 +68,11 @@ Robot.prototype.findMinCodePaths = function(codeKeyVals, minPathLen) {
     let nPt = codeKeyPts[i + 1];
     keyPtPairs.push([ pt, nPt ]);
   }
-  // keyPtPairs.forEach(ptTuple => {
-  //   console.log(`${self.keypad.getKeyAt(ptTuple[0].x, ptTuple[0].y).val} -> ${self.keypad.getKeyAt(ptTuple[1].x, ptTuple[1].y).val}`);
-  // });
   let pairPaths = [];
   for(let i = 0; i < keyPtPairs.length; ++i) {
     let [ sPos, ePos ] = keyPtPairs[i];
     let keyPaths = self.keypad.getKeyPaths(sPos, ePos);
-    console.log(`${self.keypad.getKeyAt(sPos.x, sPos.y).val} -> ${self.keypad.getKeyAt(ePos.x, ePos.y).val}`);
+    // console.log(`${self.keypad.getKeyAt(sPos.x, sPos.y).val} -> ${self.keypad.getKeyAt(ePos.x, ePos.y).val}`);
     for(let k = 0; k < keyPaths.length; ++k) {
       /*
         every key on the keypad must also be pressed with the current
@@ -85,13 +82,19 @@ Robot.prototype.findMinCodePaths = function(codeKeyVals, minPathLen) {
     }
     pairPaths.push(keyPaths);
   }
+  // console.log(pairPaths[0].length);
 
   let possiblePaths = [];
-  minPathLen = minPathLen ?? Infinity;
+  let firstShortPath = self.findMinCodePath(codeKeyVals);
+  minPathLen = minPathLen ?? firstShortPath.length;
   helper(pairPaths);
   return possiblePaths;
 
   function helper(keyPaths, pathsSoFar) {
+    // console.log('keyPaths');
+    // console.log(keyPaths);
+    // console.log('pathsSoFar');
+    // console.log(pathsSoFar);
     pathsSoFar = pathsSoFar ?? [];
     let sfPathLen = 0;
     for(let k = 0; k < pathsSoFar.length; ++k) {
@@ -112,6 +115,9 @@ Robot.prototype.findMinCodePaths = function(codeKeyVals, minPathLen) {
       if(foundPath.length < minPathLen) {
         minPathLen = foundPath.length;
       }
+      console.log(foundPath.map(mv => {
+        return '^>v<'[mv] ?? mv ?? ' ';
+      }).join(''));
       // possiblePaths.push(pathsSoFar.slice());
       possiblePaths.push(foundPath);
       return;

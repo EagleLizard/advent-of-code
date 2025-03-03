@@ -77,19 +77,61 @@ function getMovesToNumpad3(srcCode) {
   });
   numpad.onActivate(() => {
     console.log([ ...keysPressed, 'A' ].join(''));
-    keysPressed.length = 0;
+    keysPressed = [];
   });
-  /*
-    to get all possible paths, we need to get:
-      1. all paths to first keycode
-  _*/
-  // let numpadPaths = numpad.getKeyPaths(r1.pos, numpad.getKeyPos(0));
-  let firstShortPath = r1.findMinCodePath(code);
-  console.log(firstShortPath.map(moveToChar).join(''));
-  let minCodePaths = r1.findMinCodePaths(code, firstShortPath.length);
-  minCodePaths.forEach(minCodePath => {
-    console.log(minCodePath.map(moveToChar).join(''));
-  });
+
+  let robots = [
+    r1,
+    r2,
+    r3,
+  ];
+
+  let currKeyCodes = [ code.slice() ];
+  for(let rbi = 0; rbi < robots.length; ++rbi) {
+    let robot = robots[rbi];
+    let nextKeyCodes = [];
+    console.log({ rbi });
+    console.log(currKeyCodes);
+    let minKeyCodeLen = undefined;
+    for(let ck = 0; ck < currKeyCodes.length; ++ck) {
+      let currKeyCode = currKeyCodes[ck];
+      let minCodePaths = robot.findMinCodePaths(currKeyCode, minKeyCodeLen);
+      console.log(minCodePaths.length);
+      for(let mcp = 0; mcp < minCodePaths.length; ++mcp) {
+        let minCodePath = minCodePaths[mcp];
+        if((minKeyCodeLen === undefined) || (minCodePath.length < minKeyCodeLen)) {
+          minKeyCodeLen = minCodePath.length;
+        }
+        if(minCodePath.length <= minKeyCodeLen) {
+          nextKeyCodes.push(minCodePath);
+        }
+      }
+    }
+    let minKeyCodes = [];
+    for(let nkc = 0; nkc < nextKeyCodes.length; ++nkc) {
+      let nextKeyCode = nextKeyCodes[nkc];
+      if(nextKeyCode.length <= minKeyCodeLen) {
+        minKeyCodes.push(nextKeyCode);
+      }
+    }
+    console.log({ 'nextKeyCodes.length': nextKeyCodes.length });
+    console.log({ 'minKeyCodes.length': minKeyCodes.length });
+    currKeyCodes = minKeyCodes;
+    if(rbi > -1) {
+      break;
+    }
+  }
+
+  // let minCodePaths = r1.findMinCodePaths(code);
+  // /*
+  //   for each found path, find all of the shortest paths the next robot could take
+  // _*/
+  // for(let i = 0; i < minCodePaths.length; ++i) {
+  //   let minCodePath = minCodePaths[i];
+  //   console.log(minCodePath.map(moveToChar).join(''));
+  //   let nextMinPaths = r2.findMinCodePaths(minCodePath);
+  //   console.log(nextMinPaths.length);
+  // }
 }
 
 function moveToChar(move) {
