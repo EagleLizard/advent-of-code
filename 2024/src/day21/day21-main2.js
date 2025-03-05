@@ -15,19 +15,24 @@ module.exports = {
 function day21Part1(inputLines) {
   let day21Input = parseInput(inputLines);
   let codes = day21Input.codes;
+  let complexitySum = 0;
   for(let i = 0; i < codes.length; ++i) {
     let code = codes[i];
     console.log(code);
     let codeStr = code.str;
     let codeKeys = code.keys;
     let shortSeqLen = getSequenceLength(codeKeys, 1);
+    let complexity = shortSeqLen * code.num;
+    complexitySum += complexity;
     if(i > -1) {
-      break;
+      // break;
     }
   }
-  return -1;
+  return complexitySum;
 }
-
+/* 
+Part 1: 202648 | 367000.941875 ms
+_*/
 function getSequenceLength(codeKeys, numBots) {
   let numpad = getNumpad();
   let dirpad = getDirpad();
@@ -43,70 +48,30 @@ function getSequenceLength(codeKeys, numBots) {
   let minPathLen = Infinity;
   for(let i = 0; i < numpadPaths.length; ++i) {
     let npPath = [ 'A', ...numpadPaths[i] ];
-    // let dirpadPaths = getPathsToDirpadKeys(npPath);
-    let dirpadPaths = getPathsToDirpadKeys2(npPath);
+    let dirpadPaths = getPathsToDirpadKeys(npPath);
+    // dirpadPaths.forEach(dirpadPath => {
+    //   console.log(movesToStr(dirpadPath));
+    // });
+    // let dirpadPaths = getPathsToDirpadKeys2(npPath);
     for(let dpp = 0; dpp < dirpadPaths.length; ++dpp) {
       let dpPath = [ 'A', ...dirpadPaths[dpp] ];
-      // let dirpadDirpadPaths = getPathsToDirpadKeys(dpPath);
-    }
-    dirpadPaths.forEach(dirpadPath => {
-      // process.stdout.write(`${movesToStr(dirpadPath)}\n`);
-    });
-  }
-
-  // let npViaDpPaths = getPathsToNumpadViaDirpadKeys(codeKeys);
-}
-function getPathsToDirpadKeys2(srcCodeKeys) {
-  // console.log(movesToStr(codeKeys));
-  let minPathLen = Infinity;
-  let foundPaths = helper(srcCodeKeys);
-  foundPaths = foundPaths.filter(foundPath => {
-    return foundPath.length <= minPathLen;
-  });
-  return foundPaths;
-  function helper(codeKeys, soFar) {
-    // console.log(movesToStr(codeKeys));
-    soFar = soFar ?? 0;
-    if(soFar > minPathLen) {
-      return;
-    }
-    // if(keyIdx > srcCodeKeys.length - 2) {
-    if(codeKeys.length === 1) {
-      // console.log(soFar);
-      if(soFar < minPathLen) {
-        minPathLen = soFar;
-      }
-      // process.stdout.write(`${movesToStr(soFar)}\n`);
-      // foundPaths.push(soFar);
-      return;
-    }
-    let from = codeKeys[0];
-    let to = codeKeys[1];
-    // let pathsToCode = getDirpadDirPaths(from, to);
-    let pathsToCode = getDirpadPaths(from, to);
-    let nextPaths = [];
-    if(codeKeys.length === 2) {
-      for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
-        let currPtc = [ ...pathsToCode[ptc], 'A' ];
-        nextPaths.push(currPtc);
-      }
-    }
-    for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
-      let currPtc = [ ...pathsToCode[ptc], 'A' ];
-      // helper(keyIdx + 1, [ ...soFar, ...currPtc ]);
-      let currNextPaths = helper(codeKeys.slice(1), soFar + currPtc.length);
-      if(currNextPaths !== undefined) {
-        for(let cnp = 0; cnp < currNextPaths.length; ++cnp) {
-          nextPaths.push([ ...currPtc, ...currNextPaths[cnp] ]);
+      let dirpadDirpadPaths = getPathsToDirpadKeys(dpPath, minPathLen);
+      for(let dpdp = 0; dpdp < dirpadDirpadPaths.length; ++dpdp) {
+        if(dirpadDirpadPaths[dpdp].length < minPathLen) {
+          minPathLen = dirpadDirpadPaths[dpdp].length;
         }
       }
     }
-    return nextPaths;
   }
+  console.log({ minPathLen });
+  return minPathLen;
+  // let npViaDpPaths = getPathsToNumpadViaDirpadKeys(codeKeys);
 }
-function getPathsToDirpadKeys(srcCodeKeys) {
+
+function getPathsToDirpadKeys(srcCodeKeys, minPathLen) {
   // console.log(movesToStr(codeKeys));
-  let minPathLen = Infinity;
+  // let minPathLen = Infinity;
+  minPathLen = minPathLen ?? Infinity;
   let foundPaths = [];
   helper(0);
   foundPaths = foundPaths.filter(foundPath => {
@@ -121,8 +86,11 @@ function getPathsToDirpadKeys(srcCodeKeys) {
     if(keyIdx > srcCodeKeys.length - 2) {
       if(soFar.length < minPathLen) {
         minPathLen = soFar.length;
+        // console.log(movesToStr(soFar));
       }
-      // process.stdout.write(`${movesToStr(soFar)}\n`);
+      if((foundPaths.length % 1e4) === 0) {
+        // process.stdout.write(`${movesToStr(soFar)}\n`);
+      }
       foundPaths.push(soFar);
       return;
     }
@@ -131,8 +99,10 @@ function getPathsToDirpadKeys(srcCodeKeys) {
     // let pathsToCode = getDirpadDirPaths(from, to);
     let pathsToCode = getDirpadPaths(from, to);
     for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
-      let currPtc = [ ...pathsToCode[ptc], 'A' ];
-      helper(keyIdx + 1, [ ...soFar, ...currPtc ]);
+      // let currPtc = [ ...pathsToCode[ptc], 'A' ];
+      if((soFar.length + pathsToCode[ptc].length + 1) <= minPathLen) {
+        helper(keyIdx + 1, [ ...soFar, ...pathsToCode[ptc], 'A' ]);
+      }
     }
   }
 }

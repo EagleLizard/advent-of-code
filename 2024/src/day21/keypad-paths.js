@@ -77,16 +77,26 @@ function getDirpadPaths(from, to) {
   let sPos = new Point(fx, fy);
   let ePos = new Point(tx, ty);
   let foundPaths = [];
+  let minPathLen = Infinity;
   visited[sPos.y][sPos.x] = true;
   helper(sPos, []);
+  foundPaths = foundPaths.filter(foundPath => {
+    return foundPath.length <= minPathLen;
+  });
   return foundPaths;
   function helper(pos, soFar) {
     soFar = soFar ?? [];
     if(pos.x === ePos.x && pos.y === ePos.y) {
-      foundPaths.push([ ...soFar ]);
+      let foundPath = [ ...soFar ];
+      if(foundPath.length < minPathLen) {
+        minPathLen = foundPath.length;
+      }
+      foundPaths.push(foundPath);
+      // foundPaths.push([ ...soFar ]);
       return;
     }
-    for(let d = 0; d < directions.length; ++d) {
+    // for(let d = 0; d < directions.length; ++d) {
+    for(let d = directions.length - 1; d >= 0; --d) {
       let dPt = directions[d];
       let nx = pos.x + dPt.x;
       let ny = pos.y + dPt.y;
@@ -134,16 +144,25 @@ function getNumpadPaths(from, to) {
     }
   }
   let foundPaths = [];
+  let minPathLen = Infinity;
   visited[sPos.y][sPos.x] = true;
   helper(sPos, []);
+  foundPaths = foundPaths.filter(foundPath => {
+    return foundPath.length <= minPathLen;
+  });
   return foundPaths;
   function helper(pos, soFar) {
     soFar = soFar ?? [];
     if(pos.x === ePos.x && pos.y === ePos.y) {
-      foundPaths.push([ ...soFar ]);
+      let foundPath = [ ...soFar ];
+      if(foundPath.length < minPathLen) {
+        minPathLen = foundPath.length;
+      }
+      foundPaths.push(foundPath);
       return;
     }
-    for(let d = 0; d < directions.length; ++d) {
+    // for(let d = 0; d < directions.length; ++d) {
+    for(let d = directions.length - 1; d >= 0; --d) {
       let dPt = directions[d];
       let nx = pos.x + dPt.x;
       let ny = pos.y + dPt.y;
