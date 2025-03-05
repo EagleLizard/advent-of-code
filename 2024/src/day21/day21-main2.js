@@ -50,7 +50,7 @@ function getSequenceLength(codeKeys, numBots) {
       // let dirpadDirpadPaths = getPathsToDirpadKeys(dpPath);
     }
     dirpadPaths.forEach(dirpadPath => {
-      process.stdout.write(`${movesToStr(dirpadPath)}\n`);
+      // process.stdout.write(`${movesToStr(dirpadPath)}\n`);
     });
   }
 
@@ -59,36 +59,49 @@ function getSequenceLength(codeKeys, numBots) {
 function getPathsToDirpadKeys2(srcCodeKeys) {
   // console.log(movesToStr(codeKeys));
   let minPathLen = Infinity;
-  let foundPaths = [];
-  helper(srcCodeKeys);
+  let foundPaths = helper(srcCodeKeys);
   foundPaths = foundPaths.filter(foundPath => {
     return foundPath.length <= minPathLen;
   });
   return foundPaths;
   function helper(codeKeys, soFar) {
     // console.log(movesToStr(codeKeys));
-    soFar = soFar ?? [];
-    if(soFar.length > minPathLen) {
+    soFar = soFar ?? 0;
+    if(soFar > minPathLen) {
       return;
     }
     // if(keyIdx > srcCodeKeys.length - 2) {
     if(codeKeys.length === 1) {
-      if(soFar.length < minPathLen) {
-        minPathLen = soFar.length;
+      // console.log(soFar);
+      if(soFar < minPathLen) {
+        minPathLen = soFar;
       }
-      process.stdout.write(`${movesToStr(soFar)}\n`);
-      foundPaths.push(soFar);
+      // process.stdout.write(`${movesToStr(soFar)}\n`);
+      // foundPaths.push(soFar);
       return;
     }
     let from = codeKeys[0];
     let to = codeKeys[1];
     // let pathsToCode = getDirpadDirPaths(from, to);
     let pathsToCode = getDirpadPaths(from, to);
+    let nextPaths = [];
+    if(codeKeys.length === 2) {
+      for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
+        let currPtc = [ ...pathsToCode[ptc], 'A' ];
+        nextPaths.push(currPtc);
+      }
+    }
     for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
       let currPtc = [ ...pathsToCode[ptc], 'A' ];
       // helper(keyIdx + 1, [ ...soFar, ...currPtc ]);
-      helper(codeKeys.slice(1), [ ...soFar, ...currPtc ]);
+      let currNextPaths = helper(codeKeys.slice(1), soFar + currPtc.length);
+      if(currNextPaths !== undefined) {
+        for(let cnp = 0; cnp < currNextPaths.length; ++cnp) {
+          nextPaths.push([ ...currPtc, ...currNextPaths[cnp] ]);
+        }
+      }
     }
+    return nextPaths;
   }
 }
 function getPathsToDirpadKeys(srcCodeKeys) {
