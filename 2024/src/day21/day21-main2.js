@@ -1,8 +1,12 @@
 
 const { Point } = require('../lib/geom/point');
 const Directions = require('../lib/geom/directions');
+const KeypadPaths = require('./keypad-paths');
 
 const directions = Directions.getDirectionPoints();
+
+const getNumpadPaths = KeypadPaths.getNumpadPathsMemo();
+const getDirpadPaths = KeypadPaths.getDirpadPathsMemo();
 
 module.exports = {
   day21Part1,
@@ -36,17 +40,22 @@ function getSequenceLength(codeKeys, numBots) {
   // getPathsToKeysIt(codeKeys);
 
   let numpadPaths = getPathsToKeys(codeKeys);
+  let minPathLen = Infinity;
   for(let i = 0; i < numpadPaths.length; ++i) {
     let npPath = [ 'A', ...numpadPaths[i] ];
     let dirpadPaths = getPathsToDirpadKeys(npPath);
+    for(let dpp = 0; dpp < dirpadPaths.length; ++dpp) {
+      let dpPath = [ 'A', ...dirpadPaths[dpp] ];
+      // let dirpadDirpadPaths = getPathsToDirpadKeys(dpPath);
+    }
     dirpadPaths.forEach(dirpadPath => {
-      console.log(movesToStr(dirpadPath));
+      process.stdout.write(`${movesToStr(dirpadPath)}\n`);
     });
   }
 
   // let npViaDpPaths = getPathsToNumpadViaDirpadKeys(codeKeys);
 }
-function getPathsToDirpadKeys(codeKeys) {
+function getPathsToDirpadKeys(srcCodeKeys) {
   // console.log(movesToStr(codeKeys));
   let minPathLen = Infinity;
   let foundPaths = [];
@@ -60,7 +69,7 @@ function getPathsToDirpadKeys(codeKeys) {
     if(soFar.length > minPathLen) {
       return;
     }
-    if(keyIdx > codeKeys.length - 2) {
+    if(keyIdx > srcCodeKeys.length - 2) {
       if(soFar.length < minPathLen) {
         minPathLen = soFar.length;
       }
@@ -68,9 +77,10 @@ function getPathsToDirpadKeys(codeKeys) {
       foundPaths.push(soFar);
       return;
     }
-    let from = codeKeys[keyIdx];
-    let to = codeKeys[keyIdx + 1];
-    let pathsToCode = getDirpadDirPaths(from, to);
+    let from = srcCodeKeys[keyIdx];
+    let to = srcCodeKeys[keyIdx + 1];
+    // let pathsToCode = getDirpadDirPaths(from, to);
+    let pathsToCode = getDirpadPaths(from, to);
     for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
       let currPtc = [ ...pathsToCode[ptc], 'A' ];
       helper(keyIdx + 1, [ ...soFar, ...currPtc ]);
@@ -156,7 +166,9 @@ function getPathsToKeys(codeKeys) {
     }
     let from = codeKeys[keyIdx];
     let to = codeKeys[keyIdx + 1];
-    let pathsToCode = getNumpadDirPaths(from, to);
+    // let pathsToCode = getNumpadDirPaths(from, to);
+    let pathsToCode = getNumpadPaths(from, to);
+    // console.log(`ptc len: ${pathsToCode.length}, keyIdx: ${keyIdx}, soFar len: ${soFar.length}`);
     for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
       let currPtc = [ ...pathsToCode[ptc], 'A' ];
       helper(keyIdx + 1, [ ...soFar, ...currPtc ]);
