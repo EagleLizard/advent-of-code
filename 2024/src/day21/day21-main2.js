@@ -43,7 +43,8 @@ function getSequenceLength(codeKeys, numBots) {
   let minPathLen = Infinity;
   for(let i = 0; i < numpadPaths.length; ++i) {
     let npPath = [ 'A', ...numpadPaths[i] ];
-    let dirpadPaths = getPathsToDirpadKeys(npPath);
+    // let dirpadPaths = getPathsToDirpadKeys(npPath);
+    let dirpadPaths = getPathsToDirpadKeys2(npPath);
     for(let dpp = 0; dpp < dirpadPaths.length; ++dpp) {
       let dpPath = [ 'A', ...dirpadPaths[dpp] ];
       // let dirpadDirpadPaths = getPathsToDirpadKeys(dpPath);
@@ -54,6 +55,41 @@ function getSequenceLength(codeKeys, numBots) {
   }
 
   // let npViaDpPaths = getPathsToNumpadViaDirpadKeys(codeKeys);
+}
+function getPathsToDirpadKeys2(srcCodeKeys) {
+  // console.log(movesToStr(codeKeys));
+  let minPathLen = Infinity;
+  let foundPaths = [];
+  helper(srcCodeKeys);
+  foundPaths = foundPaths.filter(foundPath => {
+    return foundPath.length <= minPathLen;
+  });
+  return foundPaths;
+  function helper(codeKeys, soFar) {
+    // console.log(movesToStr(codeKeys));
+    soFar = soFar ?? [];
+    if(soFar.length > minPathLen) {
+      return;
+    }
+    // if(keyIdx > srcCodeKeys.length - 2) {
+    if(codeKeys.length === 1) {
+      if(soFar.length < minPathLen) {
+        minPathLen = soFar.length;
+      }
+      process.stdout.write(`${movesToStr(soFar)}\n`);
+      foundPaths.push(soFar);
+      return;
+    }
+    let from = codeKeys[0];
+    let to = codeKeys[1];
+    // let pathsToCode = getDirpadDirPaths(from, to);
+    let pathsToCode = getDirpadPaths(from, to);
+    for(let ptc = 0; ptc < pathsToCode.length; ++ptc) {
+      let currPtc = [ ...pathsToCode[ptc], 'A' ];
+      // helper(keyIdx + 1, [ ...soFar, ...currPtc ]);
+      helper(codeKeys.slice(1), [ ...soFar, ...currPtc ]);
+    }
+  }
 }
 function getPathsToDirpadKeys(srcCodeKeys) {
   // console.log(movesToStr(codeKeys));
