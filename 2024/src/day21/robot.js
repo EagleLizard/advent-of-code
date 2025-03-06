@@ -40,7 +40,6 @@ function Robot(keypad) {
     self.setKeypad(keypad);
   }
   self.getKeyPathsMemoCache = new Map();
-  self.getKeyPosMemoCache = {};
 }
 
 Robot.prototype.resetArm = function() {
@@ -52,8 +51,8 @@ Robot.prototype.resetArm = function() {
 
 Robot.prototype.getKeyPathsMemo = function() {
   let self = this;
-  // let cache = new Map();
-  let cache = self.getKeyPathsMemoCache;
+  let cache = new Map();
+  // let cache = self.getKeyPathsMemoCache;
   return function(sPos, ePos) {
     let cacheKey = getCacheKey(sPos, ePos);
     if(cache.has(cacheKey)) {
@@ -84,21 +83,6 @@ Robot.prototype.getMinPathsMemo = function() {
     return `${sPos.x},${sPos.y}-${ePos.x},${ePos.y}`;
   }
 };
-Robot.prototype.getKeyPosMemo = function() {
-  let self = this;
-  let cache = {};
-  // let cache = self.getKeyPosMemoCache;
-  return function(codeKey) {
-    if(cache[codeKey]) {
-      // return JSON.parse(cache[codeKey]);
-      return cache[codeKey];
-    }
-    let res = self.keypad.getKeyPos(codeKey);
-    // cache[codeKey] = JSON.stringify(res);
-    cache[codeKey] = res;
-    return res;
-  };
-};
 
 Robot.prototype.findMinCodePaths3 = function(srcCodeKeyVals, minPathLen) {
   // console.log(srcCodeKeyVals.join(''));
@@ -107,7 +91,6 @@ Robot.prototype.findMinCodePaths3 = function(srcCodeKeyVals, minPathLen) {
   let foundPaths = [];
   let getKeyPaths = self.getKeyPathsMemo();
   let getMinPaths = self.getMinPathsMemo();
-  let getKeyPos = self.getKeyPosMemo();
   // minPathLen = minPathLen ?? Infinity;
   minPathLen = Infinity;
   // helper(srcCodeKeyVals.length - 1);
@@ -131,32 +114,20 @@ Robot.prototype.findMinCodePaths3 = function(srcCodeKeyVals, minPathLen) {
       if(pathSoFar.length < minPathLen) {
         minPathLen = pathSoFar.length;
       }
-      if((foundPaths.length % 1e4) === 0) {
-        console.log(movesToStr(pathSoFar));
-      }
+      // console.log(movesToStr(pathSoFar));
       foundPaths.push(pathSoFar);
       return;
     }
     let codeKey = srcCodeKeyVals[ckIdx];
-    // let pos = self.keypad.getKeyPos(codeKey);
-    let pos = getKeyPos(codeKey);
+    let pos = self.keypad.getKeyPos(codeKey);
     let prevPos = (ckIdx === 0)
       ? origin
-      // : self.keypad.getKeyPos(srcCodeKeyVals[ckIdx - 1])
-      : getKeyPos(srcCodeKeyVals[ckIdx - 1])
+      : self.keypad.getKeyPos(srcCodeKeyVals[ckIdx - 1])
     ;
-    // let ckPaths = getMinPaths(prevPos, pos);
-    // let ckPaths = self.keypad.getMinPaths(prevPos, pos);
-    let ckPaths = getKeyPaths(prevPos, pos);
-    // let ckPaths = self.keypad.getKeyPaths(prevPos, pos);
+    let ckPaths = getMinPaths(prevPos, pos);
     for(let i = 0; i < ckPaths.length; ++i) {
       let ckPath = ckPaths[i];
       // let nPsf = [ ...ckPath, ACTIVATE_KEY_VAL, ...pathSoFar ];
-      let nextPathLen = pathSoFar.length + ckPath.length + 1;
-      if(nextPathLen > minPathLen) {
-        return;
-      }
-      // let nPsf = pathSoFar.concat(ckPath).concat([ ACTIVATE_KEY_VAL ])
       let nPsf = [ ...pathSoFar, ...ckPath, ACTIVATE_KEY_VAL ];
       helper(ckIdx + 1, nPsf);
     }
