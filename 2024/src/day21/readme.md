@@ -33,3 +33,7 @@ The solution took ~8000ms (~8s)
 **Update:*
  
 I'm going to restart with a fresh approach. My thinking is getting mired in the original structure.
+
+### `[03/04/2025][js]`
+
+It could be useful to find paths to keys one-by-one, instead of trying to find every minimum path all at once.

@@ -24,11 +24,11 @@ const getNumpadPathsMemo = () => {
     }
     let toMap = cache.get(from);
     if(toMap.has(to)) {
-      return toMap.get(to);
+      return toMap.get(to).slice();
     }
     let res = getNumpadPaths(from, to);
     toMap.set(to, res);
-    return res;
+    return toMap.get(to).slice();
   };
 };
 
@@ -40,11 +40,11 @@ const getDirpadPathsMemo = () => {
     }
     let toMap = cache.get(from);
     if(toMap.has(to)) {
-      return toMap.get(to);
+      return toMap.get(to).slice();
     }
     let res = getDirpadPaths(from, to);
     toMap.set(to, res);
-    return res;
+    return toMap.get(to).slice();
   };
 };
 
@@ -95,8 +95,8 @@ function getDirpadPaths(from, to) {
       // foundPaths.push([ ...soFar ]);
       return;
     }
-    // for(let d = 0; d < directions.length; ++d) {
-    for(let d = directions.length - 1; d >= 0; --d) {
+    for(let d = 0; d < directions.length; ++d) {
+    // for(let d = directions.length - 1; d >= 0; --d) {
       let dPt = directions[d];
       let nx = pos.x + dPt.x;
       let ny = pos.y + dPt.y;
@@ -161,8 +161,8 @@ function getNumpadPaths(from, to) {
       foundPaths.push(foundPath);
       return;
     }
-    // for(let d = 0; d < directions.length; ++d) {
-    for(let d = directions.length - 1; d >= 0; --d) {
+    for(let d = 0; d < directions.length; ++d) {
+    // for(let d = directions.length - 1; d >= 0; --d) {
       let dPt = directions[d];
       let nx = pos.x + dPt.x;
       let ny = pos.y + dPt.y;

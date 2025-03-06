@@ -16,19 +16,149 @@ function day21Part1(inputLines) {
   let day21Input = parseInput(inputLines);
   let codes = day21Input.codes;
   let complexitySum = 0;
+  let dpCache = new Map();
   for(let i = 0; i < codes.length; ++i) {
     let code = codes[i];
     console.log(code);
     let codeStr = code.str;
     let codeKeys = code.keys;
-    let shortSeqLen = getSequenceLength2(codeKeys, 1);
+    // let shortSeqLen = getSequenceLength2(codeKeys, 1);
+    let shortSeqLen = getSequenceLength3(codeKeys, 1, dpCache);
     let complexity = shortSeqLen * code.num;
     complexitySum += complexity;
     if(i > -1) {
-      break;
+      // break;
     }
   }
   return complexitySum;
+}
+
+function getSequenceLength3(srcCodeKeys, numBots, dpCache) {
+  // dpCache = new Map();
+  srcCodeKeys = srcCodeKeys.slice();
+  /*
+    since the previous approach worked, I'm going to try to break it out into a cleaner
+      function, with another function that find the shortest 2nd dirpad path from a key
+      to a key
+  _*/
+  let codeKeys = [ 'A', ...srcCodeKeys ];
+  let seqPath = [];
+  for(let ck = 0; ck < codeKeys.length - 1; ++ck) {
+    let from = codeKeys[ck];
+    let to = codeKeys[ck + 1];
+    let ckSeqPath = getSeqPath(from, to, dpCache);
+    for(let cksp = 0; cksp < ckSeqPath.length; ++cksp) {
+      seqPath.push(ckSeqPath[cksp]);
+    }
+  }
+  console.log(movesToStr(seqPath));
+  seqPath = [ 'A', ...seqPath ];
+  let fullSeqPath = [];
+  for(let sp = 0; sp < seqPath.length - 1; ++sp) {
+    let from = seqPath[sp];
+    let to = seqPath[sp + 1];
+    let spPath;
+    if(dpCache.has(from) && dpCache.get(from).has(to)) {
+      spPath = dpCache.get(from).get(to).slice();
+    } else {
+      let dpPaths = getDirpadPaths(from, to);
+      for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+        dpPaths[dpp] = [ ...dpPaths[dpp], 'A' ];
+      }
+      // dpPaths.forEach(dpPath => console.log(movesToStr(dpPath)));
+      let minDpLen = Infinity;
+      let minDpIdx = -1;
+      for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+        if(dpPaths.length < minDpLen) {
+          minDpLen = dpPaths.length;
+          minDpIdx = dpp;
+        }
+      }
+      let mPath = dpPaths[minDpIdx];
+      if(!dpCache.has(from)) {
+        dpCache.set(from, new Map());
+      }
+      dpCache.get(from).set(to, mPath);
+      spPath = dpCache.get(from).get(to).slice();
+    }
+    // console.log(`'${moveToChar(from)}' -> '${moveToChar(to)}'`);
+    // console.log(movesToStr(spPath));
+    for(let sp = 0; sp < spPath.length; ++sp) {
+      fullSeqPath.push(spPath[sp]);
+    }
+  }
+  console.log(movesToStr(fullSeqPath));
+  console.log(fullSeqPath.length);
+  return fullSeqPath.length;
+}
+
+function getSeqPath(from, to, dpCache) {
+  console.log(`'${from}' -> '${to}'`);
+  let npPaths = getNumpadPaths(from, to);
+  let npCosts = [];
+  for(let npp = 0; npp < npPaths.length; ++npp) {
+    npCosts[npp] = 0;
+    npPaths[npp] = [ ...npPaths[npp], 'A' ];
+  }
+  // npPaths.forEach(npPath => console.log(movesToStr(npPath)));
+  let npPathsLen = npPaths[0].length;
+  let minPathToCode = [];
+  for(let dpck = 0; dpck < npPathsLen; ++dpck) {
+    for(let npp = 0; npp < npPaths.length; ++npp) {
+      let npPath = [ 'A', ...npPaths[npp] ];
+      let dpFrom = npPath[dpck];
+      let dpTo = npPath[dpck + 1];
+      let dpPaths = getDirpadPaths(dpFrom, dpTo);
+      let dpMinLen = Infinity;
+      let dpMinIdx = -1;
+      for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+        dpPaths[dpp] = [ ...dpPaths[dpp], 'A' ];
+        if(dpPaths[dpp].length < dpMinLen) {
+          dpMinLen = dpPaths[dpp].length;
+          dpMinIdx = dpp;
+        }
+      }
+      npCosts[npp] += dpPaths[dpMinIdx].length;
+    }
+  }
+  let minCost = Infinity;
+  let minCostIdx = -1;
+  for(let nppc = 0; nppc < npCosts.length; ++nppc) {
+    if(npCosts[nppc] < minCost) {
+      minCost = npCosts[nppc];
+      minCostIdx = nppc;
+    }
+  }
+  for(let nppm = 0; nppm < npPaths[minCostIdx].length; ++nppm) {
+    let mPath = [ 'A', ...npPaths[minCostIdx] ];
+    // console.log(movesToStr(mPath));
+    let mFrom = mPath[nppm];
+    let mTo = mPath[nppm + 1];
+    // console.log(`mp: '${moveToChar(mFrom)}' -> ${moveToChar(mTo)}`);
+    let dpPaths = getDirpadPaths(mFrom, mTo);
+    for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+      dpPaths[dpp] = [ ...dpPaths[dpp], 'A' ];
+    }
+    let minDpLen = Infinity;
+    let minDpIdx = -1;
+    for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+      if(dpPaths[dpp].length < minDpLen) {
+        minDpLen = dpPaths[dpp].length;
+        minDpIdx = dpp;
+      }
+    }
+
+    if(!dpCache.has(mFrom)) {
+      dpCache.set(mFrom, new Map());
+    }
+    dpCache.get(mFrom).set(mTo, dpPaths[minDpIdx]);
+
+    // console.log(`= ${movesToStr(dpPaths[minDpIdx])}`);
+    for(let dpp = 0; dpp < dpPaths[minDpIdx].length; ++dpp) {
+      minPathToCode.push(dpPaths[minDpIdx][dpp]);
+    }
+  }
+  return minPathToCode;
 }
 
 function getSequenceLength2(srcCodeKeys, numBots) {
@@ -48,7 +178,7 @@ function getSequenceLength2(srcCodeKeys, numBots) {
     let npFrom = codeKeys[ck];
     let npTo = codeKeys[ck + 1];
     console.log(`'${npFrom}'->'${npTo}'`);
-    let npPaths = getNumpadPaths(npFrom, npTo).slice();
+    let npPaths = getNumpadPaths(npFrom, npTo);
     /*
       now for each path, repeat the process for the 2nd robot.
         That is, the robot pushing the directional pad of the 1st robot
@@ -73,14 +203,12 @@ function getSequenceLength2(srcCodeKeys, numBots) {
     _*/
     let npPathsLen = npPaths[0].length;
     for(let dck = 0; dck < npPathsLen; ++dck) {
-      let minPathLen = Infinity;
-      let minPathIdx = -1;
       for(let npp = 0; npp < npPaths.length; ++npp) {
         let npPath = [ 'A', ...npPaths[npp] ];
         let dpFrom = npPath[dck];
         let dpTo = npPath[dck + 1];
         console.log(`${npp}: dp: '${moveToChar(dpFrom)}'->'${moveToChar(dpTo)}'`);
-        let dpPaths = getDirpadPaths(dpFrom, dpTo).slice();
+        let dpPaths = getDirpadPaths(dpFrom, dpTo);
         let dpMin = Infinity;
         let dpMinIdx = -1;
         for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
@@ -123,7 +251,7 @@ function getSequenceLength2(srcCodeKeys, numBots) {
       let mPath = [ 'A', ...npPaths[minCostIdx] ];
       let from = mPath[nppm];
       let to = mPath[nppm + 1];
-      let dpPaths = getDirpadPaths(from, to).slice();
+      let dpPaths = getDirpadPaths(from, to);
       for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
         dpPaths[dpp] = [ ...dpPaths[dpp], 'A' ];
       }
@@ -149,6 +277,7 @@ function getSequenceLength2(srcCodeKeys, numBots) {
   console.log(movesToStr(minPathToCode));
   console.log(minPathToCode.length);
 }
+
 /* 
 Part 1: 202648 | 367000.941875 ms
 _*/
