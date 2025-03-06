@@ -21,14 +21,133 @@ function day21Part1(inputLines) {
     console.log(code);
     let codeStr = code.str;
     let codeKeys = code.keys;
-    let shortSeqLen = getSequenceLength(codeKeys, 1);
+    let shortSeqLen = getSequenceLength2(codeKeys, 1);
     let complexity = shortSeqLen * code.num;
     complexitySum += complexity;
     if(i > -1) {
-      // break;
+      break;
     }
   }
   return complexitySum;
+}
+
+function getSequenceLength2(srcCodeKeys, numBots) {
+  srcCodeKeys = srcCodeKeys.slice();
+  /*
+    get combinations to press the numpad via the first keypad, key-by-key.
+      For each key-to-key path to the numpad, get the next level of keypresses
+      that would need to be pressed by the 2nd dirpad
+  _*/
+  /*
+    add 'A' to the front of the path, because we start from the activate button
+      as the first robot
+  _*/
+  let codeKeys = [ 'A', ...srcCodeKeys ];
+  let minPathToCode = [];
+  for(let ck = 0; ck < codeKeys.length - 1; ++ck) {
+    let npFrom = codeKeys[ck];
+    let npTo = codeKeys[ck + 1];
+    console.log(`'${npFrom}'->'${npTo}'`);
+    let npPaths = getNumpadPaths(npFrom, npTo).slice();
+    /*
+      now for each path, repeat the process for the 2nd robot.
+        That is, the robot pushing the directional pad of the 1st robot
+        who is pushing the numpad keys
+    _*/
+    /*
+      Add 'A' to the end of the path, because the 2nd robot will
+        end by pushing 'A'. 
+    _*/
+    let nppCosts = [];
+    for(let npp = 0; npp < npPaths.length; ++npp) {
+      nppCosts[npp] = 0;
+      // npPaths[npp] = [ 'A', ...npPaths[npp], 'A' ];
+      npPaths[npp] = [ ...npPaths[npp], 'A' ];
+    }
+    console.log('npPaths:');
+    npPaths.forEach((npPath, idx) => console.log(`${idx}: ${movesToStr(npPath)}`));
+    /*
+      At this point, each path is a "best" path and has equal length.
+        We want to compare the lengths of the paths of the 2nd robot from each key
+        to each other key
+    _*/
+    let npPathsLen = npPaths[0].length;
+    for(let dck = 0; dck < npPathsLen; ++dck) {
+      let minPathLen = Infinity;
+      let minPathIdx = -1;
+      for(let npp = 0; npp < npPaths.length; ++npp) {
+        let npPath = [ 'A', ...npPaths[npp] ];
+        let dpFrom = npPath[dck];
+        let dpTo = npPath[dck + 1];
+        console.log(`${npp}: dp: '${moveToChar(dpFrom)}'->'${moveToChar(dpTo)}'`);
+        let dpPaths = getDirpadPaths(dpFrom, dpTo).slice();
+        let dpMin = Infinity;
+        let dpMinIdx = -1;
+        for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+          dpPaths[dpp] = [ ...dpPaths[dpp], 'A' ];
+          if(dpPaths[dpp].length < dpMin) {
+            dpMin = dpPaths[dpp].length;
+            dpMinIdx = dpp;
+          }
+        }
+        // console.log(`_ ${movesToStr(npPaths[npp])}`);
+        dpPaths.forEach(dpPath => console.log(movesToStr(dpPath)));
+        /*
+          each dirpad path is a "best" path and should have equal length, so we
+            get the cost from the length of the first item
+        _*/
+        
+        nppCosts[npp] += dpPaths[dpMinIdx].length;
+      }
+      // console.log({minPathLen});
+      // console.log({minPathIdx});
+      // console.log(`best: ${movesToStr(npPaths[minPathIdx])}`);
+      if(dck > -1) {
+        // break;
+      }
+    }
+    console.log({
+      nppCosts
+    });
+    let minCost = Infinity;
+    let minCostIdx = -1;
+    for(let nppc = 0; nppc < nppCosts.length; ++nppc) {
+      if(nppCosts[nppc] < minCost) {
+        // console.log(nppc);
+        minCost = nppCosts[nppc];
+        minCostIdx = nppc;
+      }
+    }
+    console.log(`~ ${movesToStr(npPaths[minCostIdx])}`);
+    for(let nppm = 0; nppm < npPaths[minCostIdx].length; ++nppm) {
+      let mPath = [ 'A', ...npPaths[minCostIdx] ];
+      let from = mPath[nppm];
+      let to = mPath[nppm + 1];
+      let dpPaths = getDirpadPaths(from, to).slice();
+      for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+        dpPaths[dpp] = [ ...dpPaths[dpp], 'A' ];
+      }
+      let minDp = Infinity;
+      let minDpIdx = -1;
+      for(let dpp = 0; dpp < dpPaths.length; ++dpp) {
+        if(dpPaths.length < minDp) {
+          minDp = dpPaths.length;
+          minDpIdx = dpp;
+        }
+      }
+      console.log(`= ${movesToStr(dpPaths[minDpIdx])}`);
+      for(let dpp = 0; dpp < dpPaths[minDpIdx].length; ++dpp) {
+        minPathToCode.push(dpPaths[minDpIdx][dpp]);
+      }
+      // dpPaths.forEach(dpPath => console.log(movesToStr(dpPath)));
+      // minPathToCode.push(npPaths[minCostIdx][nppm]);
+    }
+    if(ck > -1) {
+      // break;
+    }
+  }
+  console.log(movesToStr(minPathToCode));
+  console.log(minPathToCode.length);
 }
 /* 
 Part 1: 202648 | 367000.941875 ms
