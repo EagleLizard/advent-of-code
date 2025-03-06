@@ -26,6 +26,7 @@ const config = [
       'no-octal': [ 'off' ],
       'no-multiple-empty-lines': [ 'error', { 'max': 1, 'maxBOF': 1 }],
       'no-unused-vars': [ 'warn' ],
+      'no-fallthrough': [ 'off' ],
       '@stylistic/array-bracket-spacing': [ 'error', 'always', { 'objectsInArrays': false, 'arraysInArrays': false }],
       '@stylistic/eol-last': [ 'error', 'always' ]
     },
