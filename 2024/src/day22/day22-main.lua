@@ -1,5 +1,6 @@
 
 local printf = require("util.printf")
+local arr = require("util.arr-util")
 
 local function parseInput(inputLines)
   local secrets = {}
@@ -72,6 +73,55 @@ local function getSecretN(secret, n)
   return secret
 end
 
+local function getBananasPrice(secret)
+  return secret % 10
+end
+
+local function bananas(secret)
+  --[[ 
+    for each secret in a sequence, the number of bananas
+      being offered is the last digit
+  ]]
+  local nextSecret = secret
+  local prevBananasPrice
+  local bananasPrice = getBananasPrice(secret)
+  local bananasPriceDiff
+  local sequence = {}
+  local maxSeq = {}
+  local maxPrice = -math.huge
+  for i=1,10 do
+    nextSecret = getNextSecret(nextSecret)
+    prevBananasPrice = bananasPrice
+    bananasPrice = getBananasPrice(nextSecret)
+    bananasPriceDiff = bananasPrice - prevBananasPrice
+    table.insert(sequence, bananasPriceDiff)
+    if #sequence > 4 then
+      table.remove(sequence, 1)
+    end
+    if bananasPriceDiff > maxPrice and #sequence == 4 then
+      maxPrice = bananasPriceDiff
+      maxSeq = arr.copy(sequence)
+    end
+    -- printf("\n")
+    -- printf("p: %s\n", prevSecret)
+    printf("%d - %d: %d (%d)\n", i, nextSecret, bananasPrice, bananasPriceDiff)
+  end
+  for k, seqVal in ipairs(maxSeq) do
+    printf("%d%s", seqVal, (k == #maxSeq and "\n") or ", ")
+  end
+end
+
+local function day22Part2(inputLines)
+  local day22Input = parseInput(inputLines)
+  local secrets = day22Input.secrets
+
+  for _, secret in ipairs(secrets) do
+    bananas(secret)
+    printf("%d: \n", secret)
+  end
+  return -1;
+end
+
 --[[ 
   14180628689 - correct
 ]]
@@ -91,6 +141,7 @@ end
 
 local day22MainModule = {
   day22Part1 = day22Part1,
+  day22Part2 = day22Part2,
 }
 
 return day22MainModule
