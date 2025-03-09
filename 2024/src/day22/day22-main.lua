@@ -130,19 +130,59 @@ local function bananas(secret)
   return res
 end
 
+local function seqEq(a, b)
+  local eq = true
+  for i, aVal in ipairs(a) do
+    eq = aVal == b[i]
+    if not eq then
+      break
+    end
+  end
+  return eq
+end
+
 --[[ 
   find the price of the first occurrence of the sequence in the secret
     if it exists
 ]]
-
 local function findBestSeqPrice(srcSecrets)
-  local function helper(secrets, secret)
-    printf("secret: %d\n", secret)
-    if #secrets > 0 then
-      secrets = arr.copy(secrets)
-      local nextSecret = table.remove(secrets, 1)
-      helper(secrets, nextSecret)
+  local n = 2000
+  n = 10
+  local function helper(secrets, secret, targetSeq)
+    -- printf("secret: %d\n", secret)
+    local secretN = secret
+    local seq = {}
+    local prevPrice
+    local price = getBananasPrice(secret)
+    for i=1,n do
+      secretN = getNextSecret(secretN)
+      prevPrice = price
+      price = getBananasPrice(secretN)
+      local priceDiff = price - prevPrice
+      table.insert(seq, priceDiff)
+      if #seq > 4 then
+        table.remove(seq, 1)
+      end
+      if #seq == 4 then
+        -- printf("%d - [%s]\n", price, seqStr(seq))
+        local nTargetSeq
+        if targetSeq == nil then
+          nTargetSeq = seq
+        else
+          nTargetSeq = targetSeq
+        end
+        if #secrets > 0 then
+          local nSecrets = arr.copy(secrets)
+          local nextSecret = table.remove(nSecrets, 1)
+          helper(nSecrets, nextSecret, nTargetSeq)
+        end
+      end
     end
+    -- if #secrets > 0 then
+    --   secrets = arr.copy(secrets)
+    --   local nextSecret = table.remove(secrets, 1)
+    --   helper(secrets, nextSecret)
+    -- end
   end
   --[[
     for every sequence in the first sellers secrets, find the 
@@ -151,8 +191,6 @@ local function findBestSeqPrice(srcSecrets)
   local secrets = arr.copy(srcSecrets)
   local secret = table.remove(secrets, 1)
   helper(secrets, secret)
-  local n = 2000
-  n = 10
   for i, secret in ipairs(secrets) do
     
   end
