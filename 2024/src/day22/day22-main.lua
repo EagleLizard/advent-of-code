@@ -130,20 +130,48 @@ local function bananas(secret)
   return res
 end
 
+--[[ 
+  find the price of the first occurrence of the sequence in the secret
+    if it exists
+]]
+
+local function findBestSeqPrice(srcSecrets)
+  local function helper(secrets, secret)
+    printf("secret: %d\n", secret)
+    if #secrets > 0 then
+      secrets = arr.copy(secrets)
+      local nextSecret = table.remove(secrets, 1)
+      helper(secrets, nextSecret)
+    end
+  end
+  --[[
+    for every sequence in the first sellers secrets, find the 
+      sequence (if any) in the next seller's secrets.
+  ]]
+  local secrets = arr.copy(srcSecrets)
+  local secret = table.remove(secrets, 1)
+  helper(secrets, secret)
+  local n = 2000
+  n = 10
+  for i, secret in ipairs(secrets) do
+    
+  end
+end
+
 local function day22Part2(inputLines)
   local day22Input = parseInput(inputLines)
   local secrets = day22Input.secrets
-
-  for _, secret in ipairs(secrets) do
-    printf("%d: \n", secret)
-    local bestOffer = bananas(secret)
-    if bestOffer ~= nil then
-      local bestPrice = bestOffer.price
-      local bestSeq = bestOffer.seq
-      -- printf("%d - [%s]\n", bestPrice, seqStr(bestSeq))
-    end
-    break
-  end
+  local best = findBestSeqPrice(secrets)
+  -- for _, secret in ipairs(secrets) do
+  --   printf("%d: \n", secret)
+  --   local bestOffer = bananas(secret)
+  --   if bestOffer ~= nil then
+  --     local bestPrice = bestOffer.price
+  --     local bestSeq = bestOffer.seq
+  --     -- printf("%d - [%s]\n", bestPrice, seqStr(bestSeq))
+  --   end
+  --   break
+  -- end
   return -1;
 end
 
