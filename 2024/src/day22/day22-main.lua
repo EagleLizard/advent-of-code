@@ -77,6 +77,14 @@ local function getBananasPrice(secret)
   return secret % 10
 end
 
+local function seqStr(seq)
+  local str = ""
+  for i, seqVal in ipairs(seq) do
+    str = str..seqVal..((i == #seq and "") or ", ")
+  end
+  return str
+end
+
 local function bananas(secret)
   --[[ 
     for each secret in a sequence, the number of bananas
@@ -86,29 +94,40 @@ local function bananas(secret)
   local prevBananasPrice
   local bananasPrice = getBananasPrice(secret)
   local bananasPriceDiff
-  local sequence = {}
+  local diffSeq = {}
   local maxSeq = {}
   local maxPrice = -math.huge
-  for i=1,10 do
+  local n = 2000
+  -- n = 10
+  for i=1,n do
     nextSecret = getNextSecret(nextSecret)
     prevBananasPrice = bananasPrice
     bananasPrice = getBananasPrice(nextSecret)
     bananasPriceDiff = bananasPrice - prevBananasPrice
-    table.insert(sequence, bananasPriceDiff)
-    if #sequence > 4 then
-      table.remove(sequence, 1)
+    table.insert(diffSeq, bananasPriceDiff)
+    if #diffSeq > 4 then
+      table.remove(diffSeq, 1)
     end
-    if bananasPriceDiff > maxPrice and #sequence == 4 then
-      maxPrice = bananasPriceDiff
-      maxSeq = arr.copy(sequence)
+    if bananasPrice > maxPrice and #diffSeq == 4 then
+      maxPrice = bananasPrice
+      maxSeq = arr.copy(diffSeq)
     end
-    -- printf("\n")
-    -- printf("p: %s\n", prevSecret)
-    printf("%d - %d: %d (%d)\n", i, nextSecret, bananasPrice, bananasPriceDiff)
+    -- printf("%d - %d: %d (%d)\n", i, nextSecret, bananasPrice, bananasPriceDiff)
+    -- if #diffSeq == 4 then
+    --   printf("%d [%s]\n", bananasPrice, seqStr(diffSeq))
+    -- end
   end
-  for k, seqVal in ipairs(maxSeq) do
-    printf("%d%s", seqVal, (k == #maxSeq and "\n") or ", ")
+  -- for k, seqVal in ipairs(maxSeq) do
+  --   printf("%d%s", seqVal, (k == #maxSeq and "\n") or ", ")
+  -- end
+  if #maxSeq < 1 then
+    return nil
   end
+  local res = {
+    price = maxPrice,
+    seq = maxSeq,
+  }
+  return res
 end
 
 local function day22Part2(inputLines)
@@ -116,8 +135,14 @@ local function day22Part2(inputLines)
   local secrets = day22Input.secrets
 
   for _, secret in ipairs(secrets) do
-    bananas(secret)
     printf("%d: \n", secret)
+    local bestOffer = bananas(secret)
+    if bestOffer ~= nil then
+      local bestPrice = bestOffer.price
+      local bestSeq = bestOffer.seq
+      -- printf("%d - [%s]\n", bestPrice, seqStr(bestSeq))
+    end
+    break
   end
   return -1;
 end
