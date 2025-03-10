@@ -198,44 +198,59 @@ end
 
 local function findBestSeqPrice2(srcSecrets)
   local n = 2000
-  n = 10
+  -- n = 10
   local secrets = arr.copy(srcSecrets)
+  local uniqSeqMap = {}
+  local uniqSeqs = {}
   for i, secret in ipairs(secrets) do
-    printf("%d: %s\n", i, secret)
+    -- printf("%d: %s\n", i, secret)
     local secretN = secret
     local seq = {}
     local prevPrice
     local price = getBananasPrice(secret)
     for k=1,n do
+      -- printf("%d: %d\n", secretN, price)
       secretN = getNextSecret(secretN)
       prevPrice = price
       price = getBananasPrice(secretN)
+      -- printf("%d: %d\n", secretN, price)
       local priceDiff = price - prevPrice
       table.insert(seq, priceDiff)
       if #seq > 4 then
         table.remove(seq, 1)
       end
       if #seq == 4 then
-        printf("%d: %d [%s]\n", k, price, seqStr(seq))
+        -- printf("%d: %d [%s]\n", k, price, seqStr(seq))
+        local seqKey = seqStr(seq)
+        -- if seqEq(seq, {-2, 1, -1, 3}) then
+        --   printf("%d: %d\n", i, price)
+        -- end
+        if uniqSeqMap[seqKey] == nil then
+          uniqSeqMap[seqKey] = arr.copy(seq)
+          table.insert(uniqSeqs, uniqSeqMap[seqKey])
+        end
       end
     end
   end
+  --[[
+    for every unique sequence of 4 changes, find the price we would get from 
+      each seller when that sequence occurs
+  ]]
+  local uniqSeqCount = 0
+  for k, uniqSeq in pairs(uniqSeqMap) do
+    uniqSeqCount = uniqSeqCount + 1
+    -- table.insert(uniqSeqs, uniqSeq)
+  end
+  local maxBPrice = -math.huge
+  local maxBPriceSeq = nil
+  
 end
 
 local function day22Part2(inputLines)
   local day22Input = parseInput(inputLines)
   local secrets = day22Input.secrets
   local best = findBestSeqPrice2(secrets)
-  -- for _, secret in ipairs(secrets) do
-  --   printf("%d: \n", secret)
-  --   local bestOffer = bananas(secret)
-  --   if bestOffer ~= nil then
-  --     local bestPrice = bestOffer.price
-  --     local bestSeq = bestOffer.seq
-  --     -- printf("%d - [%s]\n", bestPrice, seqStr(bestSeq))
-  --   end
-  --   break
-  -- end
+  
   return -1;
 end
 
