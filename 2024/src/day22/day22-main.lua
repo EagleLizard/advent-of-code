@@ -60,11 +60,24 @@ local function op3(secret)
 end
 
 local function getNextSecret(secret)
+  -- return op3(op2(op1(secret)))
   secret = op1(secret)
   secret = op2(secret)
   secret = op3(secret)
   return secret
 end
+
+local getNextSecretMemo = (function ()
+  local cache = {}
+  return function(secret)
+    if cache[secret] ~= nil then
+      return cache[secret]
+    end
+    local res = getNextSecret(secret)
+    cache[secret] = res
+    return cache[secret]
+  end
+end)()
 
 local function getSecretN(secret, n)
   for i=1, n do
@@ -85,51 +98,6 @@ local function seqStr(seq)
   return str
 end
 
-local function bananas(secret)
-  --[[ 
-    for each secret in a sequence, the number of bananas
-      being offered is the last digit
-  ]]
-  local nextSecret = secret
-  local prevBananasPrice
-  local bananasPrice = getBananasPrice(secret)
-  local bananasPriceDiff
-  local diffSeq = {}
-  local maxSeq = {}
-  local maxPrice = -math.huge
-  local n = 2000
-  -- n = 10
-  for i=1,n do
-    nextSecret = getNextSecret(nextSecret)
-    prevBananasPrice = bananasPrice
-    bananasPrice = getBananasPrice(nextSecret)
-    bananasPriceDiff = bananasPrice - prevBananasPrice
-    table.insert(diffSeq, bananasPriceDiff)
-    if #diffSeq > 4 then
-      table.remove(diffSeq, 1)
-    end
-    if bananasPrice > maxPrice and #diffSeq == 4 then
-      maxPrice = bananasPrice
-      maxSeq = arr.copy(diffSeq)
-    end
-    -- printf("%d - %d: %d (%d)\n", i, nextSecret, bananasPrice, bananasPriceDiff)
-    -- if #diffSeq == 4 then
-    --   printf("%d [%s]\n", bananasPrice, seqStr(diffSeq))
-    -- end
-  end
-  -- for k, seqVal in ipairs(maxSeq) do
-  --   printf("%d%s", seqVal, (k == #maxSeq and "\n") or ", ")
-  -- end
-  if #maxSeq < 1 then
-    return nil
-  end
-  local res = {
-    price = maxPrice,
-    seq = maxSeq,
-  }
-  return res
-end
-
 local function seqEq(a, b)
   local eq = true
   for i, aVal in ipairs(a) do
@@ -141,61 +109,6 @@ local function seqEq(a, b)
   return eq
 end
 
---[[ 
-  find the price of the first occurrence of the sequence in the secret
-    if it exists
-]]
-local function findBestSeqPrice(srcSecrets)
-  local n = 2000
-  n = 10
-  local function helper(secrets, secret, targetSeq)
-    -- printf("secret: %d\n", secret)
-    local secretN = secret
-    local seq = {}
-    local prevPrice
-    local price = getBananasPrice(secret)
-    for i=1,n do
-      secretN = getNextSecret(secretN)
-      prevPrice = price
-      price = getBananasPrice(secretN)
-      local priceDiff = price - prevPrice
-      table.insert(seq, priceDiff)
-      if #seq > 4 then
-        table.remove(seq, 1)
-      end
-      if #seq == 4 then
-        -- printf("%d - [%s]\n", price, seqStr(seq))
-        local nTargetSeq
-        if targetSeq == nil then
-          nTargetSeq = seq
-        else
-          nTargetSeq = targetSeq
-        end
-        if #secrets > 0 then
-          local nSecrets = arr.copy(secrets)
-          local nextSecret = table.remove(nSecrets, 1)
-          helper(nSecrets, nextSecret, nTargetSeq)
-        end
-      end
-    end
-    -- if #secrets > 0 then
-    --   secrets = arr.copy(secrets)
-    --   local nextSecret = table.remove(secrets, 1)
-    --   helper(secrets, nextSecret)
-    -- end
-  end
-  --[[
-    for every sequence in the first sellers secrets, find the 
-      sequence (if any) in the next seller's secrets.
-  ]]
-  local secrets = arr.copy(srcSecrets)
-  local secret = table.remove(secrets, 1)
-  helper(secrets, secret)
-  for i, secret in ipairs(secrets) do
-    
-  end
-end
-
 local function sellAt(sellSeq, secret)
   local n = 2000
   local secretN = secret
@@ -203,7 +116,7 @@ local function sellAt(sellSeq, secret)
   local prevPrice
   local price = getBananasPrice(secretN)
   for i=1,n do
-    secretN = getNextSecret(secretN)
+    secretN = getNextSecretMemo(secretN)
     prevPrice = price
     price = getBananasPrice(secretN)
     local priceDiff = price - prevPrice
@@ -231,7 +144,7 @@ local function findBestSeqPrice2(srcSecrets)
     local price = getBananasPrice(secret)
     for k=1,n do
       -- printf("%d: %d\n", secretN, price)
-      secretN = getNextSecret(secretN)
+      secretN = getNextSecretMemo(secretN)
       prevPrice = price
       price = getBananasPrice(secretN)
       -- printf("%d: %d\n", secretN, price)
@@ -261,17 +174,21 @@ local function findBestSeqPrice2(srcSecrets)
     uniqSeqCount = uniqSeqCount + 1
     -- table.insert(uniqSeqs, uniqSeq)
   end
+  printf("uniqSeq count: %d\n", uniqSeqCount)
+  local iterCount = 0
   local maxBPrice = -math.huge
   local maxBPriceSeq = nil
   for k, uniqSeq in ipairs(uniqSeqs) do
     local priceSum = 0
     for i, secret in ipairs(secrets) do
       local sellPrice = sellAt(uniqSeq, secret)
+      -- printf("%d ", k * i)
       if sellPrice ~= nil then
-        -- printf("%d: %d - [%s]\n", i, sellPrice, seqStr(uniqSeq))
+        -- printf("%d: %d: %d - [%s]\n", k, i, sellPrice, seqStr(uniqSeq))
         priceSum = priceSum + sellPrice
         -- break
       end
+      iterCount = iterCount + 1
     end
     -- if seqEq({-2, 1, -1, 3}, uniqSeq) then
     --   printf("%d - [%s]\n", priceSum, seqStr(uniqSeq))
@@ -283,6 +200,7 @@ local function findBestSeqPrice2(srcSecrets)
     end
   end
   printf("%d - [%s]\n", maxBPrice, seqStr(maxBPriceSeq))
+  printf("iterCount: %d\n", iterCount)
   return maxBPrice
 end
 
