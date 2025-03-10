@@ -36,7 +36,18 @@ const DAY_21_FILE_NAME = 'day21_test.txt';
 // const DAY_21_FILE_NAME = 'day21.txt';
 // const DAY_22_FILE_NAME = 'day22_test.txt';
 // const DAY_22_FILE_NAME = 'day22_test2.txt';
-const DAY_22_FILE_NAME = 'day22.txt';
+const DAY_22_FILE_NAME = 'day22_test3.txt';
+/* 
+p1 - 18183557
+p2 - 27 with sequence (3, 1, 4, 1)
+_*/
+// const DAY_22_FILE_NAME = 'day22_test-e1.txt';
+/* 
+p1 - 8876699
+p2 - 27 with sequence (-1, 0, -1, 8)
+_*/
+// const DAY_22_FILE_NAME = 'day22_test-e2.txt';
+// const DAY_22_FILE_NAME = 'day22.txt';
 
 const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
@@ -48,7 +59,7 @@ const DAY_ARGS_ARR = [
   [ 20, DAY_20_FILE_NAME, day20.day20Part1, day20.day20Part2 ],
   [ 21, DAY_21_FILE_NAME, day21.day21Part1, undefined ],
   // [ 21, DAY_21_FILE_NAME, undefined, day21.day21Part2 ],
-  [ 22, DAY_22_FILE_NAME, day22.day22Part1, undefined ],
+  [ 22, DAY_22_FILE_NAME, day22.day22Part1, day22.day22Part2 ],
 ].map(dayArgsTuple => {
   let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
   return {

@@ -4,6 +4,9 @@ module.exports = {
   day22Part2,
 };
 
+/*
+1499 | 3039737.26925 ms - too low. Curiously, it's the right answer for someone else.
+_*/
 function day22Part2(inputLines) {
   let day22Input = parseInput(inputLines);
   let secrets = day22Input.secrets;
@@ -16,7 +19,8 @@ function day22Part2(inputLines) {
 }
 
 function findBestPriceSeq(srcSecrets) {
-  let n = 2000;
+  // const getNextSecretMemo = getGetNextSecretMemo();
+  let n = 2001;
   // n = 10;
   let secrets = srcSecrets.slice();
   let uniqSeqMap = new Map();
@@ -27,26 +31,28 @@ function findBestPriceSeq(srcSecrets) {
     let seq = [];
     let price = getBananaPrice(secretN);
     let prevPrice;
-    for(let k = 1; k < n; ++k) {
+    for(let k = 0; k < n; ++k) {
       secretN = getNextSecret(secretN);
       prevPrice = price;
       price = getBananaPrice(secretN);
       let priceDiff = price - prevPrice;
       // console.log(`${secretN}: ${price} (${priceDiff})`);
-      seq.push(priceDiff);
-      if(seq.length > 4) {
-        seq.shift();
-      }
       if(seq.length === 4) {
         let seqKey = getSeqStr(seq);
         if(!uniqSeqMap.has(seqKey)) {
           uniqSeqMap.set(seqKey, seq.slice());
           uniqSeqs.push(uniqSeqMap.get(seqKey));
+          // uniqSeqs.push(uniqSeqMap.get(seqKey));
         }
+      }
+      seq.push(priceDiff);
+      if(seq.length > 4) {
+        seq.shift();
       }
     }
   }
   console.log(`uniqSeq count: ${uniqSeqs.length}`);
+  console.log(`uniqSeq count: ${uniqSeqMap.size}`);
   let maxBPrice = -Infinity;
   let maxBSeq = undefined;
   for(let k = 0; k < uniqSeqs.length; ++k) {
@@ -55,24 +61,22 @@ function findBestPriceSeq(srcSecrets) {
     for(let i = 0; i < secrets.length; ++i) {
       let secret = secrets[i];
       let sellPrice = sellAt(uniqSeq, secret);
-      if(sellPrice !== undefined) {
-        priceSum += sellPrice;
-      }
+      priceSum += sellPrice;
     }
     if(priceSum > maxBPrice) {
       maxBPrice = priceSum;
       maxBSeq = uniqSeq;
       console.log(`${maxBPrice} - [${getSeqStr(maxBSeq)}]`);
     }
-    console.log(`${k} / ${uniqSeqs.length} ~ ${maxBPrice} - [${getSeqStr(maxBSeq)}]`);
+    // process.stdout.write(`${k} / ${uniqSeqs.length} ~ ${maxBPrice} - [${getSeqStr(maxBSeq)}]\n`);
   }
   return maxBPrice;
 }
 
-function sellAt(sellSeq, secret) {
-  let n = 2000;
+function sellAt(sellSeq, secret, getNextSecretFn) {
+  let n = 2001;
   let secretN = secret;
-  let seq = [];
+  // let seq = [];
   let prevPrice;
   let price = getBananaPrice(secret);
   let sellSeqIdx = 0;
@@ -80,16 +84,18 @@ function sellAt(sellSeq, secret) {
     secretN = getNextSecret(secretN);
     prevPrice = price;
     price = getBananaPrice(secretN);
-    let priceDiff = price - prevPrice;
-    if(priceDiff === sellSeq[sellSeqIdx]) {
+    // let priceDiff = price - prevPrice;
+    // if(priceDiff === sellSeq[sellSeqIdx]) {
+    if((price - prevPrice) === sellSeq[sellSeqIdx]) {
       sellSeqIdx++;
-      if(sellSeqIdx > sellSeq.length - 1) {
+      if(sellSeqIdx > 3) {
         return price;
       }
     } else {
       sellSeqIdx = 0;
     }
   }
+  return 0n;
 }
 
 function getSeqStr(seq) {
@@ -121,31 +127,36 @@ function day22Part1(inputLines) {
 }
 
 function getNextSecret(secret) {
-  secret = op1(secret);
-  secret = op2(secret);
-  secret = op3(secret);
-  return secret;
+  secret = (secret ^ (secret * 64n)) % 16777216n;
+  secret = (secret ^ (secret / 32n)) % 16777216n;
+  return (secret ^ (secret * 2048n)) % 16777216n;;
+  // return secret;
+  // secret = op1(secret);
+  // secret = op2(secret);
+  // secret = op3(secret);
+  // return secret;
 }
 
 function op1(secret) {
-  let mul = secret * 64n;
-  secret = mix(secret, mul);
-  secret = prune(secret);
-  return secret;
+  // let mul = secret * 64n;
+  // secret = mix(secret, secret * 64n);
+  // secret = prune(mix(secret, secret * 64n));
+  return (secret ^ (secret * 64n)) % 16777216n;
 }
 
 function op2(secret) {
-  let div = secret / 32n;
-  secret = mix(secret, div);
-  secret = prune(secret);
-  return secret;
+  // let div = secret / 32n;
+  // secret = mix(secret, secret / 32n);
+  // secret = prune(secret);
+  return (secret ^ (secret / 32n)) % 16777216n;
 }
 
 function op3(secret){
-  let mul = secret * 2048n;
-  secret = mix(secret, mul);
-  secret = prune(secret);
-  return secret;
+  // let mul = secret * 2048n;
+  // secret = mix(secret, mul);
+  // secret = mix(secret, secret * 2048n);
+  // secret = prune(secret);
+  return (secret ^ (secret * 2048n)) % 16777216n;
 }
 
 function mix(secret, val) {
@@ -160,7 +171,7 @@ function parseInput(inputLines) {
   let secrets = [];
   for(let i = 0; i < inputLines.length; ++i) {
     let inputLine = inputLines[i];
-    if(/^\d+$/.test(inputLine)) {
+    if(/\d+/.test(inputLine)) {
       secrets.push(BigInt(+inputLine));
     }
   }
