@@ -1,6 +1,8 @@
 
 local printf = require("util.printf")
 local arr = require("util.arr-util")
+local queueModule = require("lib.datastruct.queue")
+local Queue = queueModule.Queue
 
 local function parseInput(inputLines)
   local secrets = {}
@@ -90,6 +92,18 @@ local function getBananasPrice(secret)
   return secret % 10
 end
 
+local getBananasPriceMemo = (function ()
+  local cache = {}
+  return function (secret)
+    if cache[secret] ~= nil then
+      return cache[secret]
+    end
+    local res = getBananasPrice(secret)
+    cache[secret] = res
+    return cache[secret]
+  end
+end)()
+
 local function seqStr(seq)
   local str = ""
   for i, seqVal in ipairs(seq) do
@@ -109,24 +123,46 @@ local function seqEq(a, b)
   return eq
 end
 
+local function getNextDiff(secret)
+  local prevPrice = getBananasPrice(secret)
+  local secretN = getNextSecretMemo(secret)
+  local price = getBananasPrice(secretN)
+  local diff = price - prevPrice
+  local res = {
+    secret = secretN,
+    diff = diff,
+    price = price,
+  }
+  return res
+end
+
 local function sellAt(sellSeq, secret)
   local n = 2000
   local secretN = secret
   local seq = {}
   local prevPrice
   local price = getBananasPrice(secretN)
+  local sellSeqIdx = 1
   for i=1,n do
     secretN = getNextSecretMemo(secretN)
     prevPrice = price
     price = getBananasPrice(secretN)
     local priceDiff = price - prevPrice
-    table.insert(seq, priceDiff)
-    if #seq > 4 then
-      table.remove(seq, 1)
+    -- table.insert(seq, priceDiff)
+    -- if #seq > 4 then
+    --   table.remove(seq, 1)
+    -- end
+    if priceDiff == sellSeq[sellSeqIdx] then
+      sellSeqIdx = sellSeqIdx + 1
+      if sellSeqIdx > #sellSeq then
+        return price
+      end
+    else
+      sellSeqIdx = 1
     end
-    if seqEq(sellSeq, seq) then
-      return price
-    end
+    -- if seqEq(sellSeq, seq) then
+    --   return price
+    -- end
   end
 end
 
@@ -176,19 +212,22 @@ local function findBestSeqPrice2(srcSecrets)
   end
   printf("uniqSeq count: %d\n", uniqSeqCount)
   local iterCount = 0
+  local sellAtCount = 0
   local maxBPrice = -math.huge
   local maxBPriceSeq = nil
   for k, uniqSeq in ipairs(uniqSeqs) do
     local priceSum = 0
     for i, secret in ipairs(secrets) do
       local sellPrice = sellAt(uniqSeq, secret)
-      -- printf("%d ", k * i)
       if sellPrice ~= nil then
         -- printf("%d: %d: %d - [%s]\n", k, i, sellPrice, seqStr(uniqSeq))
         priceSum = priceSum + sellPrice
         -- break
       end
       iterCount = iterCount + 1
+      if (iterCount % 1000) == 0 then
+        -- printf("%d: %d: [%s]\n", k, i, seqStr(uniqSeq))
+      end
     end
     -- if seqEq({-2, 1, -1, 3}, uniqSeq) then
     --   printf("%d - [%s]\n", priceSum, seqStr(uniqSeq))
@@ -196,11 +235,13 @@ local function findBestSeqPrice2(srcSecrets)
     if priceSum > maxBPrice then
       maxBPrice = priceSum
       maxBPriceSeq = uniqSeq
-      printf("%d - [%s]\n", maxBPrice, seqStr(maxBPriceSeq))
+      -- printf("%d - [%s]\n", maxBPrice, seqStr(maxBPriceSeq))
     end
+    printf("%d / %d ~ %d - [%s]\n", k, uniqSeqCount, maxBPrice, seqStr(maxBPriceSeq))
   end
   printf("%d - [%s]\n", maxBPrice, seqStr(maxBPriceSeq))
   printf("iterCount: %d\n", iterCount)
+  printf("sellAtCountt: %d\n", sellAtCount)
   return maxBPrice
 end
 
