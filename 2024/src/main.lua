@@ -69,8 +69,9 @@ local DAY_16_FILE_NAME = "day16.txt"
 -- local DAY_19_FILE_NAME = "day19_test-e1.txt"
 local DAY_19_FILE_NAME = "day19.txt"
 -- local DAY_22_FILE_NAME = "day22.txt"
-local DAY_22_FILE_NAME = "day22_test.txt"
+-- local DAY_22_FILE_NAME = "day22_test.txt"
 -- local DAY_22_FILE_NAME = "day22_test2.txt"
+local DAY_22_FILE_NAME = "day22_test3.txt"
 
 local function aocBanner(t)
   local padStr = "*"

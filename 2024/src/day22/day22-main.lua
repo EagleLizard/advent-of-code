@@ -135,7 +135,7 @@ local function seqEq(a, b)
   for i, aVal in ipairs(a) do
     eq = aVal == b[i]
     if not eq then
-      break
+      return false
     end
   end
   return eq
@@ -196,6 +196,27 @@ local function findBestSeqPrice(srcSecrets)
   end
 end
 
+local function sellAt(sellSeq, secret)
+  local n = 2000
+  local secretN = secret
+  local seq = {}
+  local prevPrice
+  local price = getBananasPrice(secretN)
+  for i=1,n do
+    secretN = getNextSecret(secretN)
+    prevPrice = price
+    price = getBananasPrice(secretN)
+    local priceDiff = price - prevPrice
+    table.insert(seq, priceDiff)
+    if #seq > 4 then
+      table.remove(seq, 1)
+    end
+    if seqEq(sellSeq, seq) then
+      return price
+    end
+  end
+end
+
 local function findBestSeqPrice2(srcSecrets)
   local n = 2000
   -- n = 10
@@ -203,7 +224,7 @@ local function findBestSeqPrice2(srcSecrets)
   local uniqSeqMap = {}
   local uniqSeqs = {}
   for i, secret in ipairs(secrets) do
-    -- printf("%d: %s\n", i, secret)
+    printf("%d: %s\n", i, secret)
     local secretN = secret
     local seq = {}
     local prevPrice
@@ -220,7 +241,6 @@ local function findBestSeqPrice2(srcSecrets)
         table.remove(seq, 1)
       end
       if #seq == 4 then
-        -- printf("%d: %d [%s]\n", k, price, seqStr(seq))
         local seqKey = seqStr(seq)
         -- if seqEq(seq, {-2, 1, -1, 3}) then
         --   printf("%d: %d\n", i, price)
@@ -243,15 +263,35 @@ local function findBestSeqPrice2(srcSecrets)
   end
   local maxBPrice = -math.huge
   local maxBPriceSeq = nil
-  
+  for k, uniqSeq in ipairs(uniqSeqs) do
+    local priceSum = 0
+    for i, secret in ipairs(secrets) do
+      local sellPrice = sellAt(uniqSeq, secret)
+      if sellPrice ~= nil then
+        -- printf("%d: %d - [%s]\n", i, sellPrice, seqStr(uniqSeq))
+        priceSum = priceSum + sellPrice
+        -- break
+      end
+    end
+    -- if seqEq({-2, 1, -1, 3}, uniqSeq) then
+    --   printf("%d - [%s]\n", priceSum, seqStr(uniqSeq))
+    -- end
+    if priceSum > maxBPrice then
+      maxBPrice = priceSum
+      maxBPriceSeq = uniqSeq
+      printf("%d - [%s]\n", maxBPrice, seqStr(maxBPriceSeq))
+    end
+  end
+  printf("%d - [%s]\n", maxBPrice, seqStr(maxBPriceSeq))
+  return maxBPrice
 end
 
 local function day22Part2(inputLines)
   local day22Input = parseInput(inputLines)
   local secrets = day22Input.secrets
-  local best = findBestSeqPrice2(secrets)
+  local mostBananas = findBestSeqPrice2(secrets)
   
-  return -1;
+  return mostBananas;
 end
 
 --[[ 
