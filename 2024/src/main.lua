@@ -72,6 +72,16 @@ local DAY_22_FILE_NAME = "day22.txt"
 -- local DAY_22_FILE_NAME = "day22_test.txt"
 -- local DAY_22_FILE_NAME = "day22_test2.txt"
 -- local DAY_22_FILE_NAME = "day22_test3.txt"
+--[[ 
+  p1 - 18183557
+  p2 - 27 with sequence (3, 1, 4, 1)
+]]
+-- local DAY_22_FILE_NAME = "day22_test-e1.txt"
+--[[ 
+  p1 - 8876699
+  p2 - 27 with sequence (-1, 0, -1, 8)
+]]
+-- local DAY_22_FILE_NAME = "day22_test-e2.txt"
 
 local function aocBanner(t)
   local padStr = "*"

@@ -13,3 +13,7 @@ faster, ~9600ms (9.6s)
 ### `[03/11/2025][js]`
 
 I'm going to try packing the sequences into a single integer instead
+
+### `[lua]`
+
+Solution took ~16000ms (~1.6s)
