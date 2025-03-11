@@ -36,7 +36,7 @@ const DAY_21_FILE_NAME = 'day21_test.txt';
 // const DAY_21_FILE_NAME = 'day21.txt';
 // const DAY_22_FILE_NAME = 'day22_test.txt';
 // const DAY_22_FILE_NAME = 'day22_test2.txt';
-const DAY_22_FILE_NAME = 'day22_test3.txt';
+// const DAY_22_FILE_NAME = 'day22_test3.txt';
 /* 
 p1 - 18183557
 p2 - 27 with sequence (3, 1, 4, 1)
@@ -47,7 +47,7 @@ p1 - 8876699
 p2 - 27 with sequence (-1, 0, -1, 8)
 _*/
 // const DAY_22_FILE_NAME = 'day22_test-e2.txt';
-// const DAY_22_FILE_NAME = 'day22.txt';
+const DAY_22_FILE_NAME = 'day22.txt';
 
 const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
