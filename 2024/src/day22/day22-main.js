@@ -37,11 +37,9 @@ function day22Part2(inputLines) {
 }
 
 function unpackSeqBits(seqInt) {
-  // let mask = (1 << 4) - 1;
   let seq = [];
-  for(let i = 0n; i < 4; ++i) {
-    let shifted = (seqInt >> (i * 5n) & 31n) - 9n;
-    seq.push(shifted);
+  for(let i = 0n; i < seq.length; ++i) {
+    seq.push((seqInt >> (i * 5n) & 31n) - 9n);
   }
   return seq;
 }
@@ -49,8 +47,6 @@ function unpackSeqBits(seqInt) {
 function packSeqBits(seq) {
   let res = 0n;
   for(let i = 0n; i < seq.length; ++i) {
-    // let shifted = (seq[i] + 9n) << (i * 5n);
-    // res |= shifted;
     res |= (seq[i] + 9n) << (i * 5n);
   }
   return res;
@@ -79,7 +75,6 @@ function findBestPriceSeq2(srcSecrets) {
       }
       if(seq.length === 4) {
         let seqKey = getSeqStr(seq);
-        // let seqKey = packSeqBits(seq);
         if(seqMap[seqKey] === undefined) {
           seqMap[seqKey] = price;
         }
@@ -91,18 +86,15 @@ function findBestPriceSeq2(srcSecrets) {
   for(let i = 0; i < uniqSeqs.length; ++i) {
     let uniqSeq = uniqSeqs[i];
     let uniqSeqKey = getSeqStr(uniqSeq);
-    // let uniqSeqKey = packSeqBits(uniqSeq);
     for(let k = 0; k < seqMaps.length; ++k) {
       let seqMap = seqMaps[k];
       if(seqMap[uniqSeqKey] !== undefined) {
-        // let globalSeqPrice = globalSeqMap[uniqSeqKey] ?? 0n;
         globalSeqMap[uniqSeqKey] = (globalSeqMap[uniqSeqKey] ?? 0n) + seqMap[uniqSeqKey];
       }
     }
   }
   let bestPrice = -Infinity;
   let bestPriceSeq;
-  // let globalSeqTuples = [ ...globalSeqMap ];
   let globalSeqTuples = [ ...Object.entries(globalSeqMap) ];
   for(let i = 0; i < globalSeqTuples.length; ++i) {
     let [ seqKey, seqPrice ] = globalSeqTuples[i];
@@ -112,7 +104,6 @@ function findBestPriceSeq2(srcSecrets) {
     }
   }
   console.log(`${bestPriceSeq} - ${bestPrice}`);
-  // console.log(`${getSeqStr(unpackSeqBits(BigInt(bestPriceSeq)))} - ${bestPrice}`);
   return bestPrice;
 }
 

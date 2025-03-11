@@ -37,3 +37,7 @@ I'm going to restart with a fresh approach. My thinking is getting mired in the 
 ### `[03/04/2025][js]`
 
 It could be useful to find paths to keys one-by-one, instead of trying to find every minimum path all at once.
+
+**Update:*
+
+Packing bits had the opposite effect in this case, making it slower. This is probably a JS thing where string keys are cheaper here.
