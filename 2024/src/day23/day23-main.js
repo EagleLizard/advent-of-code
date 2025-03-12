@@ -3,7 +3,69 @@ const { LanNetwork } = require('./lan-network');
 
 module.exports = {
   day23Part1,
+  day23Part2,
 };
+
+/*
+cc,ff,fh,fr,ny,oa,pl,rg,uj,wd,xn,xs,zw - correct
+_*/
+function day23Part2(inputLines) {
+  let day23Input = parseInput(inputLines);
+  let connPairs = day23Input.connPairs;
+  let lan = new LanNetwork();
+  for(let i = 0; i < connPairs.length; ++i) {
+    let [ compA, compB ] = connPairs[i];
+    lan.addConn(compA, compB);
+  }
+  let largestConn = findLargestConn(lan);
+  let password = largestConn.map(node => node.val).join(',');
+
+  return password;
+}
+
+function findLargestConn (lan) {
+  // let foundConns = [];
+  let cycleSet = new Set();
+  let longestConnLen = -Infinity;
+  let longestConn = undefined;
+  traverse(lan, (lanNode, soFar) => {
+    // console.log(soFar.map(sfNode => sfNode.val).join(' '));
+    /*
+      only continue if the node being visited is also connected to the first node
+    _*/
+    
+    if(soFar.length > 2) {
+      let isConnected = true;
+      for(let i = 0; i < soFar.length - 1; ++i) {
+        for(let k = i + 1; k < soFar.length; ++k) {
+          isConnected = soFar[i].hasConn(soFar[k].val);
+          if(!isConnected) {
+            break;
+          }
+        }
+        if(!isConnected) {
+          break;
+        }
+      }
+      if(!isConnected) {
+        return 0;
+      }
+      if(soFar.length > longestConnLen) {
+        longestConnLen = soFar.length;
+        longestConn = soFar.slice();
+      }
+      let connKey = soFar.map(lanNode => lanNode.val).toSorted().join(' ');
+      if(cycleSet.has(connKey)) {
+        return 0;
+      }
+      cycleSet.add(connKey);
+      // if(soFar.length >= longestConnLen) {
+      //   process.stdout.write(`${connKey}\n`);
+      // }
+    }
+  });
+  return longestConn;
+}
 
 /*
 998 - correct

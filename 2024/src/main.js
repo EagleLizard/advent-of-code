@@ -63,7 +63,7 @@ const DAY_ARGS_ARR = [
   [ 21, DAY_21_FILE_NAME, day21.day21Part1, undefined ],
   // [ 21, DAY_21_FILE_NAME, undefined, day21.day21Part2 ],
   [ 22, DAY_22_FILE_NAME, day22.day22Part1, day22.day22Part2 ],
-  [ 23, DAY_23_FILE_NAME, day23.day23Part1, undefined ],
+  [ 23, DAY_23_FILE_NAME, day23.day23Part1, day23.day23Part2 ],
 ].map(dayArgsTuple => {
   let [ day, inputFileName, part1Fn, part2Fn ] = dayArgsTuple;
   return {
