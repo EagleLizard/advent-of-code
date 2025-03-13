@@ -5,6 +5,9 @@ module.exports = {
   day24Part1,
 };
 
+/*
+  53190357879014 - correct
+_*/
 function day24Part1(inputLines) {
   let day24Input = parseInput(inputLines);
   let fruitDevice = new FruitDevice();
@@ -17,8 +20,10 @@ function day24Part1(inputLines) {
     fruitDevice.addGate(lhs, op, rhs, outWire);
   });
   // console.log(fruitDevice);
-  fruitDevice.clock();
-  return -1;
+  // fruitDevice.clock();
+  while(fruitDevice.clock());
+  let output = fruitDevice.getOutput();
+  return output;
 }
 
 function parseInput(inputLines) {

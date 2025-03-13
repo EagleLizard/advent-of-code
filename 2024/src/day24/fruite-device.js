@@ -11,6 +11,81 @@ class FruitDevice {
     // console.log(inputs);
     /* get gates that accept inputs */
     let inputGates = this.getInputGates(inputs);
+    // console.log(inputGates);
+    let gateUpdates = [];
+    for(let i = 0; i < inputGates.length; ++i) {
+      let gate = inputGates[i];
+      let res = this.getGateRes(gate);
+      let currOutVal = this.getWireVal(gate.out);
+      // console.log(`${gate.out}: ${currOutVal} -> ${res}`);
+      if(currOutVal !== res) {
+        gateUpdates.push([ gate.out, res ]);
+        this.setWireVal(gate.out, res);
+      }
+    }
+    // console.log(gateUpdates);
+    return gateUpdates.length > 0;
+    // inputGates.forEach(fdGate => this.execGate(fdGate));
+    
+  }
+
+  getGateRes(fdGate) {
+    let lVal = this.getWireVal(fdGate.lhs);
+    let rVal = this.getWireVal(fdGate.rhs);
+    let op = fdGate.op;
+    let res;
+    switch(op) {
+      case 'AND':
+        res = (lVal === 1 && rVal === 1) ? 1 : 0;
+        break;
+      case 'OR':
+        res = (lVal === 1 || rVal === 1) ? 1 : 0;
+        break;
+      case 'XOR':
+        res = (rVal !== lVal) ? 1 : 0;
+        break;
+      default:
+        throw new Error(`Unexpected op: ${op}`);
+    }
+    return res;
+  }
+  getWireVal(wireKey) {
+    return this.wires.get(wireKey).val;
+  }
+  setWireVal(wireKey, val) {
+    return this.wires.get(wireKey).val = val;
+  }
+
+  getOutput() {
+    let outputWires = [ ...this.wires.values() ]
+      .filter(wire => /^z/i.test(wire.key))
+      .toSorted((a, b) => {
+        if(a.key > b.key) {
+          return 1;
+        } else if(a.key < b.key) {
+          return -1;
+        } else {
+          return 0;
+        }
+      })
+    ;
+    // 53190357879014n
+    // console.log(outputWires);
+    // let outputNum = 0n;
+    // for(let i = 0n; i < outputWires.length; ++i) {
+    //   if(outputWires[i].val === 1) {
+    //     outputNum += 2n ** i;
+    //   }
+    // }
+    let outputNum = 0;
+    outputWires.forEach((outputWire, idx) => {
+      if(outputWire.val === 1) {
+        outputNum += 2 ** idx;
+      }
+    });
+    return outputNum;
+    // console.log(outputBits);
+    // return outputBits;
   }
 
   getInputGates(inputWires) {
@@ -18,7 +93,7 @@ class FruitDevice {
     let inputGates = this.gates.filter(fdGate => {
       return inputKeySet.has(fdGate.lhs) && inputKeySet.has(fdGate.rhs);
     });
-    console.log(inputGates);
+    return inputGates;
   }
 
   getInputs() {
