@@ -12,6 +12,7 @@ import (
 
 	"github.com/EagleLizard/advent-of-code/2024/src/day1"
 	"github.com/EagleLizard/advent-of-code/2024/src/day2"
+	"github.com/EagleLizard/advent-of-code/2024/src/day24"
 	"github.com/EagleLizard/advent-of-code/2024/src/day3"
 	"github.com/EagleLizard/advent-of-code/2024/src/day4"
 	"github.com/EagleLizard/advent-of-code/2024/src/day5"
@@ -56,7 +57,8 @@ const (
 	// day7InputFileName = "day7_test.txt"
 	day7InputFileName = "day7.txt"
 	// day8InputFileName = "day8_test.txt"
-	day8InputFileName = "day8.txt"
+	day8InputFileName  = "day8.txt"
+	day24InputFileName = "day24_test1.txt"
 )
 
 var dayOptsArr = []RunDayOpts{
@@ -68,6 +70,7 @@ var dayOptsArr = []RunDayOpts{
 	{6, day6InputFileName, day6.Day6Pt1, day6.Day6Pt2},
 	{7, day7InputFileName, day7.Day7Pt1, day7.Day7Pt2},
 	{8, day8InputFileName, day8.Day8Pt1, day8.Day8Pt2},
+	{24, day24InputFileName, day24.Day24Part1, nil},
 }
 
 func main() {
