@@ -1,9 +1,16 @@
 
-const { FruitDevice } = require('./fruite-device');
+const { FruitDevice } = require('./fruit-device');
 
 module.exports = {
   day24Part1,
+  day24Part2,
 };
+
+function day24Part2(inputLines) {
+  let day24Input = parseInput(inputLines);
+
+  return -1;
+}
 
 /*
   53190357879014 - correct
@@ -19,8 +26,6 @@ function day24Part1(inputLines) {
     let [ lhs, op, rhs, outWire ] = gate;
     fruitDevice.addGate(lhs, op, rhs, outWire);
   });
-  // console.log(fruitDevice);
-  // fruitDevice.clock();
   while(fruitDevice.clock());
   let output = fruitDevice.getOutput();
   return output;
