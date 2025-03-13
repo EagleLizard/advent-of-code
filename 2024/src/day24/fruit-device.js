@@ -8,25 +8,19 @@ class FruitDevice {
   clock() {
     /* find all gates for inputs */
     let inputs = this.getInputs();
-    // console.log(inputs);
     /* get gates that accept inputs */
     let inputGates = this.getInputGates(inputs);
-    // console.log(inputGates);
     let gateUpdates = [];
     for(let i = 0; i < inputGates.length; ++i) {
       let gate = inputGates[i];
       let res = this.getGateRes(gate);
       let currOutVal = this.getWireVal(gate.out);
-      // console.log(`${gate.out}: ${currOutVal} -> ${res}`);
       if(currOutVal !== res) {
         gateUpdates.push([ gate.out, res ]);
         this.setWireVal(gate.out, res);
       }
     }
-    // console.log(gateUpdates);
     return gateUpdates.length > 0;
-    // inputGates.forEach(fdGate => this.execGate(fdGate));
-    
   }
 
   getGateRes(fdGate) {
@@ -69,14 +63,6 @@ class FruitDevice {
         }
       })
     ;
-    // 53190357879014n
-    // console.log(outputWires);
-    // let outputNum = 0n;
-    // for(let i = 0n; i < outputWires.length; ++i) {
-    //   if(outputWires[i].val === 1) {
-    //     outputNum += 2n ** i;
-    //   }
-    // }
     let outputNum = 0;
     outputWires.forEach((outputWire, idx) => {
       if(outputWire.val === 1) {
@@ -84,8 +70,6 @@ class FruitDevice {
       }
     });
     return outputNum;
-    // console.log(outputBits);
-    // return outputBits;
   }
 
   getInputGates(inputWires) {
