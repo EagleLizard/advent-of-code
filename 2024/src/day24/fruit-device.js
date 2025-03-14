@@ -14,10 +14,8 @@ class FruitDevice {
   }
 
   clock() {
-    /* find all gates for inputs */
-    let inputs = this.getInputs();
-    /* get gates that accept inputs */
-    let inputGates = this.getInputGates(inputs);
+    /* get gates that have valid inputs */
+    let inputGates = this.getInputGates();
     let gateUpdates = [];
     for(let i = 0; i < inputGates.length; ++i) {
       let gate = inputGates[i];
@@ -75,6 +73,14 @@ class FruitDevice {
     ;
     return yBits;
   }
+  getZBits() {
+    let zBits = [ ...this.wires.values() ]
+      .filter(wire => /^z/i.test(wire.key))
+      .toSorted(Wire.compAsc)
+      .map(wire => wire.val)
+    ;
+    return zBits;
+  }
 
   getOutput() {
     let outputWires = [ ...this.wires.values() ]
@@ -90,7 +96,17 @@ class FruitDevice {
     return outputNum;
   }
 
-  getInputGates(inputWires) {
+  getGatesToUpdate() {
+    let gatesToUpdate = this.getInputGates()
+      .filter(gate => {
+        let currOutVal = this.getWireVal(gate.out);
+        return currOutVal !== this.getGateRes(gate);
+      });
+    return gatesToUpdate;
+  }
+
+  getInputGates() {
+    let inputWires = this.getInputs();
     let inputKeySet = new Set(inputWires.map(wire => wire.key));
     let inputGates = this.gates.filter(fdGate => {
       return inputKeySet.has(fdGate.lhs) && inputKeySet.has(fdGate.rhs);
@@ -135,7 +151,7 @@ class FruitDevice {
     return {
       AND: '&',
       OR: '|',
-      XOR: '~',
+      XOR: '^',
     }[op];
   }
 }
