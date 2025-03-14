@@ -1,8 +1,16 @@
 
 class FruitDevice {
-  constructor() {
+  constructor(inputWireTuples, gateTuples) {
     this.wires = new Map();
     this.gates = [];
+    inputWireTuples?.forEach(inputWireTuple => {
+      let [ wireStr, val ] = inputWireTuple;
+      this.addInputWire(wireStr, val);
+    });
+    gateTuples?.forEach(gateTuple => {
+      let [ lhs, op, rhs, outWire ] = gateTuple;
+      this.addGate(lhs, op, rhs, outWire);
+    });
   }
 
   clock() {
@@ -16,6 +24,7 @@ class FruitDevice {
       let res = this.getGateRes(gate);
       let currOutVal = this.getWireVal(gate.out);
       if(currOutVal !== res) {
+        // console.log(`${gate.lhs} ${FruitDevice.opStr(gate.op)} ${gate.rhs} => ${gate.out}`);
         gateUpdates.push([ gate.out, res ]);
         this.setWireVal(gate.out, res);
       }
@@ -50,18 +59,27 @@ class FruitDevice {
     return this.wires.get(wireKey).val = val;
   }
 
+  getXBits() {
+    let xBits = [ ...this.wires.values() ]
+      .filter(wire => /^x/i.test(wire.key))
+      .toSorted(Wire.compAsc)
+      .map(wire => wire.val)
+    ;
+    return xBits;
+  }
+  getYBits() {
+    let yBits = [ ...this.wires.values() ]
+      .filter(wire => /^y/i.test(wire.key))
+      .toSorted(Wire.compAsc)
+      .map(wire => wire.val)
+    ;
+    return yBits;
+  }
+
   getOutput() {
     let outputWires = [ ...this.wires.values() ]
       .filter(wire => /^z/i.test(wire.key))
-      .toSorted((a, b) => {
-        if(a.key > b.key) {
-          return 1;
-        } else if(a.key < b.key) {
-          return -1;
-        } else {
-          return 0;
-        }
-      })
+      .toSorted(Wire.compAsc)
     ;
     let outputNum = 0;
     outputWires.forEach((outputWire, idx) => {
@@ -112,6 +130,14 @@ class FruitDevice {
     fdGate = new FdGate(lhs, op, rhs, outWire);
     this.gates.push(fdGate);
   }
+
+  static opStr(op) {
+    return {
+      AND: '&',
+      OR: '|',
+      XOR: '~',
+    }[op];
+  }
 }
 
 module.exports = {
@@ -132,3 +158,13 @@ function Wire(wireKey, val) {
   /* -1 indicates no value _*/
   self.val = val ?? -1;
 }
+
+Wire.compAsc = (a, b) => {
+  if(a.key > b.key) {
+    return 1;
+  } else if(a.key < b.key) {
+    return -1;
+  } else {
+    return 0;
+  }
+};

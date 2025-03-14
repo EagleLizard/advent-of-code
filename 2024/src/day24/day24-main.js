@@ -8,8 +8,29 @@ module.exports = {
 
 function day24Part2(inputLines) {
   let day24Input = parseInput(inputLines);
+  let inputWires = day24Input.inputWires;
+  let gates = day24Input.gates;
+  let fruitDevice = new FruitDevice(inputWires, gates);
+  let xBits = fruitDevice.getXBits();
+  let xVal = bitsToInt(xBits);
+  let yBits = fruitDevice.getYBits();
+  let yVal = bitsToInt(yBits);
+  let targetOutput = xVal + yVal;
+  console.log(`targetOutput: ${targetOutput.toLocaleString()}`);
+
+  fruitDevice.clock();
 
   return -1;
+}
+
+function bitsToInt(bitArr) {
+  let n = 0;
+  for(let i = 0; i < bitArr.length; ++i) {
+    if(bitArr[i] === 1) {
+      n += 2 ** i;
+    }
+  }
+  return n;
 }
 
 /*
