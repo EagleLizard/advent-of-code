@@ -15,7 +15,7 @@ class FruitDevice {
 
   clock() {
     /* get gates that have valid inputs */
-    let inputGates = this.getInputGates();
+    let inputGates = this.getGatesWithInputs();
     let gateUpdates = [];
     for(let i = 0; i < inputGates.length; ++i) {
       let gate = inputGates[i];
@@ -97,7 +97,7 @@ class FruitDevice {
   }
 
   getGatesToUpdate() {
-    let gatesToUpdate = this.getInputGates()
+    let gatesToUpdate = this.getGatesWithInputs()
       .filter(gate => {
         let currOutVal = this.getWireVal(gate.out);
         return currOutVal !== this.getGateRes(gate);
@@ -105,7 +105,7 @@ class FruitDevice {
     return gatesToUpdate;
   }
 
-  getInputGates() {
+  getGatesWithInputs() {
     let inputWires = this.getInputs();
     let inputKeySet = new Set(inputWires.map(wire => wire.key));
     let inputGates = this.gates.filter(fdGate => {
@@ -119,6 +119,41 @@ class FruitDevice {
       return wire.val > -1;
     });
     return inputs;
+  }
+
+  getInputGates(srcGate) {
+    let self = this;
+    let inputGates = [];
+    let inputWires = [ srcGate.lhs, srcGate.rhs ];
+    inputWires.forEach(inputWire => {
+      let foundGate = this.gates.find(gate => {
+        return gate.out === inputWire;
+      });
+      if(foundGate !== undefined) {
+        inputGates.push(foundGate);
+      }
+    });
+    // helper(srcGate);
+    return inputGates;
+    function helper(outGate) {
+      if(outGate === undefined) {
+        return;
+      }
+      let lGate = self.gates.find(gate => {
+        return gate.out === outGate.lhs;
+      });
+      let rGate = self.gates.find(gate => {
+        return gate.out === outGate.rhs;
+      });
+      helper(lGate);
+      helper(rGate);
+      if(lGate !== undefined) {
+        inputGates.push(lGate);
+      }
+      if(rGate !== undefined) {
+        inputGates.push(rGate);
+      }
+    }
   }
 
   addInputWire(wireStr, val) {

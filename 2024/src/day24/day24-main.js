@@ -1,5 +1,5 @@
 
-const { FruitDevice } = require('./fruit-device');
+const { FruitDevice, Wire } = require('./fruit-device');
 
 module.exports = {
   day24Part1,
@@ -20,35 +20,28 @@ function day24Part2(inputLines) {
   // console.log(`targetOutput: ${targetOutput.toLocaleString()}`);
   console.log(`targetOutput: ${targetOutput}`);
   console.log(`${targetOutputBits.join('')}`);
-  
-  let clockCount = 0;
-  let gatesToUpdate;
-  let prevOutBits = fruitDevice.getZBits();
-  console.log(prevOutBits.map(bit => (bit === -1) ? '|' : bit).join(''));
-  while((gatesToUpdate = fruitDevice.getGatesToUpdate()).length > 0) {
-    // console.log(clockCount);
-    /* get the gates that would be updated */
-    gatesToUpdate.forEach(gate => {
-      let nextVal = fruitDevice.getGateRes(gate);
-      if(/^z/i.test(gate.out)) {
-        // console.log(gateStr(gate));
-        // console.log(`${fruitDevice.getWireVal(gate.lhs)} ${FruitDevice.opStr(gate.op)} ${fruitDevice.getWireVal(gate.rhs)} -> ${nextVal}`);
-      }
-      fruitDevice.setWireVal(gate.out, nextVal);
-    });
-    let zBits = fruitDevice.getZBits();
-    let zBitStr = zBits.map(bit => (bit === -1) ? '|' : bit).join('');
-    if(!prevOutBits.every((outBit, idx) => outBit === zBits[idx])) {
-      // console.log(`${targetOutputBits.join('')}`);
-      console.log(`${zBitStr} - ${clockCount}`);
-      prevOutBits = zBits;
-    }
-    clockCount++;
-    if(clockCount > 0) {
-      // break;
-    }
-  }
 
+  let zGates = fruitDevice.gates
+    .filter(gate => /^z/i.test(gate.out))
+    .toSorted((a, b) => {
+      if(a.out > b.out) {
+        return 1;
+      } else if(a.out < b.out) {
+        return -1;
+      } else {
+        return 0;
+      }
+    })
+  ;
+  // console.log(zGates);
+  zGates.forEach((zGate, idx) => {
+    let inputGates = fruitDevice.getInputGates(zGate);
+    console.log('');
+    inputGates.forEach(inputGate => {
+      console.log(gateStr(inputGate));
+    });
+    console.log(gateStr(zGate));
+  });
   return -1;
 }
 

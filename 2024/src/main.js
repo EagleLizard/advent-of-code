@@ -54,8 +54,8 @@ const DAY_22_FILE_NAME = 'day22.txt';
 const DAY_23_FILE_NAME = 'day23.txt';
 // const DAY_24_FILE_NAME = 'day24_test1.txt';
 // const DAY_24_FILE_NAME = 'day24_test2.txt';
-const DAY_24_FILE_NAME = 'day24_test3.txt';
-// const DAY_24_FILE_NAME = 'day24.txt';
+// const DAY_24_FILE_NAME = 'day24_test3.txt';
+const DAY_24_FILE_NAME = 'day24.txt';
 
 const DAY_ARGS_ARR = [
   [ 1, DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
