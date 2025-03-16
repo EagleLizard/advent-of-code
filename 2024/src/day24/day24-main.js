@@ -13,9 +13,26 @@ function day24Part2(inputLines) {
   let gates = day24Input.gates;
   let fruitCircuit = new FruitCircuit(gates);
 
-  // console.log(fruitCircuit.getGates('z02'));
-  fruitCircuit.checkOutWire('z00');
+  let outWires = fruitCircuit.gates.filter(gate => {
+    return FruitCircuit.checkZInput(gate.out);
+  }).map(gate => gate.out)
+    .toSorted(FruitCircuit.wireCompAsc)
+  ;
+  // console.log(outputWires);
+  outWires.forEach(outWire => {
+    // console.log(outputWire);
+    let res = fruitCircuit.checkOutWire(outWire);
+    if(res !== true) {
+      console.log(outWire);
+    }
+  });
+
+  // fruitCircuit.checkOutWire('z00');
   fruitCircuit.checkOutWire('z01');
+  fruitCircuit.checkOutWire('z02');
+  fruitCircuit.checkOutWire('z03');
+  fruitCircuit.checkOutWire('z23');
+  // fruitCircuit.checkOutWire('z45');
   /*
     each output should be connected to one XOR
     one input wire of XOR should connect to 2 input bits
