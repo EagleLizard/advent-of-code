@@ -21,18 +21,42 @@ function day24Part2(inputLines) {
   // console.log(outputWires);
   outWires.forEach(outWire => {
     // console.log(outputWire);
-    let res = fruitCircuit.checkOutWire(outWire);
-    if(res !== true) {
-      console.log(outWire);
-    }
+    // let res = fruitCircuit.checkOutWire(outWire);
+    // if(res !== true) {
+    //   console.log(outWire);
+    // }
   });
 
   // fruitCircuit.checkOutWire('z00');
-  fruitCircuit.checkOutWire('z01');
-  fruitCircuit.checkOutWire('z02');
-  fruitCircuit.checkOutWire('z03');
-  fruitCircuit.checkOutWire('z23');
+  // fruitCircuit.checkOutWire('z01');
+  // fruitCircuit.checkOutWire('z02');
+  // fruitCircuit.checkOutWire('z03');
+  // fruitCircuit.checkOutWire('z23');
   // fruitCircuit.checkOutWire('z45');
+
+  console.log('checkOutWire2():');
+  
+  outWires.forEach(outWire => {
+    // fruitCircuit.checkOutWire2(outWire);
+  });
+
+  let testWires = [
+    'z00',
+    'z01',
+    'z02',
+    'z23',
+    'z45',
+  ];
+  testWires.forEach(testWire => {
+    let res = fruitCircuit.checkOutWire2(testWire);
+    if(res !== undefined) {
+      console.log(res);
+    }
+  });
+  // fruitCircuit.checkOutWire2('z00');
+  // fruitCircuit.checkOutWire2('z01');
+  // fruitCircuit.checkOutWire2('z02');
+  // fruitCircuit.checkOutWire2('z45');
   /*
     each output should be connected to one XOR
     one input wire of XOR should connect to 2 input bits
