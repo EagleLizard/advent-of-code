@@ -62,7 +62,7 @@ class FruitCircuit {
   }
 
   checkOutWire2(outWire) {
-    console.log(`\n_outWire: ${outWire}`);
+    // console.log(`\n_outWire: ${outWire}`);
     /*
       For the initial gate connected to the out wire,
       There are 4 valid cases:
@@ -106,6 +106,73 @@ class FruitCircuit {
   }
 
   checkFullAdderOutBit(outGate) {
+    let xorGate = this.getAdderXorGate(outGate);
+    if(xorGate === undefined) {
+      return false;
+    }
+    /*
+      The XOR gate should have input gates that match the outGate's
+        output bit - e.g. x02 = y02 = z02
+    _*/
+    if(!this.checkAdderInOutWires(xorGate, outGate)) {
+      return false;
+    }
+    /* 
+      the XOR gate input wires should both lead to the same AND gate
+        for the carry-out
+    _*/
+    let inputCarryGate = this.getAdderInputCarryGate(xorGate);
+    if(inputCarryGate === undefined) {
+      return false;
+    }
+    /*
+      The XOR gate output should lead to an AND gate for the carry
+    _*/
+    let xorCarryGate = this.getAdderXorCarryGate(xorGate, outGate);
+    if(xorCarryGate === undefined) {
+      return false;
+    }
+    /*
+      There should be two carry gates, both ands, and both should have
+        an output wire that leads to the same OR gate for the carry
+    _*/
+    let inputCarryOrGate = this.getAdderCarryOrGate(inputCarryGate.out);
+    if(inputCarryOrGate === undefined) {
+      return false;
+    }
+    let xorCarryOrGate = this.getAdderCarryOrGate(xorCarryGate.out);
+    if(xorCarryOrGate === undefined) {
+      return false;
+    }
+    if(inputCarryOrGate.id !== xorCarryOrGate.id) {
+      return false;
+    }
+    return true;
+  }
+  getAdderCarryOrGate(carryGateWire) {
+    let carryDestGates = this.getDestGates(carryGateWire);
+    if(
+      carryDestGates.length !== 1
+      || carryDestGates[0].op !== GATE_OP_MAP.OR
+    ) {
+      return;
+    }
+    return carryDestGates[0];
+  }
+  getAdderXorCarryGate(xorGate, outGate) {
+    let xorDestGates = this.getDestGates(xorGate.out).filter(gate => {
+      return gate.id !== outGate.id;
+    });
+    if(xorDestGates.length !== 1) {
+      return;
+    }
+    if(xorDestGates[0].op !== GATE_OP_MAP.AND) {
+      return;
+    }
+    let xorCarryGate = xorDestGates[0];
+    return xorCarryGate;
+  }
+  getAdderXorGate(outGate) {
     let aSrcGate = this.getSrcGate(outGate.a);
     let bSrcGate = this.getSrcGate(outGate.b);
     let hasValidGates = (
@@ -116,34 +183,15 @@ class FruitCircuit {
       && bSrcGate.op === GATE_OP_MAP.XOR
     );
     if(!hasValidGates) {
-      return false;
+      return;
     }
-    let xorGate, orGate;
-    if(aSrcGate.op === GATE_OP_MAP.XOR) {
-      xorGate = aSrcGate;
-      orGate = bSrcGate;
-    } else {
-      xorGate = bSrcGate;
-      orGate = aSrcGate;
-    }
-    /*
-      The XOR gate should have input gates that match the outGate's
-        output bit - e.g. x02 = y02 = z02
-    _*/
-    let inANum = FruitCircuit.wireNum(xorGate.a);
-    let inBNum = FruitCircuit.wireNum(xorGate.b);
-    let outZNum = FruitCircuit.wireNum(outGate.out);
-    let hasValidInOutWires = (
-      inANum === inBNum
-      && inBNum === outZNum
-    );
-    if(!hasValidInOutWires) {
-      return false;
-    }
-    /* 
-      the XOR gate input wires should both lead to the same AND gate
-        for the carry-out
-    _*/
+    let xorGate = (aSrcGate.op === GATE_OP_MAP.XOR)
+      ? aSrcGate
+      : bSrcGate
+    ;
+    return xorGate;
+  }
+  getAdderInputCarryGate(xorGate) {
     let xorAGates = this.getDestGates(xorGate.a).filter(gate => {
       return gate.id !== xorGate.id;
     });
@@ -155,46 +203,19 @@ class FruitCircuit {
       || (xorAGates[0].id !== xorBGates[0].id)
       || (xorAGates[0].op !== GATE_OP_MAP.AND)
     ) {
-      return false;
+      return;
     }
-    let inputCarryGate = xorAGates[0];
-    /*
-      The XOR gate output should lead to an AND gate for the carry
-    _*/
-    let xorDestGates = this.getDestGates(xorGate.out).filter(gate => {
-      return gate.id !== outGate.id;
-    });
-    if(xorDestGates.length !== 1) {
-      return false;
-    }
-    if(xorDestGates[0].op !== GATE_OP_MAP.AND) {
-      return false;
-    }
-    let xorCarryGate = xorDestGates[0];
-    /*
-      There should be two carry gates, both ands, and both should have
-        an output wire that leads to the same OR gate for the carry
-    _*/
-    let inputCarryDestGates = this.getDestGates(inputCarryGate.out);
-    if(
-      inputCarryDestGates.length !== 1
-      || inputCarryDestGates[0].op !== GATE_OP_MAP.OR
-    ) {
-      return false;
-    }
-    let inputCarryOrGate = inputCarryDestGates[0];
-    let xorCarryDestGates =this.getDestGates(xorCarryGate.out);
-    if(
-      xorCarryDestGates.length !== 1
-      || xorCarryDestGates[0].op !== GATE_OP_MAP.OR
-    ) {
-      return false;
-    }
-    let xorCarryOrGate = xorCarryDestGates[0];
-    if(inputCarryOrGate.id !== xorCarryOrGate.id) {
-      return false;
-    }
-    return true;
+    return xorAGates[0];
+  }
+  checkAdderInOutWires(xorGate, outGate) {
+    let inANum = FruitCircuit.wireNum(xorGate.a);
+    let inBNum = FruitCircuit.wireNum(xorGate.b);
+    let outZNum = FruitCircuit.wireNum(outGate.out);
+    let hasValidInOutWires = (
+      inANum === inBNum
+      && inBNum === outZNum
+    );
+    return hasValidInOutWires;
   }
 
   checkLastOutBit(outGate) {

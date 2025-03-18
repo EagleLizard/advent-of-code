@@ -48,7 +48,14 @@ function day24Part2(inputLines) {
     'z45',
   ];
   testWires.forEach(testWire => {
-    let res = fruitCircuit.checkOutWire2(testWire);
+    // let res = fruitCircuit.checkOutWire2(testWire);
+    // if(res !== undefined) {
+    //   console.log(res);
+    // }
+  });
+
+  outWires.forEach(outWire => {
+    let res = fruitCircuit.checkOutWire2(outWire);
     if(res !== undefined) {
       console.log(res);
     }
