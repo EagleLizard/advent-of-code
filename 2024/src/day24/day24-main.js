@@ -7,6 +7,9 @@ module.exports = {
   day24Part2,
 };
 
+/* 
+bks,hnd,nrn,tdv,tjp,z09,z16,z23 - correct
+*/
 function day24Part2(inputLines) {
   let day24Input = parseInput(inputLines);
   let inputWires = day24Input.inputWires;
@@ -58,9 +61,85 @@ function day24Part2(inputLines) {
     }
   });
   let problemGates = [ ...problemGateMap.values() ];
-  console.log(problemGates);
+  /*
+    Now we can try and brute force the swaps
+  _*/
+  let pairs = getPairs(problemGates);
+  // console.log(problemGates);
+  // pairs.forEach(pair => {
+  //   console.log(pair.map(gate => gate.id));
+  // });
+  console.log(pairs.length);
 
   return -1;
+}
+
+function checkFruitCircuitSwaps(fruitCircuit, swaps) {
+  swaps.forEach(swapTuple => {
+    let [ gate1, gate2 ] = swapTuple;
+    let temp = gate1.out;
+    gate1.out = gate2.out;
+    gate2.out = temp;
+  });
+  /* test */
+  let outWires = fruitCircuit.gates.filter(gate => {
+    return FruitCircuit.checkZInput(gate.out);
+  }).map(gate => {
+    return gate.out;
+  });
+  let validCircuit = true;
+  for(let i = 0; i < outWires.length; ++i) {
+    let outWire = outWires[i];
+    let outRes = fruitCircuit.checkOutWire2(outWire);
+    if(outRes !== undefined) {
+      validCircuit = false;
+      // console.log(outRes.length);
+      break;
+    }
+    let inRes = fruitCircuit.checkInWires(outWire);
+    if(inRes !== undefined) {
+      validCircuit = false;
+      break;
+    }
+  }
+  if(validCircuit) {
+    console.log(swaps);
+  }
+
+  /* undo the swaps */
+  swaps.forEach(swapTuple => {
+    let [ gate1, gate2 ] = swapTuple;
+    let temp = gate1.out;
+    gate1.out = gate2.out;
+    gate2.out = temp;
+  });
+}
+
+function getPairCombos(elems, n) {
+  let combos = [];
+  helper([], 0);
+  return combos;
+  function helper(curr, start) {
+    if(curr.length === n) {
+      combos.push(curr.slice());
+      return;
+    }
+    for(let i = start; i < elems.length; ++i) {
+      curr.push(elems[i]);
+      helper(curr, i + 1);
+      curr.pop();
+    }
+  }
+}
+
+function getPairs(gates) {
+  let pairs = [];
+  for(let i = 0; i < gates.length - 1; ++i) {
+    for(let k = i + 1; k < gates.length; ++k) {
+      pairs.push([ gates[i], gates[k] ]);
+    }
+  }
+  return pairs;
 }
 
 function gateStr(gate) {

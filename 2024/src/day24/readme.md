@@ -15,3 +15,7 @@ Fundamentally the problem is that the machine is wired incorrectly - a generic a
 Since this is an adding machine, I'll need to look at it as an adding circuit and identify what parts of it differ from what an adding machine should be.
 
 To do this, I'll need to analyze the circuit structurally. Doing this procedurally has been difficult, I need some what to visualize the circuits that feed into a given output wire.
+
+### `[03/18/2025][js]`
+
+I gave up on the fully programmatic solution and figured out the right answer by diagramming what I hadn't figured out. I'm not super happy with it, but it's solved.

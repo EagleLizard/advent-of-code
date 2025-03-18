@@ -282,11 +282,16 @@ class FruitCircuit {
     let aSrcGate = this.getSrcGate(outGate.a);
     let bSrcGate = this.getSrcGate(outGate.b);
     let hasValidGates = (
-      aSrcGate.op === GATE_OP_MAP.XOR
-      && bSrcGate.op === GATE_OP_MAP.OR
-    ) || (
-      aSrcGate.op === GATE_OP_MAP.OR
-      && bSrcGate.op === GATE_OP_MAP.XOR
+      aSrcGate !== undefined
+      && bSrcGate !== undefined
+    ) && (
+      (
+        aSrcGate.op === GATE_OP_MAP.XOR
+        && bSrcGate.op === GATE_OP_MAP.OR
+      ) || (
+        aSrcGate.op === GATE_OP_MAP.OR
+        && bSrcGate.op === GATE_OP_MAP.XOR
+      )
     );
     if(!hasValidGates) {
       return;
@@ -355,11 +360,16 @@ class FruitCircuit {
     let aSrcGate = this.getSrcGate(outGate.a);
     let bSrcGate = this.getSrcGate(outGate.b);
     let hasCarryGates = (
-      aSrcGate.op === GATE_OP_MAP.XOR
-      && bSrcGate.op === GATE_OP_MAP.AND
-    ) || (
-      aSrcGate.op === GATE_OP_MAP.AND
-      && bSrcGate.op === GATE_OP_MAP.XOR
+      aSrcGate !== undefined
+      && bSrcGate !== undefined
+    ) && (
+      (
+        aSrcGate.op === GATE_OP_MAP.XOR
+        && bSrcGate.op === GATE_OP_MAP.AND
+      ) || (
+        aSrcGate.op === GATE_OP_MAP.AND
+        && bSrcGate.op === GATE_OP_MAP.XOR
+      )
     );
     if(!hasCarryGates) {
       return false;
