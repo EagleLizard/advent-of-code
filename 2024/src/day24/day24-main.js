@@ -1,5 +1,5 @@
 
-const { FruitCircuit } = require('./fruit-circuit');
+const { FruitCircuit, GATE_OP_MAP } = require('./fruit-circuit');
 const { FruitDevice, Wire } = require('./fruit-device');
 
 module.exports = {
@@ -18,34 +18,17 @@ function day24Part2(inputLines) {
   }).map(gate => gate.out)
     .toSorted(FruitCircuit.wireCompAsc)
   ;
-  // console.log(outputWires);
-  outWires.forEach(outWire => {
-    // console.log(outputWire);
-    // let res = fruitCircuit.checkOutWire(outWire);
-    // if(res !== true) {
-    //   console.log(outWire);
-    // }
-  });
-
-  // fruitCircuit.checkOutWire('z00');
-  // fruitCircuit.checkOutWire('z01');
-  // fruitCircuit.checkOutWire('z02');
-  // fruitCircuit.checkOutWire('z03');
-  // fruitCircuit.checkOutWire('z23');
-  // fruitCircuit.checkOutWire('z45');
-
   console.log('checkOutWire2():');
-  
-  outWires.forEach(outWire => {
-    // fruitCircuit.checkOutWire2(outWire);
-  });
-
   let testWires = [
     'z00',
     'z01',
     'z02',
-    'z23',
-    'z45',
+    // 'z23',
+    // 'z45',
+
+    'z09',
+    // 'z17',
+    // 'z37',
   ];
   testWires.forEach(testWire => {
     // let res = fruitCircuit.checkOutWire2(testWire);
@@ -54,23 +37,28 @@ function day24Part2(inputLines) {
     // }
   });
 
+  let problemGateMap = new Map();
   outWires.forEach(outWire => {
-    let res = fruitCircuit.checkOutWire2(outWire);
-    if(res !== undefined) {
-      console.log(res);
+  // testWires.forEach(outWire => {
+    let outRes = fruitCircuit.checkOutWire2(outWire);
+    if(outRes !== undefined) {
+      console.log(`${outWire}`);
+      console.log(outRes);
+      outRes.forEach(outErrGate => {
+        problemGateMap.set(outErrGate.id, outErrGate);
+      });
+    }
+    let inRes = fruitCircuit.checkInWires(outWire);
+    if(inRes !== undefined) {
+      console.log(`${outWire} (in)`);
+      console.log(inRes);
+      inRes.forEach(outErrGate => {
+        problemGateMap.set(outErrGate.id, outErrGate);
+      });
     }
   });
-  // fruitCircuit.checkOutWire2('z00');
-  // fruitCircuit.checkOutWire2('z01');
-  // fruitCircuit.checkOutWire2('z02');
-  // fruitCircuit.checkOutWire2('z45');
-  /*
-    each output should be connected to one XOR
-    one input wire of XOR should connect to 2 input bits
-    one input wire of XOR should connect to a carry bit
-  _*/
-  // console.log(fruitCircuit.getGates('rqf'));
-  // console.log(fruitCircuit.getGates('rjt'));
+  let problemGates = [ ...problemGateMap.values() ];
+  console.log(problemGates);
 
   return -1;
 }
