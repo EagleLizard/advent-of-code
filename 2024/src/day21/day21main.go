@@ -44,7 +44,12 @@ func Day21Part1(inputLines []string) int {
 		for k := range len(keycodePath) - 1 {
 			from := keycodePath[k]
 			to := keycodePath[k+1]
-			getDirpadNumpadPaths(from, to)
+			numpadPaths := getNumpadPaths(from, to)
+			numpadStrPaths := []string{}
+			for _, numpadPath := range numpadPaths {
+				numpadStrPaths = append(numpadStrPaths, strings.Join(numpadPath, ""))
+			}
+			fmt.Printf("%v\n", numpadPaths)
 		}
 		break
 	}
@@ -53,32 +58,11 @@ func Day21Part1(inputLines []string) int {
 	return -1
 }
 
-func getDirpadNumpadPaths(from string, to string) {
-	fmt.Printf("%q -> %q\n", from, to)
-	numpadPaths := getNumpadPaths(from, to)
-	for _, numpadPath := range numpadPaths {
-		/* the robot starts at A and ends at A */
-		numpadKeyPath := append(slices.Insert(numpadPath, 0, "A"), "A")
-		fmt.Printf("nkp: %v\n", numpadKeyPath)
-		for k := range len(numpadKeyPath) - 1 {
-			from := numpadKeyPath[k]
-			to := numpadKeyPath[k+1]
-			dirpadPaths := getDirpadPaths(from, to)
-			for _, dirpadPath := range dirpadPaths {
-				fmt.Printf("%v\n", dirpadPath)
-			}
-		}
-	}
-}
-
 func getDirpadPaths(from string, to string) [][]string {
-	fmt.Printf("%q -> %q\n", from, to)
 	fromPos := getDirpadKeyPos(from)
 	toPos := getDirpadKeyPos(to)
 	foundPaths := [][]int{}
-
 	getDirpadPathsHelper(fromPos, toPos, make(map[geom.Point]bool), []int{}, func(foundPath []int) {
-		// fmt.Printf("fp: %v\n", foundPath)
 		foundPaths = append(foundPaths, foundPath)
 	})
 	minPathLen := math.MaxInt
@@ -133,7 +117,6 @@ func getNumpadPaths(from string, to string) [][]string {
 			minPathLen = len(foundPath)
 		}
 	}
-	// fmt.Printf("minPathLen: %v\n", minPathLen)
 	minPaths := [][]string{}
 	for _, foundPath := range foundPaths {
 		if len(foundPath) <= minPathLen {
@@ -141,6 +124,7 @@ func getNumpadPaths(from string, to string) [][]string {
 			for _, dir := range foundPath {
 				strPath = append(strPath, dirItoa(dir))
 			}
+			// strPath = append(strPath, "A")
 			minPaths = append(minPaths, strPath)
 		}
 	}
