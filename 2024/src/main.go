@@ -59,8 +59,9 @@ const (
 	// day7InputFileName = "day7_test.txt"
 	day7InputFileName = "day7.txt"
 	// day8InputFileName = "day8_test.txt"
-	day8InputFileName  = "day8.txt"
-	day21InputFileName = "day21_test.txt"
+	day8InputFileName = "day8.txt"
+	// day21InputFileName = "day21_test.txt"
+	day21InputFileName = "day21.txt"
 	day24InputFileName = "day24_test1.txt"
 )
 
@@ -142,8 +143,6 @@ func runDay(t clicolors.Theme, day int, inputFileName string, pt1Fn DayPartFn, p
 	totalTimeStr := t.C2(totalElapsedTime)
 	totalStr := t.Italic(fmt.Sprintf("%s: %s", totalTxt, totalTimeStr))
 	fmt.Printf("%s\n%s\n", totalStr, divStr)
-	// fmt.Printf("total: %v\n", totalElapsedTime)
-	// fmt.Printf("%s\n", divStr)
 }
 
 func runPart(ptNum int, inputLines []string, ptFn DayPartFn) RunPartRes {
