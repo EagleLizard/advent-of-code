@@ -5,6 +5,7 @@ import (
 	"math"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/EagleLizard/advent-of-code/2024/src/util/geom"
@@ -33,29 +34,104 @@ var directions = []geom.Point{
 	{X: -1, Y: 0},
 }
 
+/*
+202648 - correct
+*/
 func Day21Part1(inputLines []string) int {
 	day21Input := parseInput(inputLines)
+	complexitySum := 0
 	fmt.Printf("%q\n", day21Input)
 	for _, keyCode := range day21Input.Keycodes {
 		fmt.Printf("%s\n", keyCode)
 		keycodePath := strings.Split(keyCode, "")
 		keycodePath = slices.Insert(keycodePath, 0, "A")
-		fmt.Printf("kcp: %v\n", strings.Join(keycodePath, " "))
+		// fmt.Printf("kcp: %v\n", strings.Join(keycodePath, " "))
+		numpadDirpadSteps := [][][]string{}
+		min2ndLvlPaths := [][]string{}
+		min2ndLvlPathLen := math.MaxInt
+
 		for k := range len(keycodePath) - 1 {
 			from := keycodePath[k]
 			to := keycodePath[k+1]
 			numpadPaths := getNumpadPaths(from, to)
-			numpadStrPaths := []string{}
-			for _, numpadPath := range numpadPaths {
-				numpadStrPaths = append(numpadStrPaths, strings.Join(numpadPath, ""))
-			}
-			fmt.Printf("%v\n", numpadPaths)
+			// fmt.Printf("%v\n", numpadPaths)
+			numpadDirpadSteps = append(numpadDirpadSteps, numpadPaths)
 		}
-		break
+		// fmt.Printf("%v\n", numpadDirpadSteps)
+		pNpdPaths := getPossiblePaths(numpadDirpadSteps)
+		for _, pNpdPath := range pNpdPaths {
+			// fmt.Printf("%v\n", pNpdPath)
+			pNpdKeyPath := slices.Insert(slices.Clone(pNpdPath), 0, "A")
+			dirpadDirpadSteps := [][][]string{}
+			for k := range len(pNpdKeyPath) - 1 {
+				from := pNpdKeyPath[k]
+				to := pNpdKeyPath[k+1]
+				// fmt.Printf("  %q -> %q\n", from, to)
+				dirpadPaths := getDirpadPaths(from, to)
+				dirpadDirpadSteps = append(dirpadDirpadSteps, dirpadPaths)
+			}
+			// fmt.Printf("%v\n", len(dirpadDirpadSteps))
+			pDpdPaths := getPossiblePaths(dirpadDirpadSteps)
+			for _, pDpdPath := range pDpdPaths {
+				pDpdKeyPath := slices.Insert(slices.Clone(pDpdPath), 0, "A")
+				dpdDirpadSteps := [][][]string{}
+				for k := range len(pDpdKeyPath) - 1 {
+					from := pDpdKeyPath[k]
+					to := pDpdKeyPath[k+1]
+					dpdDirpadPaths := getDirpadPaths(from, to)
+					dpdDirpadSteps = append(dpdDirpadSteps, dpdDirpadPaths)
+				}
+				pDpdDpdPaths := getPossiblePaths(dpdDirpadSteps)
+				for _, pDpdDpdPath := range pDpdDpdPaths {
+					if len(pDpdDpdPath) < min2ndLvlPathLen {
+						min2ndLvlPathLen = len(pDpdDpdPath)
+						// min2ndLvlPaths = [][]string{}
+					}
+					if len(pDpdDpdPath) <= min2ndLvlPathLen {
+						min2ndLvlPaths = append(min2ndLvlPaths, pDpdDpdPath)
+					}
+				}
+				// fmt.Printf("%v\n", len(pDpdDpdPaths))
+			}
+		}
+		// fmt.Printf("%v\n", len(min2ndLvlPaths))
+		fmt.Printf("%v\n", min2ndLvlPathLen)
+		// break
+		keycodeNumStr := string(regexp.MustCompile(`(\d+)A`).FindSubmatch([]byte(keyCode))[1])
+		keycodeNum, err := strconv.Atoi(keycodeNumStr)
+		if err != nil {
+			panic(err)
+		}
+		complexityScore := min2ndLvlPathLen * keycodeNum
+		// fmt.Printf("%v\n", keycodeNum)
+		complexitySum += complexityScore
 	}
-	// getKeypadPaths("A", "0")
+	return complexitySum
+}
 
-	return -1
+func getPossiblePaths(pathSteps [][][]string) [][]string {
+	possiblePaths := [][]string{}
+	getPossiblePathsHelper(pathSteps, [][]string{}, func(foundPath []string) {
+		// fmt.Printf("%v\n", strings.Join(foundPath, ""))
+		possiblePaths = append(possiblePaths, foundPath)
+	})
+	return possiblePaths
+}
+
+func getPossiblePathsHelper(pathSteps [][][]string, pathSoFar [][]string, foundFn func([]string)) {
+	if len(pathSteps) < 1 {
+		foundPath := []string{}
+		for _, sfPath := range pathSoFar {
+			foundPath = append(append(foundPath, sfPath...), "A")
+		}
+		foundFn(foundPath)
+		return
+	}
+	currPathSteps := pathSteps[0]
+	for _, currPathStep := range currPathSteps {
+		nsf := append(pathSoFar, currPathStep)
+		getPossiblePathsHelper(pathSteps[1:], nsf, foundFn)
+	}
 }
 
 func getDirpadPaths(from string, to string) [][]string {

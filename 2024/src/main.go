@@ -59,8 +59,9 @@ const (
 	// day7InputFileName = "day7_test.txt"
 	day7InputFileName = "day7.txt"
 	// day8InputFileName = "day8_test.txt"
-	day8InputFileName  = "day8.txt"
-	day21InputFileName = "day21_test.txt"
+	day8InputFileName = "day8.txt"
+	// day21InputFileName = "day21_test.txt"
+	day21InputFileName = "day21.txt"
 	day24InputFileName = "day24_test1.txt"
 )
 
