@@ -87,7 +87,7 @@ local function countDesigns(towels, srcDesign)
         return cache[design]
       end
       for i, towel in ipairs(towels) do
-        local j, k = string.find(design, towel)
+        local j, k = string.find(design, "^"..towel)
         if j == 1 then
           currCount = currCount + helper(string.sub(design, k + 1))
         end
@@ -100,7 +100,7 @@ local function countDesigns(towels, srcDesign)
   return getHelper()(srcDesign)
 end
 
---[[ 
+--[[
 705756472327497 - correct
 ]]
 local function day19Part2(inputLines)
@@ -116,14 +116,14 @@ local function day19Part2(inputLines)
   return allPossibleDesigns
 end
 
---[[ 
+--[[
 304 - correct
 ]]
 local function day19Part1(inputLines)
   local day19Input = parseInput(inputLines)
   local patterns = day19Input.patterns
   local designs = day19Input.designs
-  
+
   -- for i, pattern in ipairs(patterns) do
   --   printf("%s%s", pattern, (i == #patterns and "\n") or " ")
   -- end
