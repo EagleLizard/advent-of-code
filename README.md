@@ -7,6 +7,10 @@ This repository contains [Advent of Code](https://adventofcode.com/) solutions b
 
 ## Table of Contents
 
+1. [AoC 2025](#aoc-2025)
+    1. [TypeScript](#aoc-2025-ts)
+        1. [Prerequisites](#aoc-2025-ts-prerequisites)
+        1. [Getting Started](#aoc-2025-ts-getting-started)
 1. [AoC 2024](#aoc-2024)
     1. [Go](#aoc-2024-go)
         1. [Prerequisites](aoc-2024-go-prerequisites)
@@ -35,6 +39,55 @@ This repository contains [Advent of Code](https://adventofcode.com/) solutions b
         1. [Prerequisites](#aoc-2023-cpp-prerequisites)
         1. [Getting Started](#aoc-2023-cpp-getting-started)
         1. [Running the Code](#aoc-2023-cpp-running-the-code)
+
+<a id="aoc-2025"></a>
+# AoC 2025
+
+Advent of code 2025 solutions are in the [`./2025`](./2025/) directory.
+
+Solutions are in **TypeScript**, and others...
+
+<a id="aoc-2025-ts"></a>
+## TypeScript
+
+<a id="aoc-2025-ts-prerequisites"></a>
+### Prerequisites
+
+* NodeJS @ `24.11.1`+
+* TypeScript @ `5.9.3`+
+
+<a id="aoc-2025-ts-getting-started"></a>
+### Getting Started
+
+Get [`nvm`](https://github.com/nvm-sh/nvm).
+
+In the `2025` directory, run:
+
+```sh
+nvm install
+nvm use
+npm i
+```
+
+To run the build, run one of the following:
+
+If `tsc` is installed globally:
+
+```sh
+tsc
+```
+
+If not:
+
+```sh
+npx tsc
+```
+
+I recommend running in watch mode in another terminal:
+
+```sh
+tsc -w
+```
 
 <a id="aoc-2024"></a>
 # AoC 2024
