@@ -19,16 +19,18 @@ const colors = {
   peach_light: rgb(255, 197, 109),
   pink: rgb(247, 173, 209),
   cyan: rgb(142, 250, 253),
+  // coral: rgb(234, 136, 93),
+  coral: rgb(241, 169, 139),
 } as const;
 
 export const cliColors = {
   colors,
 
-  italic,
-  dim,
-  bold,
-  inverse,
-  underline,
+  italic: fmtFn(italic),
+  dim: fmtFn(dim),
+  bold: fmtFn(bold),
+  inverse: fmtFn(inverse),
+  underline: fmtFn(underline),
 } as const;
 
 function rgb(r: number, g: number, b: number): CliFmtFn {

@@ -6,6 +6,7 @@ import { files } from './lib/files';
 
 import { day1_2024 } from './days/day1_2024/day1';
 import { day1 } from './days/day1/day1';
+import { day2 } from './days/day2/day2';
 
 type DayPartFn = {
   (inputLines: string[]): number | string
@@ -31,7 +32,8 @@ const NS_IN_MS = 1e6;
 
 const day_defs: DayTuple[] = [
   [ '24_1', day1_2024.DAY_1_FILE_NAME, day1_2024.day1Pt1 ],
-  [ 1, day1.DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ]
+  [ 1, day1.DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
+  [ 2, day2.DAY_2_FILE_NAME, day2.day2Pt1 ],
 ];
 
 const cli_theme = {
@@ -83,15 +85,20 @@ async function runDay(
   part1Fn?: DayPartFn,
   part2Fn?: DayPartFn
 ) {
+  let inputLines: string[];
   let ptRes: PartRes;
   let totalStart: bigint;
   let totalEnd: bigint;
+  let fileReadStart: bigint;
+  let fileReadEnd: bigint;
 
   let dayBannerText = `~ Day ${day} ~`;
   let dayBanner = t.c1(dayBannerText);
   process.stdout.write(`${dayBanner}\n`);
   totalStart = process.hrtime.bigint();
-  let inputLines: string[] = await files.loadInputLines(inputFileName);
+  fileReadStart = process.hrtime.bigint();
+  inputLines = await files.loadInputLines(inputFileName);
+  fileReadEnd = process.hrtime.bigint();
   if(part1Fn !== undefined) {
     ptRes = runPart(1, inputLines, part1Fn);
     printPart(t, ptRes);
@@ -105,8 +112,9 @@ async function runDay(
   let divWidth = 6;
   let divStr = '-'.repeat(divWidth);
   let totalTxt = t.c1('total');
-  let totalTimeStr = t.c2(`${totalMs} ms`);
-  let totalStr = t.italic(`${totalTxt}: ${totalTimeStr}`);
+  let totalTimeStr = t.c2(`${totalMs.toFixed(3)} ms`);
+  let totalStr = t.italic(`${totalTxt}: ${totalTimeStr} `);
+  let fileReadMs = Number(fileReadEnd - fileReadStart) / NS_IN_MS;;
   process.stdout.write(`${totalStr}\n${divStr}\n`);
 }
 
@@ -131,7 +139,7 @@ function runPart(partNum: number, inputLines: string[], partFn: DayPartFn): Part
 function printPart(t: CliTheme, partRes: PartRes) {
   let partMs = partRes.elapsedNs / NS_IN_MS;
   let solutionStr = t.c3(partRes.solution);
-  let timeStr = t.c2(`${partMs} ms`);
+  let timeStr = t.c2(`${partMs.toFixed(3)} ms`);
   let partTxt = t.c1(`Part ${partRes.partNum}`);
   let partStr = `${partTxt}: ${solutionStr} | ${timeStr}`;
   process.stdout.write(`${partStr}\n`);
