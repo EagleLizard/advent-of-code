@@ -33,7 +33,7 @@ const NS_IN_MS = 1e6;
 const day_defs: DayTuple[] = [
   [ '24_1', day1_2024.DAY_1_FILE_NAME, day1_2024.day1Pt1 ],
   [ 1, day1.DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
-  [ 2, day2.DAY_2_FILE_NAME, day2.day2Pt1 ],
+  [ 2, day2.DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2 ],
 ];
 
 const cli_theme = {
