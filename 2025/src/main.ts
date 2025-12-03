@@ -62,7 +62,7 @@ async function main() {
   let daysToRun: DayTuple[] = [];
   let cliOpts = parseArgv(process.argv);
   let dayArg = cliOpts.day;
-  if(dayArg !== undefined) {
+  if(dayArg !== undefined && dayArg !== '0') {
     let foundDay = day_defs.find((day) => {
       return `${day[0]}` === dayArg;
     });

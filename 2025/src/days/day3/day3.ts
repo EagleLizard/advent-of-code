@@ -21,7 +21,6 @@ function day3Pt2(inputLines: string[]): number {
   let joltageSum = 0;
   for(let i = 0; i < batteryBanks.length; i++) {
     let batteryBank = batteryBanks[i];
-    // console.log('> ' + batteryBank.batteries.join(''));
     let highestJoltage = getHighestJoltageN(batteryBank.batteries, 12);
     joltageSum += highestJoltage;
   }
@@ -36,7 +35,6 @@ function day3Pt1(inputLines: string[]): number {
   let joltageSum: number = 0;
   for(let i = 0; i < batteryBanks.length; i++) {
     let batteryBank = batteryBanks[i];
-    // console.log(batteryBank.batteries.join(''));
     let highestJoltage = getHighestJoltage(batteryBank.batteries);
     joltageSum += highestJoltage;
   }
@@ -60,7 +58,6 @@ function getHighestJoltageN(batteries: number[], nb: number): number {
   let lbi = -1;
   while(nb > 0) {
     let cbi = lbi + 1;
-    // console.log(`${bIdcs.map(idx => batteries[idx]).join(' ')}`);
     /*
       nb - 1 because we want to search the portion of the array for
         the current match, and the remainder of the array after the end
@@ -68,11 +65,7 @@ function getHighestJoltageN(batteries: number[], nb: number): number {
         we find the current match
     _*/
     let endIdx = batteries.length - (nb - 1);
-    // console.log(`searching from ${lbi + 1} to ${endIdx} - ${
-    //   batteries.slice(lbi+1, endIdx).join('')
-    // }`);
     for(let i = lbi + 1; i < endIdx; i++) {
-      // console.log(batteries.slice(i, batteries.length - nb).join(''));
       let battery = batteries[i];
       if(battery > batteries[cbi]) {
         cbi = i;
@@ -86,12 +79,8 @@ function getHighestJoltageN(batteries: number[], nb: number): number {
   for(let i = 0; i < bIdcs.length; i++) {
     let currJolt = batteries[bIdcs[i]];
     let pow = bIdcs.length - i - 1;
-    // console.log(`${currJolt} - pow: ${pow}`);
-    // console.log(currJolt * (10**pow));
     resJoltage += currJolt * (10**pow);
   }
-  // console.log(bIdcs.map((bIdx) => batteries[bIdx]).join(''));
-  // console.log(resJoltage);
   return resJoltage;
 }
 
