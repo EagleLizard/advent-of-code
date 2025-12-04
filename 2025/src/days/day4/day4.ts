@@ -26,7 +26,18 @@ type Day4Input = {
 export const day4 = {
   DAY_4_FILE_NAME,
   day4Pt1: day4Pt1,
+  day4Pt2: day4Pt2,
 } as const;
+
+/*
+  9280 - correct
+_*/
+function day4Pt2(inputLines: string[]): number {
+  let day4Input: Day4Input = parseInput(inputLines);
+  let grid = day4Input.grid;
+  let numMoveable = findMovableRollsMulti(grid);
+  return numMoveable;
+}
 
 /*
   1569 - correct
@@ -39,7 +50,35 @@ function day4Pt1(inputLines: string[]): number {
   return numMovable;
 }
 
-function findMovableRolls(grid: TPGridTile[][]) {
+function findMovableRollsMulti(grid: TPGridTile[][]): number {
+  let rowLen: number;
+  let moveableCount = 0;
+  // let gridCpy: TPGridTile[][] = copyGrid(grid);
+  grid = copyGrid(grid);
+  rowLen = grid[0].length;
+  let currMovable: number = -1;
+  do {
+    currMovable = 0;
+    let toMove: Point[] = [];
+    for(let y = 0; y < grid.length; y++) {
+      for(let x = 0; x < rowLen; x++) {
+        let moveableTp = checkMoveableRoll(grid, x, y);
+        if(moveableTp) {
+          currMovable++;
+          toMove.push(new Point(x, y));
+        }
+      }
+    }
+    for(let i = 0; i < toMove.length; i++) {
+      let pt = toMove[i];
+      grid[pt.y][pt.x] = tp_grid_tile_map['x'];
+    }
+    moveableCount += currMovable;
+  } while(currMovable > 0);
+  return moveableCount;
+}
+
+function findMovableRolls(grid: TPGridTile[][]): number {
   let rowLen: number;
   let moveableCount = 0;
   // let gridCpy: TPGridTile[][] = copyGrid(grid);
