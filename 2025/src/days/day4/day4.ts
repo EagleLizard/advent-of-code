@@ -53,7 +53,6 @@ function day4Pt1(inputLines: string[]): number {
 function findMovableRollsMulti(grid: TPGridTile[][]): number {
   let rowLen: number;
   let moveableCount = 0;
-  // let gridCpy: TPGridTile[][] = copyGrid(grid);
   grid = copyGrid(grid);
   rowLen = grid[0].length;
   let currMovable: number = -1;
@@ -81,7 +80,6 @@ function findMovableRollsMulti(grid: TPGridTile[][]): number {
 function findMovableRolls(grid: TPGridTile[][]): number {
   let rowLen: number;
   let moveableCount = 0;
-  // let gridCpy: TPGridTile[][] = copyGrid(grid);
   grid = copyGrid(grid);
   rowLen = grid[0].length;
   for(let y = 0; y < grid.length; y++) {
@@ -91,13 +89,8 @@ function findMovableRolls(grid: TPGridTile[][]): number {
       if(moveableTp) {
         moveableCount++;
       }
-      // if(moveableTp) {
-      //   gridCpy[y][x] = tp_grid_tile_map['x'];
-      // }
     }
   }
-  // console.log('');
-  // printGrid(gridCpy);
   return moveableCount;
 }
 function checkMoveableRoll(grid: TPGridTile[][], x: number, y: number): boolean {
@@ -108,12 +101,7 @@ function checkMoveableRoll(grid: TPGridTile[][], x: number, y: number): boolean 
   }
   gridLen = grid.length;
   rowLen = grid[0].length;
-  let adjPts: Point[] = getAdjCoords(x, y).filter(adjPt => {
-    return (
-      (adjPt.x >= 0 && adjPt.x < rowLen)
-      && (adjPt.y >= 0 && adjPt.y < gridLen)
-    );
-  });
+  let adjPts = getAdjCoords(x, y);
   // dbgLog(`${x}, ${y}`);
   // dbgLog(
   //   adjPts.map(pt => `[${pt.x}, ${pt.y}]`).join(', ')
@@ -121,7 +109,11 @@ function checkMoveableRoll(grid: TPGridTile[][], x: number, y: number): boolean 
   let adjRolls = 0;
   for(let i = 0; i < adjPts.length; i++) {
     let adjPt = adjPts[i];
-    if(grid[adjPt.y][adjPt.x] === tp_grid_tile_map['@']) {
+    if(
+      (adjPt.x >= 0 && adjPt.x < rowLen)
+      && (adjPt.y >= 0 && adjPt.y < gridLen)
+      && (grid[adjPt.y][adjPt.x] === tp_grid_tile_map['@'])
+    ) {
       adjRolls++;
     }
     if(adjRolls > 3) {
@@ -135,8 +127,7 @@ function getAdjCoords(x: number, y: number): Point[] {
   let pts: Point[] = [];
   for(let iy = y - 1; iy <= y + 1; iy++) {
     for(let ix = x - 1; ix <= x + 1; ix++) {
-      // if(ix === x && iy === y) continue;
-      if(!(ix === x && iy === y)) {
+      if(ix !== x || iy !== y) {
         pts.push(new Point(ix, iy));
       }
     }
