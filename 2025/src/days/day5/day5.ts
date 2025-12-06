@@ -1,5 +1,5 @@
 
-import { AocDay } from '../../models/aoc-day';
+import { AocDayDef } from '../../models/aoc-day-def';
 
 type FreshRange = [number, number] & {};
 type Day5Input = {
@@ -15,7 +15,7 @@ export const day5 = {
   file_name: file_name,
   part1: day5Pt1,
   part2: day5Pt2,
-} as const satisfies AocDay;
+} as const satisfies AocDayDef;
 
 /*
   341753674214273 - correct
