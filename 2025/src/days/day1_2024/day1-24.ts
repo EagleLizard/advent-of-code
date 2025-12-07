@@ -1,3 +1,4 @@
+import { AocDayDef } from '../../models/aoc-day-def';
 
 type Day1_2024Input = {
   list1: number[];
@@ -7,10 +8,11 @@ type Day1_2024Input = {
 // const DAY_1_FILE_NAME = 'day1_test1-2024.txt';
 const DAY_1_FILE_NAME = 'day1-2024.txt';
 
-export const day1_2024 = {
-  DAY_1_FILE_NAME,
-  day1Pt1,
-} as const;
+export const day1_24 = {
+  dayNum: '24_1',
+  file_name: DAY_1_FILE_NAME,
+  part1: day1Pt1,
+} as const satisfies AocDayDef;
 
 function day1Pt1(inputLines: string[]) {
   let day1Input: Day1_2024Input = parseInput(inputLines);

@@ -12,6 +12,7 @@ type Day5Input = {
 const file_name = 'day5.txt';
 
 export const day5 = {
+  dayNum: 5,
   file_name: file_name,
   part1: day5Pt1,
   part2: day5Pt2,

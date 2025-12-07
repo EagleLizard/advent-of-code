@@ -1,4 +1,6 @@
 
+import { AocDayDef } from '../../models/aoc-day-def';
+
 type BatteryBank = {
   batteries: number[];
 } & {};
@@ -7,11 +9,12 @@ type BatteryBank = {
 const DAY_3_FILE_NAME = 'day3.txt';
 
 export const day3 = {
-  DAY_3_FILE_NAME,
+  dayNum: 3,
+  file_name: DAY_3_FILE_NAME,
 
-  day3pt1: day3Pt1,
-  day3pt2: day3Pt2,
-} as const;
+  part1: day3Pt1,
+  part2: day3Pt2,
+} as const satisfies AocDayDef;
 
 /*
   175659236361660 - correct

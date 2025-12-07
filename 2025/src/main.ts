@@ -4,7 +4,7 @@ import 'source-map-support/register';
 import { cliColors, CliFmtFn } from './util/cli-colors';
 import { files } from './lib/files';
 
-import { day1_2024 } from './days/day1_2024/day1';
+import { day1_24 } from './days/day1_2024/day1-24';
 import { day1 } from './days/day1/day1';
 import { day2 } from './days/day2/day2';
 import { day3 } from './days/day3/day3';
@@ -35,11 +35,11 @@ type PartRes = {
 const NS_IN_MS = 1e6;
 
 const day_defs: DayTuple[] = [
-  [ '24_1', day1_2024.DAY_1_FILE_NAME, day1_2024.day1Pt1 ],
-  [ 1, day1.DAY_1_FILE_NAME, day1.day1Pt1, day1.day1Pt2 ],
-  [ 2, day2.DAY_2_FILE_NAME, day2.day2Pt1, day2.day2Pt2 ],
-  [ 3, day3.DAY_3_FILE_NAME, day3.day3pt1, day3.day3pt2 ],
-  [ 4, day4.DAY_4_FILE_NAME, day4.day4Pt1, day4.day4Pt2 ],
+  [ '24_1', day1_24.file_name, day1_24.part1 ],
+  [ 1, day1.file_name, day1.part1, day1.part2 ],
+  [ 2, day2.file_name, day2.part1, day2.part2 ],
+  [ 3, day3.file_name, day3.part1, day3.part2 ],
+  [ 4, day4.file_name, day4.part1, day4.part2 ],
   [ 5, day5.file_name, day5.part1, day5.part2 ],
   [ 6, day6.file_name, day6.part1, day6.part2 ],
 ];

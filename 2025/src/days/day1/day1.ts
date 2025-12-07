@@ -1,3 +1,4 @@
+import { AocDayDef } from '../../models/aoc-day-def';
 
 type DialInst = {
   dir: 'L' | 'R';
@@ -8,10 +9,11 @@ type DialInst = {
 const DAY_1_FILE_NAME = 'day1.txt';
 
 export const day1 = {
-  DAY_1_FILE_NAME,
-  day1Pt1,
-  day1Pt2,
-} as const;
+  dayNum: 1,
+  file_name: DAY_1_FILE_NAME,
+  part1: day1Pt1,
+  part2: day1Pt2,
+} as const satisfies AocDayDef;
 
 class SafeDial {
   private _dialPos = 50;

@@ -1,5 +1,7 @@
+
 import { aocConfig } from '../../lib/config';
 import { Point } from '../../lib/geom/point';
+import { AocDayDef } from '../../models/aoc-day-def';
 
 // const DAY_4_FILE_NAME = 'day4-test1.txt';
 const DAY_4_FILE_NAME = 'day4.txt';
@@ -24,10 +26,11 @@ type Day4Input = {
 } & {};
 
 export const day4 = {
-  DAY_4_FILE_NAME,
-  day4Pt1: day4Pt1,
-  day4Pt2: day4Pt2,
-} as const;
+  dayNum: 4,
+  file_name: DAY_4_FILE_NAME,
+  part1: day4Pt1,
+  part2: day4Pt2,
+} as const satisfies AocDayDef;
 
 /*
   9280 - correct

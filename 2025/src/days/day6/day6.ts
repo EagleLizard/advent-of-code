@@ -10,6 +10,7 @@ type Worksheet = {
 const file_name = 'day6.txt';
 
 export const day6 = {
+  dayNum: 6,
   file_name,
   part1: day6Pt1,
   part2: day6Pt2,

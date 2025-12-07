@@ -1,4 +1,6 @@
 
+import { AocDayDef } from '../../models/aoc-day-def';
+
 type Day2Input = {
   idRanges: [ start: number, end: number ][];
 } & {};
@@ -7,10 +9,11 @@ type Day2Input = {
 const DAY_2_FILE_NAME = 'day2.txt';
 
 export const day2 = {
-  DAY_2_FILE_NAME: DAY_2_FILE_NAME,
-  day2Pt1: day2Pt1,
-  day2Pt2: day2Pt2,
-} as const;
+  dayNum: 2,
+  file_name: DAY_2_FILE_NAME,
+  part1: day2Pt1,
+  part2: day2Pt2,
+} as const satisfies AocDayDef;
 
 /*
   85513235135 - correct
