@@ -1,5 +1,6 @@
 
 import { aocConfig } from '../../lib/config';
+import { gridUtil } from '../../lib/geom/grid-util';
 import { Point } from '../../lib/geom/point';
 import { AocDayDef } from '../../models/aoc-day-def';
 
@@ -56,7 +57,7 @@ function day4Pt1(inputLines: string[]): number {
 function findMovableRollsMulti(grid: TPGridTile[][]): number {
   let rowLen: number;
   let moveableCount = 0;
-  grid = copyGrid(grid);
+  grid = gridUtil.copy(grid);
   rowLen = grid[0].length;
   let currMovable: number = -1;
   do {
@@ -83,7 +84,7 @@ function findMovableRollsMulti(grid: TPGridTile[][]): number {
 function findMovableRolls(grid: TPGridTile[][]): number {
   let rowLen: number;
   let moveableCount = 0;
-  grid = copyGrid(grid);
+  grid = gridUtil.copy(grid);
   rowLen = grid[0].length;
   for(let y = 0; y < grid.length; y++) {
     for(let x = 0; x < rowLen; x++) {
@@ -136,19 +137,6 @@ function getAdjCoords(x: number, y: number): Point[] {
     }
   }
   return pts;
-}
-
-function copyGrid<T>(srcGrid: T[][]): T[][] {
-  let gridCpy: T[][] = [];
-  let rowLen = srcGrid[0].length;
-  for(let y = 0; y < srcGrid.length; y++) {
-    let row = [];
-    for(let x = 0; x < rowLen; x++) {
-      row.push(srcGrid[y][x]);
-    }
-    gridCpy.push(row);
-  }
-  return gridCpy;
 }
 
 function dbgLog(message?: unknown, ...optionalParams: unknown[]) {

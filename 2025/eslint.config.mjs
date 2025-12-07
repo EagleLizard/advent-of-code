@@ -51,6 +51,7 @@ const config = [
         allowTemplateLiterals: 'avoidEscape',
       }],
       /* TS */
+      // 'no-fallthrough': [ 'off' ],
       'prefer-const': [ 'off' ],
       'no-unused-vars': [ 'off' ],
       '@typescript-eslint/no-this-alias': [ 'warn' ],
