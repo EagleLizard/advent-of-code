@@ -1,5 +1,4 @@
 
-import { Queue } from '../../lib/datastruct/queue';
 import { gridUtil } from '../../lib/geom/grid-util';
 import { Point } from '../../lib/geom/point';
 import { AocDayDef } from '../../models/aoc-day-def';
@@ -9,8 +8,8 @@ type Day7Input = {
   startPos: Point;
 } & {};
 
-const DAY_7_FILE_NAME = 'day7-test1.txt';
-// const DAY_7_FILE_NAME = 'day7.txt';
+// const DAY_7_FILE_NAME = 'day7-test1.txt';
+const DAY_7_FILE_NAME = 'day7.txt';
 
 const tile_enum = {
   empty: 0,
@@ -54,68 +53,47 @@ function day7Pt1(inputLines: string[]): number {
   return numSplits;
 }
 
+/*
+  17921968177009 - correct
+_*/
 function day7Pt2(inputLines: string[]): number {
   let day7Input: Day7Input = parseInput(inputLines);
   let grid = day7Input.grid;
   let sPos = day7Input.startPos;
-  let timelineCount = traverseTimelines(grid, sPos);
+  let timelineCount = traverseTimelines2(grid, sPos);
   return timelineCount;
 }
 
-function traverseTimelines(grid: TachyonGridTile[][], sPos: Point): number {
+function traverseTimelines2(grid: TachyonGridTile[][], sPos: Point): number {
   /*
-    Create queue with starting beam S
-    1. advance down the y-axis until:
-      1.1. a splitter at Y is encountered
-      1.2. the end is encountered
-    2. When a splitter is encountered, push 2 new beams onto the queue
-      2.1. Stop advancing the current beam (move to next queue iteration)
-    3. When the end is encountered, increment the timeline count by 1
+    keep track of a row of integers representing how many beams
+      are in a particular X position.
+    If a splitter is encountered, set the adjacent cols to the
+      number of beams in the col that split, and set the col that
+      split to 0
   _*/
-  let queue = new Queue<{
-    beam: Point;
-    soFar: Point[];
-  }>();
-  let timelineCount = 0;
-  queue.push({
-    beam: Point.copy(sPos),
-    soFar: [],
-  });
-  while(!queue.isEmpty()) {
-    let currItem = queue.pop_front()!;
-    let currPt = currItem.beam;
-    let soFar = currItem.soFar;
-    let bx = currPt.x;
-    let y: number;
-    for(y = currPt.y + 1; y < grid.length; y++) {
-      if(grid[y][bx] === tachyon_grid_tile_map['^']) {
-        queue.push({
-          beam: new Point(bx - 1, y),
-          soFar: soFar.slice(),
-        });
-        queue.push({
-          beam: new Point(bx + 1, y),
-          soFar: soFar.slice(),
-        });
-        break;
-      } else {
-        soFar.push(new Point(bx, y));
-      }
+  let beams: number[] = [];
+  for(let x = 0; x < grid[sPos.y].length; x++) {
+    if(x === sPos.x) {
+      beams.push(1);
+    } else {
+      beams.push(0);
     }
-    if(y >= grid.length) {
-      timelineCount++;
-      if(true || timelineCount % 1e6 === 0) {
-        console.log(timelineCount);
-        let gridCpy = gridUtil.copy(grid);
-        for(let i = 0; i < soFar.length; i++) {
-          let currSf = soFar[i];
-          gridCpy[currSf.y][currSf.x] = tachyon_grid_tile_map['|'];
-        }
-        printGrid(gridCpy, true);
+  }
+  for(let y = sPos.y + 1; y < grid.length; y++) {
+    for(let x = 0; x < grid[y].length; x++) {
+      if(grid[y][x] === tachyon_grid_tile_map['^']) {
+        beams[x - 1] += beams[x];
+        beams[x + 1] += beams[x];
+        beams[x] = 0;
       }
     }
   }
-  return timelineCount;
+  let beamSum = 0;
+  for(let i = 0; i < beams.length; i++) {
+    beamSum += beams[i];
+  }
+  return beamSum;
 }
 
 function shootBeam(grid: TachyonGridTile[][], sPos: Point): number {
