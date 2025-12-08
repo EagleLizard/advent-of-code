@@ -55,15 +55,32 @@ export class Queue<T> {
     if(this.head === undefined || this.tail === undefined) {
       return undefined;
     }
-    if(this.head === this.tail) {
-      node = this.head;
-      this.head = this.tail = undefined;
+    if(this.tail === this.head) {
+      node = this.tail;
+      this.tail = this.head = undefined;
       // return node.val;
     } else {
       node = this.tail;
       assert(this.tail.prev !== undefined);
       this.tail = this.tail.prev;
       this.tail.next = undefined;
+    }
+    this._size--;
+    return node.val;
+  }
+  pop_front(): T | undefined {
+    let node: QueueNode<T>;
+    if(this.head === undefined || this.tail === undefined) {
+      return undefined;
+    }
+    if(this.head === this.tail){
+      node = this.head;
+      this.head = this.tail = undefined;
+    } else {
+      node = this.head;
+      assert(this.head.next !== undefined);
+      this.head = this.head.next;
+      this.head.prev = undefined;
     }
     this._size--;
     return node.val;

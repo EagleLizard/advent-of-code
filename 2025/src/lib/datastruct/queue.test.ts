@@ -47,6 +47,20 @@ suite('queue tests', () => {
     assert.equal(items.join(''), testStr);
   });
 
+  test('items added with push() return reversed with pop_front()', () => {
+    let queue = new Queue<string>();
+    const testStr = 'reverse me!';
+    const expectedStr = testStr.split('').toReversed().join('');
+    for(let i = 0; i < testStr.length; i++) {
+      queue.push(testStr[i]);
+    }
+    let revChars: string[] = [];
+    while(!queue.isEmpty()) {
+      revChars.push(queue.pop_front()!);
+    }
+    assert.equal(revChars.join(''), expectedStr);
+  });
+
   // test('queue Iterator has correct elements', () => {
   //   let queue = new Queue();
   //   let testVals = [ 5, 4, 3, 2, 1 ];
