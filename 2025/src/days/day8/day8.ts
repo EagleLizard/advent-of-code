@@ -101,10 +101,11 @@ export const day8 = {
   dayNum: 8,
   file_name: DAY_8_FILE_NAME,
   part1: day8Pt1,
+  part2: day8Pt2
 } as const satisfies AocDayDef;
 
 function day8Pt2(inputLines: string[]): number {
-
+  return -1;
 }
 
 /*
