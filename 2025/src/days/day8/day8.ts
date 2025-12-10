@@ -6,7 +6,7 @@ import { AocDayDef } from '../../models/aoc-day-def';
 const DAY_8_FILE_NAME = 'day8.txt';
 
 // const distance_pair_lim = 10; // for test input
-const distance_pair_lim = 1000; // for part1 input
+// const distance_pair_lim = 1000; // for part1 input
 
 class JunctionBox {
   public readonly id: number;
@@ -103,20 +103,128 @@ export const day8 = {
   part1: day8Pt1,
 } as const satisfies AocDayDef;
 
+function day8Pt2(inputLines: string[]): number {
+
+}
+
 /*
   131580 - correct
 _*/
 function day8Pt1(inputLines: string[]): number {
   let boxes: JunctionBox[] = parseInput(inputLines);
+  const distance_pair_lim = (boxes.length > 100)
+    ? 1000 // for part1 input
+    : 10 // for test input
+  ;
   /*
   Calculate ALL relative distances in 3d
     sort by lowest
   _*/
+  let res = connectLargestCircuits2(boxes, distance_pair_lim);
+  return res;
+}
+
+function connectLargestCircuits2(boxes: JunctionBox[], connectLimit: number): number {
+  let res: number;
+  let adjMatrix: Record<number, Set<number>> = {};
+  let circuits: Set<number>[] = [];
+  /* initialize circuits _*/
+  for(let i = 0; i < boxes.length; i++) {
+    let circuit = new Set<number>();
+    let box = boxes[i];
+    circuit.add(box.id);
+    circuits.push(circuit);
+    adjMatrix[box.id] = new Set();
+  }
+  let distances = findDistances(boxes).toSorted((a,b) => a.relDist - b.relDist);
+  for(let i = 0; i < connectLimit; i++) {
+    let currDist = distances[i];
+    let box1 = currDist.box1;
+    let box2 = currDist.box2;
+    let isDirectConnection = isConnected(adjMatrix, box1, box2);
+    if(!isDirectConnection) {
+      let inCircuit = checkInCircuit(circuits, box1, box2);
+      if(!inCircuit) {
+        connectBoxes(circuits, adjMatrix, box1, box2);
+      }
+    }
+  }
+  let circuitArrs: number[][] = [];
+  for(let i = 0; i < circuits.length; i++) {
+    let circuit = circuits[i];
+    let circuitArr: number[] = [ ...circuit ];
+    circuitArrs.push(circuitArr);
+  }
+  circuitArrs.sort((a, b) => b.length - a.length);
+  // console.log(circuitArrs);
+  res = circuitArrs[0].length * circuitArrs[1].length * circuitArrs[2].length;
+  return res;
+}
+
+function connectBoxes(
+  circuits: Set<number>[],
+  adjMatrix: Record<number, Set<number>>,
+  box1: JunctionBox,
+  box2: JunctionBox
+): void {
+  adjMatrix[box1.id].add(box2.id);
+  adjMatrix[box2.id].add(box1.id);
+  let circuit1Idx = circuits.findIndex((circuit) => {
+    return circuit.has(box1.id);
+  });
+  if(circuit1Idx === -1) {
+    /* shouldn't happen _*/
+    throw new Error(`Box ${box1.id} not in circuit: ${box1.pos.x},${box1.pos.y},${box1.pos.z}`);
+  }
+  let circuit2Idx = circuits.findIndex((circuit) => {
+    return circuit.has(box2.id);
+  });
+  if(circuit2Idx === -1) {
+    /* shouldn't happen _*/
+    throw new Error(`Box ${box2.id} not in circuit: ${box2.pos.x},${box2.pos.y},${box2.pos.z}`);
+  }
+  let circuit1 = circuits[circuit1Idx];
+  let circuit2 = circuits[circuit2Idx];
+  if(circuit1Idx !== circuit2Idx) {
+    /* merge circuits _*/
+    let circuit2BoxIds = [ ...circuit2 ];
+    for(let i = 0; i < circuit2BoxIds.length; i++) {
+      let circuit2BoxId = circuit2BoxIds[i];
+      circuit1.add(circuit2BoxId);
+    }
+    circuits.splice(circuit2Idx, 1);
+  }
+}
+
+function checkInCircuit(circuits: Set<number>[], box1: JunctionBox, box2: JunctionBox): boolean {
+  let circuit1 = circuits.find((circuit) => {
+    return circuit.has(box1.id);
+  });
+  if(circuit1 === undefined) {
+    /* shouldn't happen _*/
+    throw new Error(`Box ${box1.id} not in circuit: ${box1.pos.x},${box1.pos.y},${box1.pos.z}`);
+  }
+  return circuit1.has(box2.id);
+}
+
+function isConnected(
+  adjMatrix: Record<number, Set<number>>,
+  box1: JunctionBox,
+  box2: JunctionBox
+): boolean {
+  return adjMatrix[box1.id].has(box2.id) || adjMatrix[box2.id].has(box1.id);
+}
+
+function connectLargestCircuits(boxes: JunctionBox[], connectLimit: number): number {
   let graph: CircuitGraph = new CircuitGraph(boxes);
+  let distStartNs = process.hrtime.bigint();
   let distances = findDistances(boxes);
+  let distEndNs = process.hrtime.bigint();
+  let distMs: number = Number(distEndNs - distStartNs) / 1e6;
+  console.log(`distance ms: ${distMs}`);
   distances.sort((a, b) => a.relDist - b.relDist);
   for(let i = 0; i < distances.length; i++) {
-    if(i > (distance_pair_lim - 1)) {
+    if(i > (connectLimit - 1)) {
       break;
     }
     let currDist = distances[i];
