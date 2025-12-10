@@ -12,6 +12,7 @@ import { day4 } from './days/day4/day4';
 import { day5 } from './days/day5/day5';
 import { day6 } from './days/day6/day6';
 import { day7 } from './days/day7/day7';
+import { day8 } from './days/day8/day8';
 
 type DayPartFn = {
   (inputLines: string[]): number | string
@@ -44,6 +45,7 @@ const day_defs: DayTuple[] = [
   [ 5, day5.file_name, day5.part1, day5.part2 ],
   [ 6, day6.file_name, day6.part1, day6.part2 ],
   [ 7, day7.file_name, day7.part1, day7.part2 ],
+  [ 8, day8.file_name, day8.part1, ],
 ];
 
 const cli_theme = {
