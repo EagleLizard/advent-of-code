@@ -8,6 +8,11 @@ const DAY_8_FILE_NAME = 'day8.txt';
 // const distance_pair_lim = 10; // for test input
 // const distance_pair_lim = 1000; // for part1 input
 
+type CircuitInit = {
+  circuits: Set<number>[],
+  adjMatrix: Record<number, Set<number>>,
+} & {};
+
 class JunctionBox {
   public readonly id: number;
   pos: Point3d;
@@ -25,10 +30,6 @@ export const day8 = {
   part2: day8Pt2
 } as const satisfies AocDayDef;
 
-function day8Pt2(inputLines: string[]): number {
-  return -1;
-}
-
 /*
   131580 - correct
 _*/
@@ -43,6 +44,59 @@ function day8Pt1(inputLines: string[]): number {
     sort by lowest
   _*/
   let res = connectLargestCircuits2(boxes, distance_pair_lim);
+  return res;
+}
+
+/*
+  6844224 - correct
+_*/
+function day8Pt2(inputLines: string[]): number {
+  let boxes: JunctionBox[] = parseInput(inputLines);
+  let res = connectLargestCircuits3(boxes);
+  return res;
+}
+
+function connectLargestCircuits3(boxes: JunctionBox[]): number {
+  let circuitInit: CircuitInit = initCircuits(boxes);
+  let adjMatrix: Record<number, Set<number>> = circuitInit.adjMatrix;
+  let circuits: Set<number>[] = circuitInit.circuits;
+  let distances = findDistances(boxes).toSorted((a,b) => a.relDist - b.relDist);
+  for(let i = 0; i < distances.length; i++) {
+    let currDist = distances[i];
+    let box1 = currDist.box1;
+    let box2 = currDist.box2;
+    // console.log(adjMatrix);
+    let isDirectConnection = isConnected(adjMatrix, box1, box2);
+    if(!isDirectConnection) {
+      let inCircuit = checkInCircuit(circuits, box1, box2);
+      if(!inCircuit) {
+        connectBoxes(circuits, adjMatrix, box1, box2);
+        if(circuits.length === 1) {
+          // console.log(box1);
+          // console.log(box2);
+          return box1.pos.x * box2.pos.x;
+        }
+      }
+    }
+    // console.log(`${i} - circuits.length: ${circuits.length}`);
+  }
+  return -1;
+}
+function initCircuits(boxes: JunctionBox[]): CircuitInit {
+  let res: CircuitInit;
+  let adjMatrix: Record<number, Set<number>> = {};
+  let circuits: Set<number>[] = [];
+  for(let i = 0; i < boxes.length; i++) {
+    let circuit = new Set<number>();
+    let box = boxes[i];
+    circuit.add(box.id);
+    circuits.push(circuit);
+    adjMatrix[box.id] = new Set();
+  }
+  res = {
+    adjMatrix: adjMatrix,
+    circuits: circuits,
+  };
   return res;
 }
 
@@ -134,7 +188,13 @@ function isConnected(
   box1: JunctionBox,
   box2: JunctionBox
 ): boolean {
-  return adjMatrix[box1.id].has(box2.id) || adjMatrix[box2.id].has(box1.id);
+  try {
+    return adjMatrix[box1.id].has(box2.id) || adjMatrix[box2.id].has(box1.id);
+  } catch(e) {
+    console.error(`box1.id: ${box1.id}`);
+    console.error(`box2.id: ${box2.id}`);
+    throw e;
+  }
 }
 
 type DistancePair = {
