@@ -46,8 +46,8 @@ const day_defs: DayTuple[] = [
   [ 5, day5.file_name, day5.part1, day5.part2 ],
   [ 6, day6.file_name, day6.part1, day6.part2 ],
   [ 7, day7.file_name, day7.part1, day7.part2 ],
-  [ 8, day8.file_name, day8.part1, ],
-  [ 9, day9.file_name, day9.part1, ],
+  [ 8, day8.file_name, day8.part1, day8.part2 ],
+  [ 9, day9.file_name, day9.part1, day9.part2 ],
 ];
 
 const cli_theme = {

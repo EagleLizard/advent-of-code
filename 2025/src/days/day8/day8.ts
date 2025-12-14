@@ -11,90 +11,11 @@ const DAY_8_FILE_NAME = 'day8.txt';
 class JunctionBox {
   public readonly id: number;
   pos: Point3d;
-  // connections: JunctionBox[];
   constructor(x: number, y: number, z: number) {
     this.id = JunctionBox.id_counter++;
     this.pos = new Point3d(x, y, z);
-    // this.connections = [];
   }
   private static id_counter = 0;
-}
-
-class CircuitGraph {
-  /* edges */
-  nodes: JunctionBox[];
-  connections: [ JunctionBox['id'], JunctionBox['id'] ][];
-  /* adjacency matrix */
-  adjMatrix: Record<JunctionBox['id'], Set<JunctionBox['id']>>;
-  constructor(nodes: JunctionBox[]) {
-    this.nodes = nodes.slice();
-    this.connections = [];
-    this.adjMatrix = {};
-    for(let i = 0; i < this.nodes.length; i++) {
-      let node = this.nodes[i];
-      this.adjMatrix[node.id] = new Set();
-    }
-  }
-  connect(box1: JunctionBox, box2: JunctionBox) {
-    this.adjMatrix[box1.id].add(box2.id);
-    this.adjMatrix[box2.id].add(box1.id);
-  }
-  isConnected(box1: JunctionBox, box2: JunctionBox): boolean {
-    return this.adjMatrix[box1.id].has(box2.id)
-    || this.adjMatrix[box2.id].has(box1.id);
-  }
-  getCircuits(): number[][] {
-    let circuits: number[][] = [];
-    for(let i = 0; i < this.nodes.length; i++) {
-      let node = this.nodes[i];
-      let foundCircuit: number[] | undefined = circuits.find(circuit => {
-        return circuit.includes(node.id);
-      });
-      if(foundCircuit === undefined)  {
-        let currCircuit = this.getCircuit(node);
-        circuits.push([ ...currCircuit ]);
-      }
-    }
-    return circuits;
-  }
-  getCircuit(box: JunctionBox) {
-    let visited: Set<number> = new Set();
-    let toVisit: number[] = [ box.id ];
-    while(toVisit.length > 0) {
-      let currId = toVisit.shift()!;
-      if(visited.has(currId)) {
-        /* cycle, continue */
-        continue;
-      }
-      visited.add(currId);
-      let connectedIds = [ ...this.adjMatrix[currId] ];
-      for(let i = 0; i < connectedIds.length; i++) {
-        toVisit.push(connectedIds[i]);
-      }
-    }
-    return visited;
-  }
-  isInCircuit(box1: JunctionBox, box2: JunctionBox): boolean {
-    let visited: Set<number> = new Set();
-    let toVisit: number[] = [ box1.id ];
-    while(toVisit.length > 0) {
-      let currId = toVisit.shift()!;
-      if(visited.has(currId)) {
-        /* cycle, continue */
-        continue;
-      }
-      visited.add(currId);
-      if(currId === box2.id) {
-        return true;
-      }
-      let connectedIds = [ ...this.adjMatrix[currId] ];
-      for(let i = 0; i < connectedIds.length; i++) {
-        let connectedId = connectedIds[i];
-        toVisit.push(connectedId);
-      }
-    }
-    return false;
-  }
 }
 
 export const day8 = {
@@ -214,34 +135,6 @@ function isConnected(
   box2: JunctionBox
 ): boolean {
   return adjMatrix[box1.id].has(box2.id) || adjMatrix[box2.id].has(box1.id);
-}
-
-function connectLargestCircuits(boxes: JunctionBox[], connectLimit: number): number {
-  let graph: CircuitGraph = new CircuitGraph(boxes);
-  let distStartNs = process.hrtime.bigint();
-  let distances = findDistances(boxes);
-  let distEndNs = process.hrtime.bigint();
-  let distMs: number = Number(distEndNs - distStartNs) / 1e6;
-  console.log(`distance ms: ${distMs}`);
-  distances.sort((a, b) => a.relDist - b.relDist);
-  for(let i = 0; i < distances.length; i++) {
-    if(i > (connectLimit - 1)) {
-      break;
-    }
-    let currDist = distances[i];
-    let box1 = currDist.box1;
-    let box2 = currDist.box2;
-    let isDirectConnection = graph.isConnected(box1, box2);
-    let isInCircuit = graph.isInCircuit(box1, box2);
-    if(!isDirectConnection) {
-      if(!isInCircuit) {
-        graph.connect(box1, box2);
-      }
-    }
-  }
-  let circuits = graph.getCircuits().toSorted((a,b) => b.length - a.length);
-  let res = circuits[0].length * circuits[1].length * circuits[2].length;
-  return res;
 }
 
 type DistancePair = {
